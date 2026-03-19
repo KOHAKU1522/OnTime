@@ -5,9 +5,15 @@ import styles from "./LoginPage.module.css";
 import { useNavigate } from "react-router-dom";
 
 import { auth } from "../firebase";
-import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { sendEmailVerification } from "firebase/auth";
+import {
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithRedirect,
+    getRedirectResult,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+} from "firebase/auth";
 
 export default function LoginPage() {
 
@@ -29,9 +35,18 @@ export default function LoginPage() {
     // }, [errorMessage]);
 
     useEffect(() => {
-        if (auth.currentUser) {
-            navigate("/home");
-        }
+        // 認証状態を監視（リダイレクト後の復元も検知する）
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) navigate("/home");
+        });
+
+        // リダイレクトエラーのみハンドリング
+        getRedirectResult(auth).catch((error) => {
+            console.error(error);
+            setErrorMessage("Googleログインに失敗しました");
+        });
+
+        return () => unsubscribe();
     }, []);
 
     const handleLogin = async () => {
@@ -57,13 +72,24 @@ export default function LoginPage() {
     };
 
     const handleGoogleLogin = async () => {
+        const provider = new GoogleAuthProvider();
         try {
-            const provider = new GoogleAuthProvider();
             await signInWithPopup(auth, provider);
-            console.log("Googleログイン成功");
-            navigate("/home");
         } catch (error) {
-            console.error(error);
+            if (
+                error.code === "auth/popup-blocked" ||
+                error.code === "auth/popup-cancelled-by-user"
+            ) {
+                // ポップアップがブロックされた場合はリダイレクト方式にフォールバック
+                try {
+                    await signInWithRedirect(auth, provider);
+                } catch (e) {
+                    setErrorMessage(e.code || "Googleログインに失敗しました");
+                }
+            } else {
+                // エラーコードをそのまま表示して原因を特定できるようにする
+                setErrorMessage(error.code || "Googleログインに失敗しました");
+            }
         }
     };
 
