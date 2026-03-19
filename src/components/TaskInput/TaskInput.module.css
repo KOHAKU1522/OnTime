@@ -105,6 +105,9 @@
 
 /* ===== 選択中の日付表示 ===== */
 .selectedDate {
+    display: flex;
+    align-items: center;
+    gap: 5px;
     font-size: 0.82rem;
     color: var(--brand);
     font-weight: 500;

@@ -105,6 +105,11 @@
   box-sizing: border-box;
 }
 
+/* iOSのinputタップ時の自動ズームを防ぐ */
+input, textarea, select {
+  font-size: max(16px, 1em);
+}
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;

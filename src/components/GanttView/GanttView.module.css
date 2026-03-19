@@ -86,6 +86,103 @@
     line-height: 1;
 }
 
+/* ===== タスク詳細ポップアップ ===== */
+.popupOverlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 400;
+    display: flex;
+    align-items: flex-end;
+    animation: popupFadeIn 0.2s ease;
+}
+
+@keyframes popupFadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.popupSheet {
+    width: 100%;
+    background: var(--bg-card);
+    border-radius: 20px 20px 0 0;
+    padding: 0 20px 20px;
+    animation: popupSlideUp 0.25s ease;
+}
+
+@keyframes popupSlideUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+}
+
+.popupHandle {
+    width: 36px;
+    height: 4px;
+    border-radius: 99px;
+    background: var(--border);
+    margin: 12px auto 16px;
+}
+
+.popupTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.popupStar {
+    color: #f59e0b;
+    font-size: 0.95rem;
+}
+
+.popupRow {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin-bottom: 10px;
+}
+
+.popupLabel {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    min-width: 36px;
+    padding-top: 1px;
+}
+
+.popupValue {
+    font-size: 0.88rem;
+    color: var(--text-primary);
+    flex: 1;
+    white-space: pre-wrap;
+    word-break: break-word;
+}
+
+.popupTags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+
+.popupClose {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    background: var(--bg-card-alt);
+    border: none;
+    border-radius: 12px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
 .actionRow {
     display: flex;
     gap: 4px;

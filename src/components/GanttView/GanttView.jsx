@@ -1,10 +1,12 @@
 import styles from "./GanttView.module.css";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { auth, db } from "../../firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
+import TagChip from "../TagChip/TagChip";
 
 export default function GanttView({ tasks, sortType = "short" }) {
     const scrollRef = useRef(null);
+    const [popupTask, setPopupTask] = useState(null);
 
     const getDate = (date) => {
         if (typeof date?.toDate === "function") return date.toDate();
@@ -100,7 +102,13 @@ export default function GanttView({ tasks, sortType = "short" }) {
         await deleteDoc(taskRef);
     };
 
+    const popupDl = popupTask ? getDate(popupTask.deadline) : null;
+    const popupDaysLeft = popupDl ? Math.ceil((popupDl - new Date()) / (1000 * 60 * 60 * 24)) : 0;
+    const popupRemain = !popupTask ? "" : popupTask.completed ? "完了済み" : popupDaysLeft < 0 ? "期限切れ" : popupDaysLeft === 0 ? "今日まで" : `残り ${popupDaysLeft}日`;
+    const popupTags = popupTask?.tags ?? [];
+
     return (
+        <>
         <div className={styles.container}>
 
             {/* 左固定：タスク名 + アクションボタン */}
@@ -238,10 +246,12 @@ export default function GanttView({ tasks, sortType = "short" }) {
                                     <div
                                         className={styles.bar}
                                         title={task.taskName}
+                                        onClick={() => setPopupTask(task)}
                                         style={{
                                             left: `${start * CELL_WIDTH}px`,
                                             width: `${width}px`,
                                             backgroundColor: barColor,
+                                            cursor: "pointer",
                                         }}
                                     >
                                         <span className={styles.barLabel}>
@@ -257,5 +267,38 @@ export default function GanttView({ tasks, sortType = "short" }) {
             </div>
 
         </div>
+
+        {popupTask && (
+            <div className={styles.popupOverlay} onClick={() => setPopupTask(null)}>
+                <div className={styles.popupSheet} onClick={e => e.stopPropagation()}>
+                    <div className={styles.popupHandle} />
+                    <div className={styles.popupTitle}>
+                        {popupTask.starred && <span className={styles.popupStar}>★</span>}
+                        {popupTask.taskName}
+                    </div>
+                    <div className={styles.popupRow}>
+                        <span className={styles.popupLabel}>期限</span>
+                        <span className={styles.popupValue}>{popupDl.toLocaleString("ja-JP", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                    </div>
+                    <div className={styles.popupRow}>
+                        <span className={styles.popupLabel}>状態</span>
+                        <span className={styles.popupValue}>{popupRemain}</span>
+                    </div>
+                    {popupTask.description && (
+                        <div className={styles.popupRow}>
+                            <span className={styles.popupLabel}>メモ</span>
+                            <span className={styles.popupValue}>{popupTask.description}</span>
+                        </div>
+                    )}
+                    {popupTags.length > 0 && (
+                        <div className={styles.popupTags}>
+                            {popupTags.map((tag, i) => <TagChip key={i} tag={tag} readonly />)}
+                        </div>
+                    )}
+                    <button className={styles.popupClose} onClick={() => setPopupTask(null)}>閉じる</button>
+                </div>
+            </div>
+        )}
+        </>
     );
 }
