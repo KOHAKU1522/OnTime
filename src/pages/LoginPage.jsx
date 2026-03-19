@@ -73,21 +73,22 @@ export default function LoginPage() {
 
     const handleGoogleLogin = async () => {
         const provider = new GoogleAuthProvider();
+        const fmt = (e) => e?.code ? `${e.code}` : `${e?.name}: ${e?.message}`;
         try {
             await signInWithPopup(auth, provider);
         } catch (error) {
-            if (
-                error.code === "auth/popup-blocked" ||
-                error.code === "auth/popup-cancelled-by-user"
-            ) {
-                // ポップアップがブロックされた場合はリダイレクト方式にフォールバック
+            if (error.code === "auth/popup-cancelled-by-user") {
+                // ユーザーが自分でキャンセルした場合は何もしない
+                return;
+            }
+            if (error.code === "auth/popup-blocked") {
                 try {
                     await signInWithRedirect(auth, provider);
                 } catch (e) {
-                    setErrorMessage(e.code || "Googleログインに失敗しました");
+                    setErrorMessage(fmt(e));
                 }
             } else {
-                setErrorMessage(error.code ? `${error.code}: ${error.message}` : `${error.name}: ${error.message}`);
+                setErrorMessage(fmt(error));
             }
         }
     };
