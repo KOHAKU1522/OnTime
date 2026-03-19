@@ -8,6 +8,7 @@ import { auth } from "../firebase";
 import {
     signInWithEmailAndPassword,
     GoogleAuthProvider,
+    signInWithPopup,
     signInWithRedirect,
     getRedirectResult,
     onAuthStateChanged,
