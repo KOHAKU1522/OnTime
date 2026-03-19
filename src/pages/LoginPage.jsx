@@ -87,8 +87,7 @@ export default function LoginPage() {
                     setErrorMessage(e.code || "Googleログインに失敗しました");
                 }
             } else {
-                // エラーコードをそのまま表示して原因を特定できるようにする
-                setErrorMessage(error.code || "Googleログインに失敗しました");
+                setErrorMessage(error.code ? `${error.code}: ${error.message}` : `${error.name}: ${error.message}`);
             }
         }
     };
