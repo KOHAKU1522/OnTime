@@ -10,8 +10,8 @@
 export const codes = [
     {
         title: "GanttView.jsx",
-        description: "説明（省略可）",
-        language: "JSX",
+        description: "ReactでFirestoreのタスクをガントチャート表示し、操作と詳細ポップアップを提供するコンポーネント",
+        language: "JavaScript",
         code: `import styles from "./GanttView.module.css";
 import { useRef, useEffect, useState } from "react";
 import { db } from "../../firebase";
@@ -314,7 +314,7 @@ export default function GanttView({ tasks, sortType = "short" }) {
     },
     {
         title: "GanttView.css",
-        description: "説明（省略可）",
+        description: "Reactガントチャートのタスク表示やポップアップを整えるCSSスタイル",
         language: "CSS",
         code: `.container {
     display: flex;
@@ -656,8 +656,8 @@ export default function GanttView({ tasks, sortType = "short" }) {
     },
     {
         title: "MacroPage.jsx",
-        description: "マクロページのJSXです",
-        language: "JSX",
+        description: "ReactとFirestoreで、指定頻度で自動タスクを追加・管理できるマクロ機能のページコンポーネント",
+        language: "JavaScript",
         code: `import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { auth, db } from "../firebase";
@@ -898,8 +898,8 @@ export default function MacroPage() {
     },
     {
         title: "App.jsx",
-        description: "説明（省略可）",
-        language: "JSX",
+        description: "React Routerを使ってログインページと保護されたメインページ群をルーティングするアプリのエントリコンポーネント",
+        language: "JavaScript",
         code: `import { Route, Routes } from 'react-router-dom';
 import { ROUTES } from './const';
 
@@ -945,21 +945,216 @@ export default App;
 `
     },
     {
-        title: "タイトル",
-        description: "説明（省略可）",
-        language: "javascript",
-        code: `コード本文`
+        title: "LoginPage.jsx",
+        description: "Firebase認証を使ってメール・パスワードやGoogleアカウントでログイン・新規登録を行い、認証状態に応じてホームページへ遷移するReactログインページコンポーネント",
+        language: "JavasSript",
+        code: `import { useEffect, useState } from "react";
+import { LOGIN_PAGE_SUBTITLE } from "../const";
+import styles from "./LoginPage.module.css";
+
+import { useNavigate } from "react-router-dom";
+
+import { auth } from "../firebase";
+import {
+    signInWithEmailAndPassword,
+    GoogleAuthProvider,
+    signInWithPopup,
+    signInWithRedirect,
+    getRedirectResult,
+    onAuthStateChanged,
+    createUserWithEmailAndPassword,
+    sendEmailVerification,
+} from "firebase/auth";
+
+export default function LoginPage() {
+
+    const [subtitle] = useState(() =>
+        LOGIN_PAGE_SUBTITLE[Math.floor(Math.random() * LOGIN_PAGE_SUBTITLE.length)]
+    );
+
+    const navigate = useNavigate();
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const [errorMessage, setErrorMessage] = useState("");
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) navigate("/home");
+        });
+
+        getRedirectResult(auth).catch((error) => {
+            console.error(error);
+            setErrorMessage("Googleログインに失敗しました");
+        });
+
+        return () => unsubscribe();
+    }, []);
+
+    const handleLogin = async () => {
+        try {
+            const userCredential = await signInWithEmailAndPassword(auth, email, password);
+
+            if (!userCredential.user.emailVerified) {
+                setErrorMessage("メール確認をしてください");
+                return;
+            }
+
+            navigate("/home");
+
+        } catch (error) {
+            if (error.code === "auth/user-not-found") {
+                setErrorMessage("ユーザーが存在しません");
+            } else if (error.code === "auth/wrong-password") {
+                setErrorMessage("パスワードが間違っています");
+            } else {
+                setErrorMessage("ログインに失敗しました");
+            }
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        const provider = new GoogleAuthProvider();
+        const fmt = (e) => e?.code ? \`\${e.code}\` : \`\${e?.name}: \${e?.message}\`;
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (error) {
+            if (error.code === "auth/popup-cancelled-by-user") {
+                return;
+            }
+            if (error.code === "auth/popup-blocked") {
+                try {
+                    await signInWithRedirect(auth, provider);
+                } catch (e) {
+                    setErrorMessage(fmt(e));
+                }
+            } else {
+                setErrorMessage(fmt(error));
+            }
+        }
+    };
+
+    const handleRegister = async () => {
+
+        if (!email || !password) {
+            setErrorMessage("メールとパスワードを入力してください");
+            return;
+        }
+
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+
+            await sendEmailVerification(userCredential.user);
+            await auth.signOut();
+            setErrorMessage("確認メールを送信しました");
+            navigate("/");
+
+        } catch (error) {
+            if (error.code === "auth/email-already-in-use") {
+                setErrorMessage("このメールは既に登録されています");
+            } else if (error.code === "auth/invalid-email") {
+                setErrorMessage("メールアドレスの形式が正しくありません");
+            } else if (error.code === "auth/weak-password") {
+                setErrorMessage("パスワードは6文字以上にしてください");
+            } else {
+                setErrorMessage("登録に失敗しました");
+            }
+        }
+    };
+
+    return (
+        <div className={styles.container}>
+            <div className={styles.card}>
+                <h1 className={styles.title}>OnTime</h1>
+                <p className={errorMessage ? styles.error : styles.subtitle}>
+                    {errorMessage || subtitle}
+                </p>
+
+                <input
+                    type="email"
+                    placeholder="メールアドレス"
+                    className={styles.input}
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                />
+
+                <input
+                    type="password"
+                    placeholder="パスワード"
+                    className={styles.input}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                />
+
+                <button className={styles.button} onClick={handleLogin}>
+                    ログイン
+                </button>
+
+                <button className={\`\${styles.googleButton} \${styles.button}\`} onClick={handleGoogleLogin}>
+                    <img className={styles.img} src="/images/google-logo.png" alt="" />
+                    Googleでログイン
+                </button>
+
+                <button className={styles.button} onClick={handleRegister}>
+                    新規登録
+                </button>
+            </div>
+        </div>
+    );
+}
+`
     },
     {
-        title: "タイトル",
+        title: "useNotification.js",
         description: "説明（省略可）",
-        language: "javascript",
-        code: `コード本文`
+        language: "JavaScript",
+        code: `import { useEffect, useRef } from "react";
+        
+export function useNotifications(tasks, enabled, notifyMinutes = 1440) {
+    const notifiedRef = useRef(new Set());
+
+    useEffect(() => {
+        if (!enabled) return;
+        if (!("Notification" in window)) return;
+        if (Notification.permission !== "granted") return;
+
+        const checkDeadlines = () => {
+            const now = new Date();
+            tasks.forEach(task => {
+                if (task.completed) return;
+                const deadline = typeof task.deadline?.toDate === "function"
+                    ? task.deadline.toDate()
+                    : new Date(task.deadline);
+                const diffMs = deadline - now;
+                const diffMin = diffMs / 60000;
+
+                const key = \`\${task.id}_\${notifyMinutes}\`;
+                if (diffMin > 0 && diffMin <= notifyMinutes && !notifiedRef.current.has(key)) {
+                    notifiedRef.current.add(key);
+                    const diffH = Math.floor(diffMin / 60);
+                    const remaining = diffH >= 1
+                        ? \`あと\${diffH}時間\`
+                        : \`あと\${Math.ceil(diffMin)}分\`;
+                    new Notification("OnTime - 期限が近づいています", {
+                        body: \`「\${task.taskName}」の期限まで\${remaining}です\`,
+                        icon: "/images/app-logo.png",
+                    });
+                }
+            });
+        };
+
+        checkDeadlines();
+        const interval = setInterval(checkDeadlines, 60000);
+        return () => clearInterval(interval);
+    }, [tasks, enabled, notifyMinutes]);
+}
+`
     },
-    {
-        title: "タイトル",
-        description: "説明（省略可）",
-        language: "javascript",
-        code: `コード本文`
-    },
+    // {
+    //     title: "タイトル",
+    //     description: "説明（省略可）",
+    //     language: "javascript",
+    //     code: `コード本文`
+    // },
 ];
