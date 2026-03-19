@@ -3,7 +3,7 @@ import styles from "./HomePage.module.css";
 
 import { useOutletContext } from "react-router-dom";
 
-import { auth, db } from "../firebase";
+import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
 
 import TaskInput from "../components/TaskInput/TaskInput";
@@ -12,7 +12,7 @@ import ProfileMenu from "../components/ProfileMenu/ProfileMenu";
 
 export default function HomePage() {
 
-    const { tasks, sortType, setSortType, showToast } = useOutletContext();
+    const { user, tasks, sortType, setSortType, showToast } = useOutletContext();
     const [showMenu, setShowMenu] = useState(false);
 
     const today = new Date();
@@ -35,7 +35,6 @@ export default function HomePage() {
     }).length;
 
     const handleAddTask = async (task) => {
-        const user = auth.currentUser;
         if (!user) return;
 
         await addDoc(
@@ -68,8 +67,8 @@ export default function HomePage() {
                     </div>
                 </div>
                 <button className={styles.userIcon} onClick={() => setShowMenu(true)}>
-                    {auth.currentUser?.photoURL
-                        ? <img src={auth.currentUser.photoURL} alt="user" className={styles.userPhoto} />
+                    {user?.photoURL
+                        ? <img src={user.photoURL} alt="user" className={styles.userPhoto} />
                         : "👤"
                     }
                 </button>

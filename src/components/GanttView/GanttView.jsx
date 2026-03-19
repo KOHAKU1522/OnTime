@@ -1,10 +1,12 @@
 import styles from "./GanttView.module.css";
 import { useRef, useEffect, useState } from "react";
-import { auth, db } from "../../firebase";
+import { db } from "../../firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { useAuthUser } from "../../hooks/useAuthUser";
 import TagChip from "../TagChip/TagChip";
 
 export default function GanttView({ tasks, sortType = "short" }) {
+    const user = useAuthUser();
     const scrollRef = useRef(null);
     const [popupTask, setPopupTask] = useState(null);
 
@@ -88,14 +90,12 @@ export default function GanttView({ tasks, sortType = "short" }) {
     }
 
     const handleComplete = async (task) => {
-        const user = auth.currentUser;
         if (!user) return;
         const taskRef = doc(db, "users", user.uid, "tasks", task.id);
         await updateDoc(taskRef, { completed: true, completedAt: new Date() });
     };
 
     const handleDelete = async (task) => {
-        const user = auth.currentUser;
         if (!user) return;
         if (!window.confirm("このタスクを削除しますか？")) return;
         const taskRef = doc(db, "users", user.uid, "tasks", task.id);

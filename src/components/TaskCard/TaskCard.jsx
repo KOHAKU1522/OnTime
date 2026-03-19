@@ -1,8 +1,9 @@
 import styles from "./TaskCard.module.css";
 
 import { useState, useEffect, useRef } from "react";
-import { db, auth } from "../../firebase";
+import { db } from "../../firebase";
 import { doc, updateDoc, deleteDoc } from "firebase/firestore";
+import { useAuthUser } from "../../hooks/useAuthUser";
 
 import TaskEditModal from "../TaskEditModal/TaskEditModal";
 import TagChip from "../TagChip/TagChip";
@@ -44,7 +45,7 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
     const isExpired = diffHours <= 0 && !task.completed;
     const isDanger = diffHours > 0 && diffHours <= 24 && !task.completed;
 
-    const user = auth.currentUser;
+    const user = useAuthUser();
 
     // ===== 星（重要）トグル =====
     const toggleStar = async (e) => {

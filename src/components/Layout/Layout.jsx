@@ -104,7 +104,7 @@ export default function Layout() {
         <div className="layout">
             <main className={styles.content}>
                 <Outlet context={{
-                    tasks, sortType, setSortType,
+                    user, tasks, sortType, setSortType,
                     showToast,
                     notificationsEnabled, toggleNotifications
                 }} />
