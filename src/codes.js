@@ -1107,7 +1107,7 @@ export default function LoginPage() {
     },
     {
         title: "useNotification.js",
-        description: "説明（省略可）",
+        description: "Reactでタスクの期限が近づいたときにブラウザ通知を送るカスタムフックuseNotifications",
         language: "JavaScript",
         code: `import { useEffect, useRef } from "react";
         
