@@ -4,8 +4,8 @@ import { Outlet } from "react-router-dom";
 import styles from "./Layout.module.css";
 
 import { useEffect, useState, useRef } from "react";
-import { auth, db } from "../../firebase";
-import { onAuthStateChanged } from "firebase/auth";
+import { db } from "../../firebase";
+import { useAuthUser } from "../../hooks/useAuthUser";
 import {
     collection, onSnapshot, addDoc, getDocs, updateDoc, doc
 } from "firebase/firestore";
@@ -15,6 +15,7 @@ import { useNotifications } from "../../hooks/useNotifications";
 
 export default function Layout() {
 
+    const user = useAuthUser();
     const [tasks, setTasks] = useState([]);
     const [sortType, setSortType] = useState("short");
     const [notificationsEnabled, setNotificationsEnabled] = useState(
@@ -26,32 +27,14 @@ export default function Layout() {
     useNotifications(tasks, notificationsEnabled);
 
     useEffect(() => {
-        let unsubscribeTasks = null;
-
-        const startListener = (user) => {
-            if (!user || unsubscribeTasks) return;
-            const tasksRef = collection(db, "users", user.uid, "tasks");
-            unsubscribeTasks = onSnapshot(tasksRef, (snapshot) => {
-                setTasks(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
-            });
-        };
-
-        // auth.currentUser が既に設定されていればすぐ開始
-        if (auth.currentUser) {
-            startListener(auth.currentUser);
-            return () => { if (unsubscribeTasks) unsubscribeTasks(); };
-        }
-
-        // Google リダイレクト後など auth 復元を待つ
-        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-            startListener(user);
+        if (!user?.uid) return;
+        const tasksRef = collection(db, "users", user.uid, "tasks");
+        const unsubscribe = onSnapshot(tasksRef, (snapshot) => {
+            setTasks(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
         });
 
-        return () => {
-            unsubscribeAuth();
-            if (unsubscribeTasks) unsubscribeTasks();
-        };
-    }, []);
+        return () => unsubscribe();
+    }, [user?.uid]);
 
     // マクロチェック：セッションにつき1回
     useEffect(() => {
@@ -59,8 +42,7 @@ export default function Layout() {
         macroCheckedRef.current = true;
 
         const runMacros = async () => {
-            const user = auth.currentUser;
-            if (!user) return;
+            if (!user?.uid) return;
 
             const macrosRef = collection(db, "users", user.uid, "macros");
             const snap = await getDocs(macrosRef);
