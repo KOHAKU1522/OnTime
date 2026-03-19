@@ -5,6 +5,7 @@ import styles from "./Layout.module.css";
 
 import { useEffect, useState, useRef } from "react";
 import { auth, db } from "../../firebase";
+import { onAuthStateChanged } from "firebase/auth";
 import {
     collection, onSnapshot, addDoc, getDocs, updateDoc, doc
 } from "firebase/firestore";
@@ -25,20 +26,31 @@ export default function Layout() {
     useNotifications(tasks, notificationsEnabled);
 
     useEffect(() => {
-        const user = auth.currentUser;
-        if (!user) return;
+        let unsubscribeTasks = null;
 
-        const tasksRef = collection(db, "users", user.uid, "tasks");
+        const startListener = (user) => {
+            if (!user || unsubscribeTasks) return;
+            const tasksRef = collection(db, "users", user.uid, "tasks");
+            unsubscribeTasks = onSnapshot(tasksRef, (snapshot) => {
+                setTasks(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
+            });
+        };
 
-        const unsubscribe = onSnapshot(tasksRef, (snapshot) => {
-            const list = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
-            }));
-            setTasks(list);
+        // auth.currentUser が既に設定されていればすぐ開始
+        if (auth.currentUser) {
+            startListener(auth.currentUser);
+            return () => { if (unsubscribeTasks) unsubscribeTasks(); };
+        }
+
+        // Google リダイレクト後など auth 復元を待つ
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+            startListener(user);
         });
 
-        return () => unsubscribe();
+        return () => {
+            unsubscribeAuth();
+            if (unsubscribeTasks) unsubscribeTasks();
+        };
     }, []);
 
     // マクロチェック：セッションにつき1回
