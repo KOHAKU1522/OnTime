@@ -105,9 +105,9 @@
   box-sizing: border-box;
 }
 
-/* iOSのinputタップ時の自動ズームを防ぐ */
+/* iOSのinputタップ時の自動ズームを防ぐ（!importantでCSSモジュールの上書きを防止） */
 input, textarea, select {
-  font-size: max(16px, 1em);
+  font-size: max(16px, 1em) !important;
 }
 
 body {
