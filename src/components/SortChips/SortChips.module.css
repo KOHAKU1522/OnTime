@@ -1,0 +1,40 @@
+.chips {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 2px;
+}
+
+.chips::-webkit-scrollbar {
+    display: none;
+}
+
+.chip {
+    flex-shrink: 0;
+    padding: 5px 12px;
+    border-radius: 99px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s, background 0.15s;
+    white-space: nowrap;
+}
+
+.chip:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.active {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+}
+
+.active:hover {
+    color: #fff;
+}

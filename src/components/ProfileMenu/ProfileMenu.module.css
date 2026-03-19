@@ -1,0 +1,142 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.35);
+    z-index: 200;
+    display: flex;
+    align-items: flex-end;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.sheet {
+    width: 100%;
+    background: var(--bg-card);
+    border-radius: 20px 20px 0 0;
+    padding: 0 0 0;
+    animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.handle {
+    width: 36px;
+    height: 4px;
+    border-radius: 99px;
+    background: var(--border);
+    margin: 12px auto 0;
+}
+
+.userSection {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 20px 20px 18px;
+}
+
+.avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--bg-card-alt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.avatarImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.userInfo {
+    overflow: hidden;
+}
+
+.userName {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.userEmail {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+
+.divider {
+    height: 1px;
+    background: var(--divider);
+    margin: 0;
+}
+
+.itemDivider {
+    height: 1px;
+    background: var(--divider);
+    margin: 0 20px;
+}
+
+.menuItem {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 20px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+}
+
+.menuIcon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    background: var(--bg-card-alt);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-primary);
+    flex-shrink: 0;
+}
+
+.menuLabel {
+    flex: 1;
+    font-size: 0.95rem;
+    font-weight: 500;
+    color: var(--text-primary);
+}
+
+.menuArrow {
+    font-size: 1.1rem;
+    color: var(--text-muted);
+}
+
+.danger .menuIcon {
+    background: var(--color-danger-bg);
+    color: var(--color-danger);
+}
+
+.danger .menuLabel {
+    color: var(--color-danger);
+}
+
+.safeArea {
+    height: env(safe-area-inset-bottom, 20px);
+    min-height: 20px;
+}

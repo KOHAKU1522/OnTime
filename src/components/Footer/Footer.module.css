@@ -1,0 +1,81 @@
+.footer {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(480px, 92%);
+    height: 68px;
+
+    background: var(--bg-footer);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--bg-footer-border);
+
+    border-radius: 24px;
+    box-shadow: var(--shadow-footer);
+
+    display: flex;
+    align-items: center;
+
+    z-index: 100;
+}
+
+.footerItems {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footerItem {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    position: relative;
+}
+
+.footerButton {
+    width: 44px;
+    height: 36px;
+    border-radius: 12px;
+    border: none;
+    background: transparent;
+    color: var(--footer-inactive);
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+}
+
+.footerName {
+    font-size: 10px;
+    color: var(--footer-inactive);
+    font-weight: 500;
+    letter-spacing: 0.01em;
+}
+
+.active {
+    background: var(--footer-active-bg);
+    color: var(--text-primary);
+}
+
+.activeText {
+    color: var(--text-primary);
+    font-weight: 700;
+}
+
+.activeDot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--footer-active-dot);
+    margin-top: 1px;
+}

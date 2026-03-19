@@ -1,0 +1,77 @@
+.container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: var(--bg-page);
+}
+
+.card {
+    background: var(--bg-card);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-card);
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.title {
+    text-align: center;
+    margin: 0;
+    color: var(--text-primary);
+}
+
+.subtitle {
+    text-align: center;
+    font-size: 14px;
+    color: var(--text-secondary);
+    margin-bottom: 10px;
+}
+
+.error {
+    text-align: center;
+    font-size: 14px;
+    color: var(--color-danger);
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+.input {
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    outline: none;
+}
+
+.input:focus {
+    border-color: var(--brand);
+}
+
+.button {
+    padding: 10px;
+    background-color: var(--text-primary);
+    color: var(--bg-page);
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.button:hover {
+    opacity: 0.9;
+}
+
+.googleButton {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.img {
+    width: 20px;
+    height: auto;
+    padding: 0 5px 0 0;
+}

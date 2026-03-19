@@ -1,0 +1,112 @@
+.container {
+    margin-top: 20px;
+    max-width: 450px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.sortBar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.sortTitle {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.list {
+    display: flex;
+    flex-direction: column;
+    margin-top: 12px;
+}
+
+.empty {
+    color: var(--text-muted);
+    text-align: center;
+    padding: 32px 20px;
+    font-size: 0.9rem;
+}
+
+/* ===== 検索バー ===== */
+.searchBar {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.searchInput {
+    width: 100%;
+    padding: 9px 36px 9px 12px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    outline: none;
+    box-sizing: border-box;
+}
+
+.searchInput:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 2px var(--brand-focus-ring);
+}
+
+.searchClear {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.searchClear:hover {
+    color: var(--text-primary);
+}
+
+/* ===== タグフィルター ===== */
+.tagFilter {
+    display: flex;
+    gap: 6px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+}
+
+.tagFilter::-webkit-scrollbar {
+    display: none;
+}
+
+.tagFilterChip {
+    flex-shrink: 0;
+    padding: 4px 12px;
+    border-radius: 99px;
+    border: 1.5px solid var(--border);
+    background: var(--bg-card);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.tagFilterChip:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.tagFilterChip.active {
+    background: var(--tag-bg);
+    border-color: var(--tag-bg);
+    color: var(--tag-text);
+}

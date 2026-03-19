@@ -1,0 +1,236 @@
+.container {
+    background: var(--bg-card);
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-card);
+    margin-bottom: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.95rem;
+    outline: none;
+    box-sizing: border-box;
+    color: var(--text-primary);
+    background: var(--bg-input);
+}
+
+.input:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 2px var(--brand-focus-ring);
+}
+
+.textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+    color: var(--text-primary);
+    background: var(--bg-input);
+    resize: vertical;
+    min-height: 64px;
+    font-family: inherit;
+}
+
+.textarea:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 2px var(--brand-focus-ring);
+}
+
+/* ===== セクション ===== */
+.section {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.sectionLabel {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+/* ===== プリセットボタン ===== */
+.presets {
+    display: flex;
+    gap: 6px;
+}
+
+.presetBtn {
+    flex: 1;
+    padding: 8px 4px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-preset);
+    color: var(--text-primary);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    white-space: nowrap;
+}
+
+.presetBtn:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.presetSelected {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+}
+
+.presetSelected:hover {
+    color: #fff;
+}
+
+/* ===== 選択中の日付表示 ===== */
+.selectedDate {
+    font-size: 0.82rem;
+    color: var(--brand);
+    font-weight: 500;
+}
+
+/* ===== トグルボタン ===== */
+.toggleBtn {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 0.8rem;
+    cursor: pointer;
+    padding: 0;
+    text-align: left;
+}
+
+.toggleBtn:hover {
+    color: var(--brand);
+}
+
+/* ===== 追加ボタン ===== */
+.addButton {
+    background-color: var(--brand);
+    color: white;
+    padding: 11px;
+    border: none;
+    border-radius: 10px;
+    width: 100%;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.95rem;
+    transition: background 0.2s;
+}
+
+.addButton:hover {
+    background-color: var(--brand-hover);
+}
+
+/* ===== タグ入力 ===== */
+.tagInputRow {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.tagInputField {
+    flex: 1;
+    padding: 8px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.85rem;
+    outline: none;
+    background: var(--bg-input);
+    color: var(--text-primary);
+}
+
+.tagInputField:focus {
+    border-color: var(--brand);
+}
+
+.tagAddBtn {
+    padding: 8px 12px;
+    border: 1px solid var(--brand);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--brand);
+    font-size: 0.8rem;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.tagAddBtn:hover {
+    background: var(--brand);
+    color: white;
+}
+
+.tagChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tagChip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 99px;
+}
+
+.tagChipRemove {
+    background: none;
+    border: none;
+    color: var(--tag-text);
+    cursor: pointer;
+    font-size: 0.7rem;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+.tagChipRemove:hover {
+    opacity: 1;
+}
+
+.tagSuggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.tagSuggestLabel {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tagSuggestChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}

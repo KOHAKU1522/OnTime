@@ -1,0 +1,220 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.4);
+    z-index: 300;
+    display: flex;
+    align-items: flex-end;
+    animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.sheet {
+    width: 100%;
+    background: var(--bg-card);
+    border-radius: 20px 20px 0 0;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: slideUp 0.25s ease;
+}
+
+@keyframes slideUp {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+}
+
+.handle {
+    width: 36px;
+    height: 4px;
+    border-radius: 99px;
+    background: var(--border);
+    margin: 12px auto 0;
+}
+
+.content {
+    padding: 20px 20px 0;
+}
+
+.formTitle {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0 0 20px;
+}
+
+.field {
+    margin-bottom: 16px;
+}
+
+.label {
+    display: block;
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-bottom: 6px;
+}
+
+.input {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    outline: none;
+    box-sizing: border-box;
+    color: var(--text-primary);
+    background: var(--bg-input);
+}
+
+.input:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 2px var(--brand-focus-ring);
+}
+
+.textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+    box-sizing: border-box;
+    color: var(--text-primary);
+    background: var(--bg-input);
+    resize: vertical;
+    min-height: 80px;
+    font-family: inherit;
+}
+
+.textarea:focus {
+    border-color: var(--brand);
+    box-shadow: 0 0 0 2px var(--brand-focus-ring);
+}
+
+.tagInputRow {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.tagInputField {
+    flex: 1;
+    padding: 9px 12px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.9rem;
+    outline: none;
+    background: var(--bg-input);
+    color: var(--text-primary);
+}
+
+.tagInputField:focus {
+    border-color: var(--brand);
+}
+
+.tagAddBtn {
+    padding: 9px 14px;
+    border: 1.5px solid var(--brand);
+    border-radius: 10px;
+    background: transparent;
+    color: var(--brand);
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.tagAddBtn:hover {
+    background: var(--brand);
+    color: white;
+}
+
+.tagChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.tagChip {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    background: var(--tag-bg);
+    color: var(--tag-text);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 99px;
+}
+
+.tagChipRemove {
+    background: none;
+    border: none;
+    color: var(--tag-text);
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.7;
+}
+
+.tagChipRemove:hover {
+    opacity: 1;
+}
+
+.tagSuggestions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+}
+
+.tagSuggestLabel {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.tagSuggestChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.saveBtn {
+    width: 100%;
+    padding: 13px;
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    transition: background 0.2s;
+}
+
+.saveBtn:hover:not(:disabled) {
+    background: var(--brand-hover);
+}
+
+.saveBtn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.safeArea {
+    height: env(safe-area-inset-bottom, 20px);
+    min-height: 20px;
+}

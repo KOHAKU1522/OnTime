@@ -1,0 +1,101 @@
+.wrapper {
+    position: relative;
+    display: inline-flex;
+}
+
+.chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    padding: 3px 8px;
+    border-radius: 99px;
+    user-select: none;
+    white-space: nowrap;
+    transition: opacity 0.1s;
+}
+
+.clickable {
+    cursor: pointer;
+}
+
+.clickable:hover {
+    opacity: 0.8;
+}
+
+.colorDotSmall {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    opacity: 0.7;
+}
+
+.removeBtn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.75rem;
+    padding: 0 0 0 2px;
+    line-height: 1;
+    opacity: 0.7;
+    flex-shrink: 0;
+}
+
+.removeBtn:hover {
+    opacity: 1;
+}
+
+/* ===== カラーピッカー ===== */
+.picker {
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    z-index: 500;
+    min-width: 160px;
+    animation: popIn 0.15s ease;
+}
+
+@keyframes popIn {
+    from { opacity: 0; transform: scale(0.95) translateY(-4px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.pickerLabel {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 8px;
+}
+
+.colorGrid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 5px;
+}
+
+.swatch {
+    width: 26px;
+    height: 26px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.1s;
+    outline-offset: 2px;
+}
+
+.swatch:hover {
+    transform: scale(1.15);
+}
+
+.swatchActive {
+    transform: scale(1.1);
+}
