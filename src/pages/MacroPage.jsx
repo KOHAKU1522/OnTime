@@ -24,6 +24,11 @@ const DEFAULT_FORM = {
 };
 
 export default function MacroPage() {
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const navigate = useNavigate();
     const [macros, setMacros] = useState([]);
     const [showForm, setShowForm] = useState(false);
@@ -86,7 +91,7 @@ export default function MacroPage() {
             <header className={styles.header}>
                 <button className={styles.backBtn} onClick={() => navigate(-1)}>
                     <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="15 18 9 12 15 6"/>
+                        <polyline points="15 18 9 12 15 6" />
                     </svg>
                 </button>
                 <h2 className={styles.title}>マクロ</h2>
@@ -129,9 +134,9 @@ export default function MacroPage() {
                         </button>
                         <button className={styles.deleteBtn} onClick={() => handleDelete(macro)}>
                             <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/>
-                                <path d="M10 11v6M14 11v6"/>
+                                <polyline points="3 6 5 6 21 6" />
+                                <path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6" />
+                                <path d="M10 11v6M14 11v6" />
                             </svg>
                         </button>
                     </div>

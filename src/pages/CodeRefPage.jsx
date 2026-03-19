@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./CodeRefPage.module.css";
 import { codes } from "../codes";
@@ -61,6 +61,11 @@ function CodeBlock({ entry }) {
 }
 
 export default function CodeRefPage() {
+
+    useEffect(() => {
+        window.scrollTo(0, 0);
+    }, []);
+
     const navigate = useNavigate();
 
     return (
@@ -71,10 +76,6 @@ export default function CodeRefPage() {
                 </button>
                 <h2 className={styles.title}>コード参照</h2>
             </div>
-
-            <p className={styles.desc}>
-                codes.js にコードを追加するとここに表示されます。
-            </p>
 
             {codes.length === 0 ? (
                 <div className={styles.empty}>

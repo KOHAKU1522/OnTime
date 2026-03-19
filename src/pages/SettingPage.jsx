@@ -280,7 +280,7 @@ export default function SettingPage() {
                     <div className={`${styles.row} ${styles.rowStatic}`}>
                         <span className={styles.rowIcon}><InfoIcon /></span>
                         <span className={styles.rowLabel}>バージョン</span>
-                        <span className={styles.rowValue}>ver.1.0.0</span>
+                        <span className={styles.rowValue}>v1.0.0</span>
                     </div>
                     <div className={styles.divider} />
                     <button className={styles.row} onClick={() => navigate(`/${ROUTES.CODE_REF}`)}>
