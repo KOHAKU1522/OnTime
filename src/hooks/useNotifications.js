@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export function useNotifications(tasks, enabled) {
+export function useNotifications(tasks, enabled, notifyMinutes = 1440) {
     const notifiedRef = useRef(new Set());
 
     useEffect(() => {
@@ -18,22 +18,16 @@ export function useNotifications(tasks, enabled) {
                 const diffMs = deadline - now;
                 const diffMin = diffMs / 60000;
 
-                // 1時間以内かつ未来の場合に通知（セッション内1回のみ）
-                if (diffMin > 0 && diffMin <= 60 && !notifiedRef.current.has(`${task.id}_1h`)) {
-                    notifiedRef.current.add(`${task.id}_1h`);
-                    new Notification("OnTime - 期限が近づいています", {
-                        body: `「${task.taskName}」の期限まであと${Math.ceil(diffMin)}分です`,
-                        icon: "/vite.svg",
-                    });
-                }
-
-                // 1日以内かつ1時間超の場合に通知
-                if (diffMin > 60 && diffMin <= 1440 && !notifiedRef.current.has(`${task.id}_1d`)) {
-                    notifiedRef.current.add(`${task.id}_1d`);
+                const key = `${task.id}_${notifyMinutes}`;
+                if (diffMin > 0 && diffMin <= notifyMinutes && !notifiedRef.current.has(key)) {
+                    notifiedRef.current.add(key);
                     const diffH = Math.floor(diffMin / 60);
+                    const remaining = diffH >= 1
+                        ? `あと${diffH}時間`
+                        : `あと${Math.ceil(diffMin)}分`;
                     new Notification("OnTime - 期限が近づいています", {
-                        body: `「${task.taskName}」の期限まであと${diffH}時間です`,
-                        icon: "/vite.svg",
+                        body: `「${task.taskName}」の期限まで${remaining}です`,
+                        icon: "/images/app-logo.png",
                     });
                 }
             });
@@ -42,5 +36,5 @@ export function useNotifications(tasks, enabled) {
         checkDeadlines();
         const interval = setInterval(checkDeadlines, 60000);
         return () => clearInterval(interval);
-    }, [tasks, enabled]);
+    }, [tasks, enabled, notifyMinutes]);
 }

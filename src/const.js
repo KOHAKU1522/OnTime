@@ -4,6 +4,7 @@ export const ROUTES = {
   CALENDAR: "calendar",
   SETTING: "setting",
   MACRO: "macro",
+  CODE_REF: "code-ref",
 };
 
 export const LOGIN_PAGE_SUBTITLE = [

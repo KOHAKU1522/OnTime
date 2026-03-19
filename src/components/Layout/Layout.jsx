@@ -21,10 +21,13 @@ export default function Layout() {
     const [notificationsEnabled, setNotificationsEnabled] = useState(
         () => localStorage.getItem("notificationsEnabled") === "true"
     );
+    const [notifyMinutes, setNotifyMinutes] = useState(
+        () => Number(localStorage.getItem("notifyMinutes") || 1440)
+    );
     const macroCheckedRef = useRef(false);
     const { toast, showToast, dismissToast } = useToast();
 
-    useNotifications(tasks, notificationsEnabled);
+    useNotifications(tasks, notificationsEnabled, notifyMinutes);
 
     useEffect(() => {
         if (!user?.uid) return;
@@ -100,13 +103,19 @@ export default function Layout() {
         localStorage.setItem("notificationsEnabled", val ? "true" : "false");
     };
 
+    const changeNotifyMinutes = (val) => {
+        setNotifyMinutes(val);
+        localStorage.setItem("notifyMinutes", String(val));
+    };
+
     return (
         <div className="layout">
             <main className={styles.content}>
                 <Outlet context={{
                     user, tasks, sortType, setSortType,
                     showToast,
-                    notificationsEnabled, toggleNotifications
+                    notificationsEnabled, toggleNotifications,
+                    notifyMinutes, changeNotifyMinutes
                 }} />
             </main>
             <Footer />

@@ -25,9 +25,14 @@ const InfoIcon = () => <Icon><circle cx="12" cy="12" r="10" /><line x1="12" y1="
 export default function SettingPage() {
     const navigate = useNavigate();
     const user = auth.currentUser;
-    const { tasks, notificationsEnabled, toggleNotifications } = useOutletContext();
+    const { tasks, notificationsEnabled, toggleNotifications, notifyMinutes, changeNotifyMinutes } = useOutletContext();
     const [isDark, setIsDark] = useDarkMode();
     const [chartTab, setChartTab] = useState("week");
+
+    const PRESET_MINUTES = [60, 180, 360, 720, 1440, 4320];
+    const isCustom = !PRESET_MINUTES.includes(notifyMinutes);
+    const [customValue, setCustomValue] = useState(() => isCustom ? String(Math.round(notifyMinutes / 60)) : "");
+    const [customUnit, setCustomUnit] = useState("hour");
 
     const totalTasks = tasks.length;
     const completedTasks = tasks.filter(t => t.completed).length;
@@ -150,7 +155,7 @@ export default function SettingPage() {
                         <span className={styles.rowIcon}><BellIcon /></span>
                         <span className={styles.rowLabel}>
                             {notifPermission === "granted"
-                                ? (notificationsEnabled ? "通知オン（1時間前・1日前）" : "通知オフ")
+                                ? (notificationsEnabled ? "通知オン" : "通知オフ")
                                 : "期限リマインダー"
                             }
                         </span>
@@ -172,6 +177,76 @@ export default function SettingPage() {
                             </button>
                         )}
                     </div>
+                    {notificationsEnabled && notifPermission === "granted" && (
+                        <>
+                            <div className={styles.divider} />
+                            <div className={styles.notifTimingRow}>
+                                <span className={styles.notifTimingLabel}>通知タイミング</span>
+                                <div className={styles.notifChips}>
+                                    {[
+                                        { label: "1時間前", minutes: 60 },
+                                        { label: "3時間前", minutes: 180 },
+                                        { label: "6時間前", minutes: 360 },
+                                        { label: "12時間前", minutes: 720 },
+                                        { label: "24時間前", minutes: 1440 },
+                                        { label: "3日前", minutes: 4320 },
+                                    ].map(opt => (
+                                        <button
+                                            key={opt.minutes}
+                                            className={`${styles.notifChip} ${notifyMinutes === opt.minutes ? styles.notifChipActive : ""}`}
+                                            onClick={() => changeNotifyMinutes(opt.minutes)}
+                                        >
+                                            {opt.label}
+                                        </button>
+                                    ))}
+                                    <button
+                                        className={`${styles.notifChip} ${isCustom ? styles.notifChipActive : ""}`}
+                                        onClick={() => {
+                                            setCustomValue("");
+                                            setCustomUnit("hour");
+                                            if (!isCustom) changeNotifyMinutes(-1);
+                                        }}
+                                    >
+                                        カスタム
+                                    </button>
+                                </div>
+                                {isCustom && (
+                                    <div className={styles.customTimingRow}>
+                                        <input
+                                            type="number"
+                                            min="1"
+                                            className={styles.customTimingInput}
+                                            value={customValue}
+                                            onChange={(e) => setCustomValue(e.target.value)}
+                                            placeholder="数値"
+                                        />
+                                        <select
+                                            className={styles.customTimingSelect}
+                                            value={customUnit}
+                                            onChange={(e) => setCustomUnit(e.target.value)}
+                                        >
+                                            <option value="min">分前</option>
+                                            <option value="hour">時間前</option>
+                                            <option value="day">日前</option>
+                                        </select>
+                                        <button
+                                            className={styles.customTimingBtn}
+                                            onClick={() => {
+                                                const v = Number(customValue);
+                                                if (!v || v <= 0) return;
+                                                const mins = customUnit === "min" ? v
+                                                    : customUnit === "hour" ? v * 60
+                                                    : v * 1440;
+                                                changeNotifyMinutes(mins);
+                                            }}
+                                        >
+                                            設定
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        </>
+                    )}
                 </div>
             </section>
 
@@ -207,6 +282,12 @@ export default function SettingPage() {
                         <span className={styles.rowLabel}>バージョン</span>
                         <span className={styles.rowValue}>ver.1.0.0</span>
                     </div>
+                    <div className={styles.divider} />
+                    <button className={styles.row} onClick={() => navigate(`/${ROUTES.CODE_REF}`)}>
+                        <span className={styles.rowIcon}><TagIcon /></span>
+                        <span className={styles.rowLabel}>コード参照</span>
+                        <span className={styles.rowArrow}>›</span>
+                    </button>
                 </div>
             </section>
 

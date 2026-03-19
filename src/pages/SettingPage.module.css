@@ -305,3 +305,99 @@
     color: white;
     border-color: var(--brand);
 }
+
+/* ===== 通知タイミング ===== */
+.notifTimingRow {
+    padding: 12px 16px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.notifTimingLabel {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+}
+
+.notifChips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+}
+
+.notifChip {
+    padding: 6px 12px;
+    border: 1px solid var(--border);
+    border-radius: 99px;
+    background: var(--bg-preset);
+    color: var(--text-primary);
+    font-size: 0.78rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+
+.notifChip:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.notifChipActive {
+    background: var(--brand);
+    border-color: var(--brand);
+    color: #fff;
+}
+
+/* ===== カスタム通知タイミング ===== */
+.customTimingRow {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+
+.customTimingInput {
+    width: 70px;
+    padding: 7px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    outline: none;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    box-sizing: border-box;
+    min-width: 0;
+}
+
+.customTimingInput:focus {
+    border-color: var(--brand);
+}
+
+.customTimingSelect {
+    padding: 7px 8px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    font-size: 0.88rem;
+    outline: none;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    cursor: pointer;
+}
+
+.customTimingSelect:focus {
+    border-color: var(--brand);
+}
+
+.customTimingBtn {
+    padding: 7px 14px;
+    background: var(--brand);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
