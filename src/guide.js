@@ -6,7 +6,7 @@ export const guide = [
 https://ontime-web-app.netlify.app/
 
 を"Safari"で開いて、画像の手順の通りに操作することでホームにアプリを追加できます。追加することでネイティブアプリのような感覚で起動できます。`,
-        image_src: ["/images/IMG_4282.jpeg", "/images/IMG_4283.jpeg", "/images/IMG_4284.jpeg", "public/images/IMG_4285.jpeg",]
+        image_src: ["/images/IMG_4282.jpeg", "/images/IMG_4283.jpeg", "/images/IMG_4284.jpeg", "/images/IMG_4285.jpeg",]
     },
     {
         title: "マクロ機能の使い方",
@@ -23,6 +23,6 @@ https://ontime-web-app.netlify.app/
         sentence: `「スワイプ機能」
 タスクは右から左にスワイプすることで簡単に「完了済み」にすることができます。
 また、左から右にスワイプすることで「重要なタスク」に登録でき、常にタスク一覧の上位に表示することができます。`,
-        image_src: ["",],
+        image_src: ["/images/swipe1.png", "/images/swipe2.png",],
     },
 ];

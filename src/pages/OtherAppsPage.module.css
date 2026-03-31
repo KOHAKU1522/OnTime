@@ -195,7 +195,7 @@ ul {
     padding: 14px;
     background: var(--bg-card);
     border-radius: 10px;
-    max-height: 12em;
+    max-height: 18em;
     overflow-y: auto;
     font-size: 0.76rem;
     line-height: 1.2;
