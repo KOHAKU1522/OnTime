@@ -10,7 +10,7 @@ import TaskInput from "../components/TaskInput/TaskInput";
 import TaskList from "../components/TaskList/TaskList";
 import ProfileMenu from "../components/ProfileMenu/ProfileMenu";
 
-export default function HomePage() {
+export default function HomePage({ isGuest }) {
 
     const { user, tasks, sortType, setSortType, showToast } = useOutletContext();
     const [showMenu, setShowMenu] = useState(false);
@@ -34,7 +34,29 @@ export default function HomePage() {
         );
     }).length;
 
+    // ゲストモード用の追加タスク
+    const [guestTasks, setGuestTasks] = useState([]);
+    const allTasks = isGuest ? [...tasks, ...guestTasks] : tasks;
+
     const handleAddTask = async (task) => {
+
+        if (isGuest) {
+            const newTask = {
+                taskName: task.taskName,
+                deadline: new Date(task.deadline),
+                startDate: task.startDate ? new Date(task.startDate) : null,
+                description: task.description || null,
+                tags: task.tags ?? [],
+                completed: false,
+                createdAt: new Date()
+            };
+            
+            showToast("ゲストモード：保存されません");
+            
+            setGuestTasks(prev => [...prev, newTask]);
+            return;
+        }
+
         if (!user) return;
 
         await addDoc(
@@ -74,9 +96,9 @@ export default function HomePage() {
                 </button>
             </header>
 
-            <TaskInput onAddTask={handleAddTask} allTags={[...new Set(tasks.flatMap(t => t.tags ?? []))]} />
+            <TaskInput onAddTask={handleAddTask} allTags={[...new Set(allTasks.flatMap(t => t.tags ?? []))]} />
 
-            <TaskList tasks={tasks} sortType={sortType} setSortType={setSortType} showToast={showToast} />
+            <TaskList tasks={allTasks} sortType={sortType} setSortType={setSortType} showToast={showToast} />
 
             {showMenu && <ProfileMenu onClose={() => setShowMenu(false)} />}
 

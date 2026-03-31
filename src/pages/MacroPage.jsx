@@ -20,7 +20,7 @@ const DEFAULT_FORM = {
     frequency: "daily",
     weekdays: [],
     dayOfMonth: 1,
-    deadlineDays: 1,
+    deadlineDays: 0,
 };
 
 export default function MacroPage() {

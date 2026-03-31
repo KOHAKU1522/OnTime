@@ -190,6 +190,25 @@
     gap: 6px;
 }
 
+.uncompleteBtn {
+    width: 100%;
+    padding: 11px;
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.95rem;
+    font-weight: 500;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background 0.2s, color 0.2s;
+}
+
+.uncompleteBtn:hover {
+    background: var(--bg-input);
+    color: var(--text-primary);
+}
+
 .saveBtn {
     width: 100%;
     padding: 13px;

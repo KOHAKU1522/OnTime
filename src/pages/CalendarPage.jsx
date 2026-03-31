@@ -5,13 +5,15 @@ import SortChips from "../components/SortChips/SortChips";
 import styles from "./CalendarPage.module.css";
 import { getTagStyle } from "../utils/tagColors";
 
-export default function CalendarPage() {
+export default function CalendarPage({ isGuest, guestTasks }) {
     const { tasks, sortType, setSortType } = useOutletContext();
     const [selectedTags, setSelectedTags] = useState([]);
 
     const today = new Date();
 
-    const allTags = [...new Set(tasks.flatMap(t => t.tags ?? []))];
+    const allTasks = isGuest ? [...tasks, ...guestTasks] : tasks;
+
+    const allTags = [...new Set(allTasks.flatMap(t => t.tags ?? []))];
 
     const toggleTag = (tag) => {
         setSelectedTags(prev =>
@@ -20,8 +22,8 @@ export default function CalendarPage() {
     };
 
     const filteredTasks = selectedTags.length > 0
-        ? tasks.filter(t => selectedTags.every(tag => (t.tags ?? []).includes(tag)))
-        : tasks;
+        ? allTasks.filter(t => selectedTags.every(tag => (t.tags ?? []).includes(tag)))
+        : allTasks;
 
     const activeCount = filteredTasks.filter(t => !t.completed).length;
     const todayCount = filteredTasks.filter(t => {

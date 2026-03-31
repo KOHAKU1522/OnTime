@@ -3,7 +3,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
 import { Navigate } from "react-router-dom";
 
-export default function ProtectedRoute({ children }) {
+export default function ProtectedRoute({ children, isGuest }) {
     const [user, setUser] = useState(undefined);
 
     useEffect(() => {
@@ -15,7 +15,7 @@ export default function ProtectedRoute({ children }) {
 
     if (user === undefined) return null;
 
-    if (!user) return <Navigate to="/" />;
+    if (!user && !isGuest) return <Navigate to="/" />;
 
     return children;
 }

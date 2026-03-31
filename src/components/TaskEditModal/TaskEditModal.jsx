@@ -50,6 +50,14 @@ export default function TaskEditModal({ task, onClose, allTags = [] }) {
         onClose();
     };
 
+    const handleUncomplete = async () => {
+        const user = auth.currentUser;
+        if (!user) return;
+        const taskRef = doc(db, "users", user.uid, "tasks", task.id);
+        await updateDoc(taskRef, { completed: false, completedAt: null });
+        onClose();
+    };
+
     return (
         <div className={styles.overlay} onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
             <div className={styles.sheet}>
@@ -130,6 +138,11 @@ export default function TaskEditModal({ task, onClose, allTags = [] }) {
                         )}
                     </div>
 
+                    {task.completed && (
+                        <button className={styles.uncompleteBtn} onClick={handleUncomplete}>
+                            未完了に戻す
+                        </button>
+                    )}
                     <button
                         className={styles.saveBtn}
                         onClick={handleSave}

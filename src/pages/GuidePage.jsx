@@ -10,7 +10,6 @@ const BackIcon = () => (
 );
 
 function GuideBlock({ entry }) {
-
     return (
         <div className={styles.codeCard}>
             <div className={styles.codeHeader}>
@@ -18,18 +17,23 @@ function GuideBlock({ entry }) {
                     <span className={styles.codeTitle}>{entry.title}</span>
                 </div>
             </div>
+
             {entry.sentence && (
-                <pre className={styles.codeDesc}>{entry.sentence}</pre>
+                <div className={styles.codeDesc}>{entry.sentence}</div>
             )}
-            <pre className={styles.codePre}>
-                <div>{entry.image_src && (
-                    <img
-                        src={entry.image_src}
-                        alt={entry.title}
-                        className={styles.guideImage}
-                    />
-                )}</div>
-            </pre>
+
+            {entry.image_src && entry.image_src.length > 0 && (
+                <div className={styles.imageRow}>
+                    {entry.image_src.map((src, i) => (
+                        <img
+                            key={i}
+                            src={src}
+                            alt={`${entry.title} ${i + 1}`}
+                            className={styles.guideImage}
+                        />
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

@@ -16,6 +16,10 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
     const [showEdit, setShowEdit] = useState(false);
     const pendingDeleteRef = useRef(null);
 
+    const [swipeX, setSwipeX] = useState(0);
+    const [isDragging, setIsDragging] = useState(false);
+    const touchStartXRef = useRef(null);
+
     useEffect(() => {
         const timer = setInterval(() => {
             setNow(new Date());
@@ -47,6 +51,46 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
 
     const user = useAuthUser();
 
+    // ===== スワイプで完了 =====
+    const handleDragStart = (clientX) => {
+        touchStartXRef.current = clientX;
+        setIsDragging(true);
+    };
+
+    const handleDragMove = (clientX) => {
+        if (touchStartXRef.current === null) return;
+        const dx = clientX - touchStartXRef.current;
+        if (dx < 0) {
+            setSwipeX(Math.max(dx, -120));
+        } else if (dx > 0) {
+            setSwipeX(Math.min(dx, 120));
+        }
+    };
+
+    const handleDragEnd = () => {
+        if (touchStartXRef.current === null) return;
+        setIsDragging(false);
+        if (swipeX < -80) {
+            task.completed ? uncompleteTask() : completeTask();
+        } else if (swipeX > 80) {
+            toggleStar({ stopPropagation: () => {} });
+        }
+        setSwipeX(0);
+        touchStartXRef.current = null;
+    };
+
+    const handleTouchStart = (e) => handleDragStart(e.touches[0].clientX);
+    const handleTouchMove = (e) => handleDragMove(e.touches[0].clientX);
+    const handleTouchEnd = () => handleDragEnd();
+
+    const handleMouseDown = (e) => handleDragStart(e.clientX);
+    const handleMouseMove = (e) => {
+        if (touchStartXRef.current === null) return;
+        handleDragMove(e.clientX);
+    };
+    const handleMouseUp = () => handleDragEnd();
+    const handleMouseLeave = () => handleDragEnd();
+
     // ===== 星（重要）トグル =====
     const toggleStar = async (e) => {
         e.stopPropagation();
@@ -64,6 +108,19 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
         if (showToast) {
             showToast("タスクを完了しました", async () => {
                 await updateDoc(taskRef, { completed: false, completedAt: null });
+            });
+        }
+    };
+
+    // ===== 未完了に戻す =====
+    const uncompleteTask = async () => {
+        if (!user) return;
+        const taskRef = doc(db, "users", user.uid, "tasks", task.id);
+        await updateDoc(taskRef, { completed: false, completedAt: null });
+
+        if (showToast) {
+            showToast("未完了に戻しました", async () => {
+                await updateDoc(taskRef, { completed: true, completedAt: new Date() });
             });
         }
     };
@@ -132,8 +189,21 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
 
     const tags = task.tags ?? [];
 
+    const completeRevealOpacity = Math.min(Math.max(-swipeX, 0) / 80, 1);
+    const starRevealOpacity = Math.min(Math.max(swipeX, 0) / 80, 1);
+
     return (
         <>
+            <div className={styles.swipeContainer}>
+            <div className={styles.swipeBgLeft} style={{ opacity: starRevealOpacity }}>
+                {task.starred ? "★ 重要解除" : "★ 重要に追加"}
+            </div>
+            <div
+                className={styles.swipeBg}
+                style={{ opacity: completeRevealOpacity }}
+            >
+                {task.completed ? "↩ 未完了に戻す" : "✓ 完了"}
+            </div>
             <div
                 className={`
                     ${styles.card}
@@ -141,7 +211,18 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
                     ${isExpired ? styles.expired : ""}
                     ${task.completed ? styles.completed : ""}
                 `}
-                style={{ background: backgroundStyle }}
+                style={{
+                    background: backgroundStyle,
+                    transform: `translateX(${swipeX}px)`,
+                    transition: isDragging ? "background 0.4s ease" : "transform 0.3s ease, background 0.4s ease",
+                }}
+                onTouchStart={handleTouchStart}
+                onTouchMove={handleTouchMove}
+                onTouchEnd={handleTouchEnd}
+                onMouseDown={handleMouseDown}
+                onMouseMove={handleMouseMove}
+                onMouseUp={handleMouseUp}
+                onMouseLeave={handleMouseLeave}
             >
                 <div className={styles.left}>
                     <div className={styles.titleRow}>
@@ -215,6 +296,7 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
                         />
                     </div>
                 )}
+            </div>
             </div>
 
             {showEdit && (

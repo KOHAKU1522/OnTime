@@ -52,12 +52,21 @@ export default function TaskList({ tasks, sortType, setSortType, showToast }) {
         return [...starred, ...normal];
     };
 
+    // 完了済みを completedAt 降順（新しい順）で並べるヘルパー
+    const sortCompleted = (arr) => {
+        return [...arr].sort((a, b) => {
+            const aTime = a.completedAt?.toDate ? a.completedAt.toDate() : new Date(a.completedAt ?? 0);
+            const bTime = b.completedAt?.toDate ? b.completedAt.toDate() : new Date(b.completedAt ?? 0);
+            return bTime - aTime;
+        });
+    };
+
     // ソート
     let displayTasks = [...filtered];
 
     if (sortType === "short") {
         const incomplete = filtered.filter(t => !t.completed).sort((a, b) => getDeadline(a) - getDeadline(b));
-        const completed  = filtered.filter(t => t.completed);
+        const completed  = sortCompleted(filtered.filter(t => t.completed));
         displayTasks = [...starFirst(incomplete), ...completed];
     }
     if (sortType === "recent") {
@@ -67,7 +76,7 @@ export default function TaskList({ tasks, sortType, setSortType, showToast }) {
             return bTime - aTime;
         });
         const incomplete = sorted.filter(t => !t.completed);
-        const completed  = sorted.filter(t => t.completed);
+        const completed  = sortCompleted(filtered.filter(t => t.completed));
         displayTasks = [...starFirst(incomplete), ...completed];
     }
     if (sortType === "long") {
@@ -75,7 +84,7 @@ export default function TaskList({ tasks, sortType, setSortType, showToast }) {
         displayTasks = starFirst(sorted);
     }
     if (sortType === "completed") {
-        displayTasks = filtered.filter(t => t.completed);
+        displayTasks = sortCompleted(filtered.filter(t => t.completed));
     }
 
     return (

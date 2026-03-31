@@ -16,7 +16,7 @@ import {
     sendEmailVerification,
 } from "firebase/auth";
 
-export default function LoginPage() {
+export default function LoginPage({ isGuest, setIsGuest }) {
 
     const [subtitle] = useState(() =>
         LOGIN_PAGE_SUBTITLE[Math.floor(Math.random() * LOGIN_PAGE_SUBTITLE.length)]
@@ -157,6 +157,17 @@ export default function LoginPage() {
 
                 <button className={styles.button} onClick={handleRegister}>
                     新規登録
+                </button>
+
+                <button
+                    className={styles.button}
+                    onClick={() => {
+                        setIsGuest(true);
+                        navigate("/home");
+                        alert("ゲストログインの場合、「データの保存」「カレンダー機能」「マクロ機能」等がご利用いただけません。")
+                    }}
+                >
+                    ログインせずに使う
                 </button>
             </div>
         </div>

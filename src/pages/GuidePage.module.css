@@ -154,7 +154,9 @@
     margin: 10px 14px 0;
     line-height: 1.5;
     font-weight: 550;
-    text-overflow: ellipsis;
+
+    white-space: pre-wrap;       /* ←改行OK */
+    word-break: break-word;      /* 長い文字も折り返す */
 }
 
 .codePre {
@@ -171,4 +173,16 @@
     font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
     color: var(--text-primary);
     white-space: pre;
+}
+
+.imageRow {
+    overflow-y: auto;
+    display: flex;
+    padding: 10px;
+}
+
+.guideImage {
+    height: 380px;
+    padding: 0 10px;
+    border-radius: 30px;
 }
