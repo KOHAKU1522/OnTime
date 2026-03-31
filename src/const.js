@@ -5,6 +5,8 @@ export const ROUTES = {
   SETTING: "setting",
   MACRO: "macro",
   CODE_REF: "code-ref",
+  GUIDE: "guide",
+  OTHER_APPS: "otherApps"
 };
 
 export const LOGIN_PAGE_SUBTITLE = [

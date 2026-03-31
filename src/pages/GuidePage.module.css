@@ -1,0 +1,174 @@
+.page {
+    min-height: 100vh;
+    background: var(--bg-page);
+    padding: 20px 16px 100px;
+    font-family: sans-serif;
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    margin-top: 12px;
+}
+
+.backBtn {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+    border: none;
+    background: var(--bg-card);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: var(--text-primary);
+    margin-right: 10px;
+    flex-shrink: 0;
+}
+
+.title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+.desc {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    margin: 0 0 20px;
+}
+
+/* ===== empty ===== */
+.empty {
+    text-align: center;
+    padding: 60px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+.emptyIcon {
+    color: var(--text-muted);
+    opacity: 0.4;
+}
+
+.emptyText {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 600;
+}
+
+.emptyHint {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    opacity: 0.7;
+}
+
+/* ===== list ===== */
+.list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* ===== code card ===== */
+.codeCard {
+    background: var(--bg-card);
+    border-radius: 14px;
+    box-shadow: var(--shadow-card);
+    overflow: hidden;
+}
+
+.codeHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid var(--divider);
+    gap: 10px;
+}
+
+.codeMeta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    overflow: hidden;
+}
+
+.codeTitle {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.codeLang {
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: var(--brand);
+    background: var(--brand-focus-ring);
+    border-radius: 6px;
+    padding: 2px 7px;
+    /* text-transform: uppercase; */
+    letter-spacing: 0.05em;
+    flex-shrink: 0;
+}
+
+.copyBtn {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 0.72rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.15s;
+    white-space: nowrap;
+}
+
+.copyBtn:hover {
+    border-color: var(--brand);
+    color: var(--brand);
+}
+
+.copyBtn.copied {
+    border-color: #22c55e;
+    color: #22c55e;
+    background: rgba(34, 197, 94, 0.08);
+}
+
+.codeDesc {
+    font-size: 0.78rem;
+    color: var(--text-primary);
+    margin: 10px 14px 0;
+    line-height: 1.5;
+    font-weight: 550;
+    text-overflow: ellipsis;
+}
+
+.codePre {
+    margin: 10px 0 0;
+    padding: 14px;
+    background: var(--bg-page);
+    overflow-x: auto;
+    font-size: 0.68rem;
+    line-height: 1.2;
+    border-top: 1px solid var(--divider);
+}
+
+.codePre code {
+    font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+    color: var(--text-primary);
+    white-space: pre;
+}

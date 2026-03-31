@@ -74,7 +74,7 @@ export default function CodeRefPage() {
                 <button className={styles.backBtn} onClick={() => navigate(-1)}>
                     <BackIcon />
                 </button>
-                <h2 className={styles.title}>コード参照</h2>
+                <h2 className={styles.title}>コード参照(一部抜粋)</h2>
             </div>
 
             {codes.length === 0 ? (

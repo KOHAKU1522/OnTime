@@ -22,6 +22,23 @@ const LogOutIcon = () => <Icon><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
 const TagIcon = () => <Icon><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></Icon>;
 const InfoIcon = () => <Icon><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></Icon>;
 
+const GuideIcon = () => (
+    <Icon>
+        <rect x="5" y="3" width="14" height="18" rx="2" />
+        <line x1="8" y1="9" x2="16" y2="9" />
+        <circle cx="12" cy="15" r="1" />
+    </Icon>
+);
+
+const AppsIcon = () => (
+    <Icon>
+        <rect x="4" y="4" width="6" height="6" rx="1.5" />
+        <rect x="14" y="4" width="6" height="6" rx="1.5" />
+        <rect x="4" y="14" width="6" height="6" rx="1.5" />
+        <rect x="14" y="14" width="6" height="6" rx="1.5" />
+    </Icon>
+);
+
 export default function SettingPage() {
     const navigate = useNavigate();
     const user = auth.currentUser;
@@ -236,7 +253,7 @@ export default function SettingPage() {
                                                 if (!v || v <= 0) return;
                                                 const mins = customUnit === "min" ? v
                                                     : customUnit === "hour" ? v * 60
-                                                    : v * 1440;
+                                                        : v * 1440;
                                                 changeNotifyMinutes(mins);
                                             }}
                                         >
@@ -282,10 +299,28 @@ export default function SettingPage() {
                         <span className={styles.rowLabel}>バージョン</span>
                         <span className={styles.rowValue}>v1.0.0</span>
                     </div>
+
                     <div className={styles.divider} />
+
                     <button className={styles.row} onClick={() => navigate(`/${ROUTES.CODE_REF}`)}>
                         <span className={styles.rowIcon}><TagIcon /></span>
                         <span className={styles.rowLabel}>コード参照</span>
+                        <span className={styles.rowArrow}>›</span>
+                    </button>
+
+                    <div className={styles.divider} />
+
+                    <button className={styles.row} onClick={() => navigate(`/${ROUTES.GUIDE}`)}>
+                        <span className={styles.rowIcon}><GuideIcon /></span>
+                        <span className={styles.rowLabel}>アプリの使い方</span>
+                        <span className={styles.rowArrow}>›</span>
+                    </button>
+
+                    <div className={styles.divider} />
+
+                    <button className={styles.row} onClick={() => navigate(`/${ROUTES.OTHER_APPS}`)}>
+                        <span className={styles.rowIcon}><AppsIcon /></span>
+                        <span className={styles.rowLabel}>他のおすすめのアプリ</span>
                         <span className={styles.rowArrow}>›</span>
                     </button>
                 </div>

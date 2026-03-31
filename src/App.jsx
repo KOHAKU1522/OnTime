@@ -7,6 +7,8 @@ import CalendarPage from "./pages/CalendarPage";
 import SettingPage from "./pages/SettingPage";
 import MacroPage from "./pages/MacroPage";
 import CodeRefPage from "./pages/CodeRefPage";
+import GuidePage from './pages/GuidePage';
+import OtherAppsPage from "./pages/OtherAppsPage"
 
 import './App.css';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -33,6 +35,8 @@ function App() {
           <Route path={ROUTES.SETTING} element={<SettingPage />} />
           <Route path={ROUTES.MACRO} element={<MacroPage />} />
           <Route path={ROUTES.CODE_REF} element={<CodeRefPage />} />
+          <Route path={ROUTES.GUIDE} element={<GuidePage />} />
+          <Route path={ROUTES.OTHER_APPS} element={<OtherAppsPage />} />
         </Route>
       </Routes>
     </>
