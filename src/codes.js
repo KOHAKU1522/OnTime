@@ -1643,6 +1643,10 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
     const [swipeX, setSwipeX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
     const touchStartXRef = useRef(null);
+    const touchStartYRef = useRef(null);
+    const directionLockRef = useRef(null);
+
+    const DIRECTION_THRESHOLD = 10;
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -1674,14 +1678,24 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
 
     const user = useAuthUser();
 
-    const handleDragStart = (clientX) => {
+    const handleDragStart = (clientX, clientY) => {
         touchStartXRef.current = clientX;
+        touchStartYRef.current = clientY;
+        directionLockRef.current = null;
         setIsDragging(true);
     };
 
-    const handleDragMove = (clientX) => {
+    const handleDragMove = (clientX, clientY) => {
         if (touchStartXRef.current === null) return;
         const dx = clientX - touchStartXRef.current;
+        const dy = clientY - touchStartYRef.current;
+
+        if (directionLockRef.current === null) {
+            if (Math.abs(dx) < DIRECTION_THRESHOLD && Math.abs(dy) < DIRECTION_THRESHOLD) return;
+            directionLockRef.current = Math.abs(dx) >= Math.abs(dy) ? "h" : "v";
+        }
+        if (directionLockRef.current === "v") return;
+
         if (dx < 0) {
             setSwipeX(Math.max(dx, -120));
         } else if (dx > 0) {
@@ -1692,23 +1706,27 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
     const handleDragEnd = () => {
         if (touchStartXRef.current === null) return;
         setIsDragging(false);
-        if (swipeX < -80) {
-            task.completed ? uncompleteTask() : completeTask();
-        } else if (swipeX > 80) {
-            toggleStar({ stopPropagation: () => {} });
+        if (directionLockRef.current === "h") {
+            if (swipeX < -80) {
+                task.completed ? uncompleteTask() : completeTask();
+            } else if (swipeX > 80) {
+                toggleStar({ stopPropagation: () => { } });
+            }
         }
         setSwipeX(0);
         touchStartXRef.current = null;
+        touchStartYRef.current = null;
+        directionLockRef.current = null;
     };
 
-    const handleTouchStart = (e) => handleDragStart(e.touches[0].clientX);
-    const handleTouchMove = (e) => handleDragMove(e.touches[0].clientX);
+    const handleTouchStart = (e) => handleDragStart(e.touches[0].clientX, e.touches[0].clientY);
+    const handleTouchMove = (e) => handleDragMove(e.touches[0].clientX, e.touches[0].clientY);
     const handleTouchEnd = () => handleDragEnd();
 
-    const handleMouseDown = (e) => handleDragStart(e.clientX);
+    const handleMouseDown = (e) => handleDragStart(e.clientX, e.clientY);
     const handleMouseMove = (e) => {
         if (touchStartXRef.current === null) return;
-        handleDragMove(e.clientX);
+        handleDragMove(e.clientX, e.clientY);
     };
     const handleMouseUp = () => handleDragEnd();
     const handleMouseLeave = () => handleDragEnd();
@@ -1810,107 +1828,107 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
     return (
         <>
             <div className={styles.swipeContainer}>
-            <div className={styles.swipeBgLeft} style={{ opacity: starRevealOpacity }}>
-                {task.starred ? "★ 重要解除" : "★ 重要に追加"}
-            </div>
-            <div
-                className={styles.swipeBg}
-                style={{ opacity: completeRevealOpacity }}
-            >
-                {task.completed ? "↩ 未完了に戻す" : "✓ 完了"}
-            </div>
-            <div
-                className={\`
+                <div className={styles.swipeBgLeft} style={{ opacity: starRevealOpacity }}>
+                    {task.starred ? "★ 重要解除" : "★ 重要に追加"}
+                </div>
+                <div
+                    className={styles.swipeBg}
+                    style={{ opacity: completeRevealOpacity }}
+                >
+                    {task.completed ? "未完了に戻す" : "✓ 完了"}
+                </div>
+                <div
+                    className={\`
                     \${styles.card}
                     \${isDanger ? styles.danger : ""}
                     \${isExpired ? styles.expired : ""}
                     \${task.completed ? styles.completed : ""}
                 \`}
-                style={{
-                    background: backgroundStyle,
-                    transform: \`translateX(\${swipeX}px)\`,
-                    transition: isDragging ? "background 0.4s ease" : "transform 0.3s ease, background 0.4s ease",
-                }}
-                onTouchStart={handleTouchStart}
-                onTouchMove={handleTouchMove}
-                onTouchEnd={handleTouchEnd}
-                onMouseDown={handleMouseDown}
-                onMouseMove={handleMouseMove}
-                onMouseUp={handleMouseUp}
-                onMouseLeave={handleMouseLeave}
-            >
-                <div className={styles.left}>
-                    <div className={styles.titleRow}>
+                    style={{
+                        background: backgroundStyle,
+                        transform: \`translateX(\${swipeX}px)\`,
+                        transition: isDragging ? "background 0.4s ease" : "transform 0.3s ease, background 0.4s ease",
+                    }}
+                    onTouchStart={handleTouchStart}
+                    onTouchMove={handleTouchMove}
+                    onTouchEnd={handleTouchEnd}
+                    onMouseDown={handleMouseDown}
+                    onMouseMove={handleMouseMove}
+                    onMouseUp={handleMouseUp}
+                    onMouseLeave={handleMouseLeave}
+                >
+                    <div className={styles.left}>
+                        <div className={styles.titleRow}>
+                            <button
+                                className={\`\${styles.starBtn} \${task.starred ? styles.starred : ""}\`}
+                                onClick={toggleStar}
+                                title={task.starred ? "重要から外す" : "重要に追加"}
+                            >
+                                {task.starred ? "★" : "☆"}
+                            </button>
+                            <div className={styles.title}>{task.taskName}</div>
+                        </div>
+                        <div className={styles.deadline}>
+                            期限: {deadline.toLocaleString()}
+                        </div>
+                        {tags.length > 0 && (
+                            <div className={styles.tagList}>
+                                {tags.map((tag, i) => (
+                                    <TagChip key={i} tag={tag} readonly />
+                                ))}
+                            </div>
+                        )}
+                    </div>
+
+                    <div className={styles.right}>
+                        <div className={styles.time}>{formatRemain()}</div>
+                        <div className={styles.buttons}>
+                            {!task.completed && (
+                                <button className={styles.doneBtn} onClick={completeTask}>完了</button>
+                            )}
+                            <button className={styles.editBtn} onClick={() => setShowEdit(true)}>編集</button>
+                            <button className={styles.deleteBtn} onClick={deleteTask}>削除</button>
+                        </div>
+                    </div>
+
+                    <div className={styles.expandRow}>
                         <button
-                            className={\`\${styles.starBtn} \${task.starred ? styles.starred : ""}\`}
-                            onClick={toggleStar}
-                            title={task.starred ? "重要から外す" : "重要に追加"}
+                            className={styles.expandBtn}
+                            onClick={() => setIsExpanded(v => !v)}
                         >
-                            {task.starred ? "★" : "☆"}
+                            <span className={\`\${styles.expandIcon} \${isExpanded ? styles.open : ""}\`}>▼</span>
+                            {description ? "メモあり" : "メモを追加"}
                         </button>
-                        <div className={styles.title}>{task.taskName}</div>
                     </div>
-                    <div className={styles.deadline}>
-                        期限: {deadline.toLocaleString()}
-                    </div>
-                    {tags.length > 0 && (
-                        <div className={styles.tagList}>
-                            {tags.map((tag, i) => (
-                                <TagChip key={i} tag={tag} readonly />
-                            ))}
+
+                    {isExpanded && (
+                        <div className={styles.expandedArea}>
+                            <textarea
+                                className={styles.descriptionTextarea}
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                onBlur={handleDescriptionBlur}
+                                placeholder="メモを入力..."
+                            />
+                        </div>
+                    )}
+
+                    {!task.completed && !isExpired && (
+                        <div className={styles.gaugeWrapper}>
+                            <div
+                                className={styles.gauge}
+                                style={{
+                                    width: \`\${remainRatio * 100}%\`,
+                                    backgroundColor: isDanger
+                                        ? "rgb(239, 68, 68)"
+                                        : remainRatio < 0.5
+                                            ? "rgb(245, 158, 11)"
+                                            : "rgb(59, 130, 246)"
+                                }}
+                            />
                         </div>
                     )}
                 </div>
-
-                <div className={styles.right}>
-                    <div className={styles.time}>{formatRemain()}</div>
-                    <div className={styles.buttons}>
-                        {!task.completed && (
-                            <button className={styles.doneBtn} onClick={completeTask}>完了</button>
-                        )}
-                        <button className={styles.editBtn} onClick={() => setShowEdit(true)}>編集</button>
-                        <button className={styles.deleteBtn} onClick={deleteTask}>削除</button>
-                    </div>
-                </div>
-
-                <div className={styles.expandRow}>
-                    <button
-                        className={styles.expandBtn}
-                        onClick={() => setIsExpanded(v => !v)}
-                    >
-                        <span className={\`\${styles.expandIcon} \${isExpanded ? styles.open : ""}\`}>▼</span>
-                        {description ? "メモあり" : "メモを追加"}
-                    </button>
-                </div>
-
-                {isExpanded && (
-                    <div className={styles.expandedArea}>
-                        <textarea
-                            className={styles.descriptionTextarea}
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            onBlur={handleDescriptionBlur}
-                            placeholder="メモを入力..."
-                        />
-                    </div>
-                )}
-
-                {!task.completed && !isExpired && (
-                    <div className={styles.gaugeWrapper}>
-                        <div
-                            className={styles.gauge}
-                            style={{
-                                width: \`\${remainRatio * 100}%\`,
-                                backgroundColor: isDanger
-                                    ? "rgb(239, 68, 68)"
-                                    : remainRatio < 0.5
-                                        ? "rgb(245, 158, 11)"
-                                        : "rgb(59, 130, 246)"
-                            }}
-                        />
-                    </div>
-                )}
-            </div>
             </div>
 
             {showEdit && (

@@ -297,7 +297,7 @@ export default function SettingPage() {
                     <div className={`${styles.row} ${styles.rowStatic}`}>
                         <span className={styles.rowIcon}><InfoIcon /></span>
                         <span className={styles.rowLabel}>バージョン</span>
-                        <span className={styles.rowValue}>v1.1.1</span>
+                        <span className={styles.rowValue}>v1.1.2</span>
                     </div>
 
                     <div className={styles.divider} />

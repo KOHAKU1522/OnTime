@@ -21,6 +21,8 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
     const touchStartXRef = useRef(null);
     const touchStartYRef = useRef(null);
     const directionLockRef = useRef(null); // null | "h" | "v"
+
+    // ここいじれば誤爆率下げられる。X軸が10px動くまで判定しない。
     const DIRECTION_THRESHOLD = 10;
 
     useEffect(() => {
