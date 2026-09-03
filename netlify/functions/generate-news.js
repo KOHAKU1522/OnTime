@@ -1,3 +1,10 @@
+const NEWS_PROMPT = `
+ニュース候補から最も新しく重要な記事を1件だけ選んでください。
+候補に書かれている情報だけを使い、候補にない人物名・事件名・数字・日付を絶対に追加しないでください。
+タイトルが文字化けしている、意味を判別できない、またはニュース内容が不明な候補は選ばないでください。
+選んだ記事を日本語の自然な2〜3文で要約してください。1文目に記事の日付を含め、見出し・箇条書き・前置き・謝罪は不要です。
+`;
+
 export default async function handler() {
   try {
     const apiKey = globalThis.process?.env?.GEMINI_API_KEY;
@@ -13,12 +20,26 @@ export default async function handler() {
       throw new Error(`ニュースソース取得失敗: ${newsResponse.status}`);
     }
     const rss = await newsResponse.text();
+    const getTag = (item, tag) => item.match(
+      new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)</${tag}>`)
+    )?.[1] ?? "";
+    const cleanText = (text) => text
+      .replace(/<!\[CDATA\[|\]\]>/g, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&#39;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/\s+/g, " ")
+      .trim();
     const newsSource = [...rss.matchAll(/<item>([\s\S]*?)<\/item>/g)]
       .slice(0, 10)
-      .map(([, item]) => item
-        .replace(/<[^>]+>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim())
+      .map(([, item], index) => {
+        const title = cleanText(getTag(item, "title"));
+        const publishedAt = cleanText(getTag(item, "pubDate"));
+        return `[${index + 1}] ${title} (公開日時: ${publishedAt})`;
+      })
       .join("\n");
 
     if (!newsSource) {
@@ -33,7 +54,7 @@ export default async function handler() {
         body: JSON.stringify({
           contents: [{
             parts: [{
-                text: `今日は${new Intl.DateTimeFormat("ja-JP", { timeZone: "Asia/Tokyo", dateStyle: "long" }).format(new Date())}です。以下はGoogleニュースの最新一覧です。今日または直近のニュースを1件だけ選び、日付を必ず含めて、事実ベースで日本語2〜3行に要約してください。古いニュースしかない場合は、その中で最も新しいものを選んでください。見出しや前置きは不要です。\n\n${newsSource}`
+          text: `今日は${new Intl.DateTimeFormat("ja-JP", { timeZone: "Asia/Tokyo", dateStyle: "long" }).format(new Date())}です。${NEWS_PROMPT}\n\nニュース候補:\n${newsSource}`
             }]
           }],
           generationConfig: { temperature: 0.2, maxOutputTokens: 180 }
