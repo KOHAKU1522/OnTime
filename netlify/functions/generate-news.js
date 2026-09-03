@@ -41,22 +41,20 @@ export default async function handler() {
       .replace(/&quot;/g, '"')
       .replace(/\s+/g, " ")
       .trim();
-    const newsSource = [...rss.matchAll(/<item>([\s\S]*?)<\/item>/g)]
+    const newsItems = [...rss.matchAll(/<item>([\s\S]*?)<\/item>/g)]
       .slice(0, 10)
       .map(([, item]) => {
         const title = cleanText(getTag(item, "title"));
-        return title;
+        return title.replace(/\s+-\s+[^-]+$/, "");
       })
-      .join("\n");
+      .filter(Boolean);
 
-    if (!newsSource) {
+    if (!newsItems.length) {
       throw new Error("ニュース項目が見つかりませんでした");
     }
 
-    const latestTitle = newsSource.split("\n")[0]
-      .replace(/^\[1\]\s*/, "")
-      .replace(/\s+-\s+[^-]+$/, "");
-    fallbackNews = latestTitle;
+    const selectedNews = newsItems[Math.floor(Math.random() * newsItems.length)];
+    fallbackNews = selectedNews;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
@@ -67,7 +65,7 @@ export default async function handler() {
         body: JSON.stringify({
           contents: [{
             parts: [{
-                text: `${NEWS_PROMPT}\n\nニュースタイトル:\n${latestTitle}`
+                text: `${NEWS_PROMPT}\n\nニュースタイトル:\n${selectedNews}`
             }]
           }],
           generationConfig: { temperature: 0.2, maxOutputTokens: 180 }
