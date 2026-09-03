@@ -1,7 +1,8 @@
 const NEWS_PROMPT = `
-以下のニュースタイトルをもとに、読者に伝わる自然な日本語の文章を2〜3文で作ってください。
-タイトルに書かれていない具体的な人物名・数字・経緯・日付は追加しないでください。
-タイトルの内容から確実に言える範囲だけを、簡潔に説明してください。
+以下のニュース記事のタイトルと概要をもとに、読者に伝わる自然な日本語の要約を2〜3文で作ってください。
+タイトルをそのまま繰り返すのではなく、何が起きたのか、分かる範囲で背景や影響を説明してください。
+記事のタイトルと概要に書かれていない具体的な人物名・数字・経緯・日付は追加しないでください。
+概要が短い場合は、無理に情報を補わず、分かっている内容だけで文章にしてください。
 見出し・箇条書き・前置き・謝罪・英語の日付表記は不要です。
 `;
 
@@ -45,16 +46,20 @@ export default async function handler() {
       .slice(0, 10)
       .map(([, item]) => {
         const title = cleanText(getTag(item, "title"));
-        return title.replace(/\s+-\s+[^-]+$/, "");
+        const description = cleanText(getTag(item, "description"));
+        return {
+          title: title.replace(/\s+-\s+[^-]+$/, ""),
+          description
+        };
       })
-      .filter(Boolean);
+      .filter((item) => item.title);
 
     if (!newsItems.length) {
       throw new Error("ニュース項目が見つかりませんでした");
     }
 
     const selectedNews = newsItems[Math.floor(Math.random() * newsItems.length)];
-    fallbackNews = selectedNews;
+    fallbackNews = selectedNews.title;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
@@ -65,7 +70,7 @@ export default async function handler() {
         body: JSON.stringify({
           contents: [{
             parts: [{
-                text: `${NEWS_PROMPT}\n\nニュースタイトル:\n${selectedNews}`
+                text: `${NEWS_PROMPT}\n\nニュースタイトル:\n${selectedNews.title}\n\n記事概要:\n${selectedNews.description}`
             }]
           }],
           generationConfig: { temperature: 0.2, maxOutputTokens: 180 }
