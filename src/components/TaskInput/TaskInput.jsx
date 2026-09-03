@@ -80,13 +80,26 @@ export default function TaskInput({ onAddTask, allTags = [] }) {
         <div className={styles.container}>
             <h2 className={styles.title}>タスク追加</h2>
 
-            <input
-                type="text"
-                placeholder="タスク名"
-                value={taskName}
-                onChange={(e) => setTaskName(e.target.value)}
-                className={styles.input}
-            />
+            <div className={styles.taskNameInputWrapper}>
+                <input
+                    type="text"
+                    placeholder="タスク名"
+                    value={taskName}
+                    onChange={(e) => setTaskName(e.target.value)}
+                    className={`${styles.input} ${styles.taskNameInput}`}
+                />
+                {taskName && (
+                    <button
+                        type="button"
+                        onClick={() => setTaskName("")}
+                        className={styles.clearButton}
+                        aria-label="タスク名をクリア"
+                        title="タスク名をクリア"
+                    >
+                        ×
+                    </button>
+                )}
+            </div>
 
             <VoiceInput value={taskName} onChange={setTaskName}/>
 
