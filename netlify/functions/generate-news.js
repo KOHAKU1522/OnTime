@@ -42,9 +42,13 @@ export default async function handler() {
       .replace(/&quot;/g, '"')
       .replace(/\s+/g, " ")
       .trim();
-    const getArticleText = (html) => cleanText(html
-      .replace(/<(script|style|nav|header|footer|aside)[^>]*>[\s\S]*?<\/\1>/gi, " ")
-      .replace(/<[^>]+>/g, " ")).slice(0, 8000);
+    const getArticleText = (html) => {
+      const article = html.match(/<article[^>]*>([\s\S]*?)<\/article>/i)?.[1] ?? html;
+      const text = cleanText(article
+        .replace(/<(script|style|nav|header|footer|aside|form)[^>]*>[\s\S]*?<\/\1>/gi, " ")
+        .replace(/<[^>]+>/g, " ")).slice(0, 8000);
+      return /(?:�|Ã.|Â.|æ.|ã.){3,}/.test(text) ? "" : text;
+    };
     const newsItems = [...rss.matchAll(/<item>([\s\S]*?)<\/item>/g)]
       .slice(0, 10)
       .map(([, item]) => {
