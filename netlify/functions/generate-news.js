@@ -1,8 +1,8 @@
 const NEWS_PROMPT = `
 以下のニュース記事のタイトルと概要をもとに、読者に伝わる自然な日本語の要約を2〜3文で作ってください。
-タイトルをそのまま繰り返すのではなく、何が起きたのか、分かる範囲で背景や影響を説明してください。
-記事のタイトルと概要に書かれていない具体的な人物名・数字・経緯・日付は追加しないでください。
-概要が短い場合は、無理に情報を補わず、分かっている内容だけで文章にしてください。
+本文がある場合は本文を優先し、タイトルをそのまま繰り返さず、何が起きたのかを説明してください。
+記事に書かれていない具体的な人物名・数字・経緯・日付は追加しないでください。
+情報が不足している場合は、無理に補わず、分かっている内容だけで文章にしてください。
 見出し・箇条書き・前置き・謝罪・英語の日付表記は不要です。
 `;
 
@@ -42,14 +42,19 @@ export default async function handler() {
       .replace(/&quot;/g, '"')
       .replace(/\s+/g, " ")
       .trim();
+    const getArticleText = (html) => cleanText(html
+      .replace(/<(script|style|nav|header|footer|aside)[^>]*>[\s\S]*?<\/\1>/gi, " ")
+      .replace(/<[^>]+>/g, " ")).slice(0, 8000);
     const newsItems = [...rss.matchAll(/<item>([\s\S]*?)<\/item>/g)]
       .slice(0, 10)
       .map(([, item]) => {
         const title = cleanText(getTag(item, "title"));
         const description = cleanText(getTag(item, "description"));
+        const link = cleanText(getTag(item, "link"));
         return {
           title: title.replace(/\s+-\s+[^-]+$/, ""),
-          description
+          description,
+          link
         };
       })
       .filter((item) => item.title);
@@ -60,6 +65,23 @@ export default async function handler() {
 
     const selectedNews = newsItems[Math.floor(Math.random() * newsItems.length)];
     fallbackNews = selectedNews.title;
+    let articleText = "";
+
+    if (selectedNews.link) {
+      try {
+        const articleResponse = await fetch(selectedNews.link, {
+          signal: AbortSignal.timeout(3000),
+          headers: { "User-Agent": "OnTime news summarizer" }
+        });
+        if (articleResponse.ok) {
+          articleText = getArticleText(
+            new TextDecoder("utf-8").decode(await articleResponse.arrayBuffer())
+          );
+        }
+      } catch (error) {
+        console.warn("記事本文を取得できませんでした:", error.message);
+      }
+    }
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
@@ -70,7 +92,7 @@ export default async function handler() {
         body: JSON.stringify({
           contents: [{
             parts: [{
-                text: `${NEWS_PROMPT}\n\nニュースタイトル:\n${selectedNews.title}\n\n記事概要:\n${selectedNews.description}`
+                text: `${NEWS_PROMPT}\n\nニュースタイトル:\n${selectedNews.title}\n\n記事概要:\n${selectedNews.description}\n\n記事本文:\n${articleText}`
             }]
           }],
           generationConfig: { temperature: 0.2, maxOutputTokens: 180 }
