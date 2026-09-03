@@ -1,0 +1,26 @@
+.container {
+  margin-top: 0px;
+  display: flex;
+  gap: 0px;
+  align-items: center;
+}
+
+.micButton {
+  padding: 8px 12px;
+  font-size: 14px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-primary);
+  cursor: pointer;
+}
+
+.micButton.on {
+  background: var(--brand);
+  color: #efefef;
+}
+
+.info {
+  font-size: 12px;
+  color: var(--text-muted);
+}

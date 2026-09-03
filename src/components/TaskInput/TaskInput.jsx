@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "./TaskInput.module.css";
 import TagChip from "../TagChip/TagChip";
+import VoiceInput from "../VoiceInput/VoiceInput.jsx";
 
 const PRESETS = [
     { label: "今日中", getDate: () => { const d = new Date(); d.setHours(23, 59, 0, 0); return d; } },
@@ -86,6 +87,8 @@ export default function TaskInput({ onAddTask, allTags = [] }) {
                 onChange={(e) => setTaskName(e.target.value)}
                 className={styles.input}
             />
+
+            <VoiceInput value={taskName} onChange={setTaskName}/>
 
             <div className={styles.section}>
                 <div className={styles.sectionLabel}>期限</div>
