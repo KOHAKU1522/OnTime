@@ -27,7 +27,7 @@ export default async function handler() {
     if (!newsResponse.ok) {
       throw new Error(`ニュースソース取得失敗: ${newsResponse.status}`);
     }
-    const rss = await newsResponse.text();
+    const rss = new TextDecoder("utf-8").decode(await newsResponse.arrayBuffer());
     const getTag = (item, tag) => item.match(
       new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)</${tag}>`)
     )?.[1] ?? "";
