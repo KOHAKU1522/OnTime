@@ -32,7 +32,16 @@ export default async function handler() {
     const getTag = (item, tag) => item.match(
       new RegExp(`<${tag}(?:\\s[^>]*)?>([\\s\\S]*?)</${tag}>`)
     )?.[1] ?? "";
-    const cleanText = (text) => text
+    const repairEncoding = (text) => {
+      if (!/(?:Ã.|Â.|ã.|æ.|å.|ç.|é.)/.test(text)) return text;
+      try {
+        const bytes = Uint8Array.from(text, (character) => character.charCodeAt(0));
+        return new TextDecoder("utf-8").decode(bytes);
+      } catch {
+        return text;
+      }
+    };
+    const cleanText = (text) => repairEncoding(text)
       .replace(/<!\[CDATA\[|\]\]>/g, "")
       .replace(/<[^>]+>/g, " ")
       .replace(/&amp;/g, "&")
