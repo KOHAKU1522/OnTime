@@ -1,0 +1,23 @@
+.container {
+	margin-bottom: 20px;
+	padding: 14px 16px;
+	border-left: 3px solid var(--brand);
+	background: var(--bg-card);
+	box-shadow: var(--shadow-card);
+}
+
+.label {
+	margin-bottom: 6px;
+	color: var(--brand);
+	font-size: 0.7rem;
+	font-weight: 700;
+	letter-spacing: 0.08em;
+}
+
+.text {
+	margin: 0;
+	color: var(--text-secondary);
+	font-size: 0.88rem;
+	line-height: 1.65;
+	white-space: pre-line;
+}

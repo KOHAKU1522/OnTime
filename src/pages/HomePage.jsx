@@ -9,6 +9,7 @@ import { addDoc, collection } from "firebase/firestore";
 import TaskInput from "../components/TaskInput/TaskInput";
 import TaskList from "../components/TaskList/TaskList";
 import ProfileMenu from "../components/ProfileMenu/ProfileMenu";
+import News from "../components/News/News";
 
 export default function HomePage({ isGuest }) {
 
@@ -95,6 +96,8 @@ export default function HomePage({ isGuest }) {
                     }
                 </button>
             </header>
+
+            <News></News>
 
             <TaskInput onAddTask={handleAddTask} allTags={[...new Set(allTasks.flatMap(t => t.tags ?? []))]} />
 
