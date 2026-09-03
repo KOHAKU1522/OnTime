@@ -36,6 +36,44 @@
     box-shadow: 0 0 0 2px var(--brand-focus-ring);
 }
 
+.taskNameInputWrapper {
+    position: relative;
+}
+
+.taskNameInput {
+    padding-right: 38px;
+}
+
+.clearButton {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    font-size: 2.25rem;
+    line-height: 1;
+    cursor: pointer;
+    transform: translateY(-50%);
+}
+
+.clearButton:hover {
+    background: var(--bg-preset);
+    color: var(--text-primary);
+}
+
+.clearButton:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 1px;
+}
+
 .textarea {
     width: 100%;
     padding: 10px 12px;
