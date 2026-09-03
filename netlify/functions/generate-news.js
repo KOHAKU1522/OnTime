@@ -2,8 +2,15 @@ const NEWS_PROMPT = `
 ニュース候補から最も新しく重要な記事を1件だけ選んでください。
 候補に書かれている情報だけを使い、候補にない人物名・事件名・数字・日付を絶対に追加しないでください。
 タイトルが文字化けしている、意味を判別できない、またはニュース内容が不明な候補は選ばないでください。
-選んだ記事を日本語の自然な2〜3文で要約してください。1文目に記事の日付を含め、見出し・箇条書き・前置き・謝罪は不要です。
+選んだ記事を日本語の自然な2〜3文で要約してください。見出し・箇条書き・前置き・謝罪・英語の日付表記は不要です。
 `;
+
+const formatNews = (text) => text
+  .split(/\r?\n/)
+  .map((line) => line.replace(/^\s*[-*]\s*/, "").trim())
+  .filter((line) => line && !/^(?:Mon|Tue|Wed|Thu|Fri|Sat|Sun),\s+\d{1,2}\s+[A-Z][a-z]{2}/.test(line))
+  .join("\n")
+  .trim();
 
 export default async function handler() {
   let fallbackNews = "";
@@ -47,9 +54,9 @@ export default async function handler() {
       throw new Error("ニュース項目が見つかりませんでした");
     }
 
-    fallbackNews = newsSource.split("\n")[0]
+    fallbackNews = formatNews(newsSource.split("\n")[0]
       .replace(/^\[1\]\s*/, "")
-      .replace(/\s*\(公開日時:.*\)$/, "");
+      .replace(/\s*\(公開日時:.*\)$/, ""));
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
@@ -76,7 +83,7 @@ export default async function handler() {
     }
 
     const data = await response.json();
-    const news = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const news = formatNews(data.candidates?.[0]?.content?.parts?.[0]?.text ?? "");
 
     if (!news) {
       return new Response(JSON.stringify({ news: fallbackNews }), {
