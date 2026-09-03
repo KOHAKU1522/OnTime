@@ -1,0 +1,38 @@
+{
+  "planHash": "d739af7755ebb8d2aba23e379267da24c0444955d10fdf32da112f62ea623cc8",
+  "phase": "baseline",
+  "recordedAtUtc": "2026-09-03T15:58:02.9942939Z",
+  "retryCount": 0,
+  "resetBaseline": false,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 2873,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "build-succeeds",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E ontime@0.0.0 build\r\n\u003E vite build\r\n\r\n\u001B[36mvite v7.3.1 \u001B[32mbuilding client environment for production...\u001B[36m\u001B[39m\r\ntransforming...\r\n\u001B[32m\u2713\u001B[39m 112 modules transformed.\r\nrendering chunks...\r\ncomputing gzip size...\r\n\u001B[2mdist/\u001B[22m\u001B[32mindex.html                 \u001B[39m\u001B[1m\u001B[2m  0.68 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   0.37 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[35massets/index-D_L1VpXy.css  \u001B[39m\u001B[1m\u001B[2m 49.05 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   8.73 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[36massets/index-Bm8dU-UZ.js   \u001B[39m\u001B[1m\u001B[33m717.06 kB\u001B[39m\u001B[22m\u001B[2m \u2502 gzip: 218.63 kB\u001B[22m\r\n\u001B[33m\r\n(!) Some chunks are larger than 500 kB after minification. Consider:\r\n- Using dynamic import() to code-split the application\r\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\r\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\u001B[39m\r\n\u001B[32m\u2713 built in 4.59s\u001B[39m\r\n",
+        "durationMs": 5966
+      },
+      {
+        "name": "dev-server-serves-home",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\n\u003Chtml lang=\u0022ja\u0022\u003E\n\n\u003Chead\u003E\n  \u003Cscript type=\u0022module\u0022\u003Eimport { injectIntoGlobalHook } from \u0022/@react-refresh\u0022;\ninjectIntoGlobalHook(window);\nwindow.$RefreshReg$ = () =\u003E {};\nwindow.$RefreshSig$ = () =\u003E (type) =\u003E type;\u003C/script\u003E\n\n  \u003Cscript type=\u0022module\u0022 src=\u0022/@vite/client\u0022\u003E\u003C/script\u003E\n\n  \u003Cmeta charset=\u0022UTF-8\u0022 /\u003E\n\n  \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1.0\u0022 /\u003E\n  \u003Ctitle\u003EOnTime\u003C/title\u003E\n  \u003Clink rel=\u0022manifest\u0022 href=\u0022/manifest.json\u0022 /\u003E\n  \u003Clink rel=\u0022apple-touch-icon\u0022 href=\u0022/images/app-logo2.png\u0022 /\u003E\n  \u003Cmeta name=\u0022apple-mobile-web-app-capable\u0022 content=\u0022yes\u0022 /\u003E\n  \u003Cmeta name=\u0022apple-mobile-web-app-status-bar-style\u0022 content=\u0022default\u0022 /\u003E\n  \u003Cmeta name=\u0022apple-mobile-web-app-title\u0022 content=\u0022OnTime\u0022 /\u003E\n\u003C/head\u003E\n\n\u003Cbody\u003E\n  \u003Cdiv id=\u0022root\u0022\u003E\u003C/div\u003E\n  \u003Cscript type=\u0022module\u0022 src=\u0022/src/main.jsx?t=1788451009280\u0022\u003E\u003C/script\u003E\n\u003C/body\u003E\n\n\u003C/html\u003E",
+        "durationMs": 18
+      }
+    ]
+  }
+}
