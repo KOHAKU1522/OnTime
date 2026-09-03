@@ -8,11 +8,22 @@ export default async function handler() {
       });
     }
 
-    const newsResponse = await fetch("https://www3.nhk.or.jp/rss/news/cat0.xml");
+    const newsResponse = await fetch("https://news.google.com/rss?hl=ja&gl=JP&ceid=JP:ja");
     if (!newsResponse.ok) {
       throw new Error(`ニュースソース取得失敗: ${newsResponse.status}`);
     }
-    const newsSource = (await newsResponse.text()).slice(0, 12000);
+    const rss = await newsResponse.text();
+    const newsSource = [...rss.matchAll(/<item>([\s\S]*?)<\/item>/g)]
+      .slice(0, 10)
+      .map(([, item]) => item
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim())
+      .join("\n");
+
+    if (!newsSource) {
+      throw new Error("ニュース項目が見つかりませんでした");
+    }
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
@@ -22,7 +33,7 @@ export default async function handler() {
         body: JSON.stringify({
           contents: [{
             parts: [{
-                text: `以下はNHKの最新ニュース一覧です。この中から重要なニュースを1件選び、事実ベースで日本語2〜3行に要約してください。見出しは不要です。\n\n${newsSource}`
+                text: `今日は${new Intl.DateTimeFormat("ja-JP", { timeZone: "Asia/Tokyo", dateStyle: "long" }).format(new Date())}です。以下はGoogleニュースの最新一覧です。今日または直近のニュースを1件だけ選び、日付を必ず含めて、事実ベースで日本語2〜3行に要約してください。古いニュースしかない場合は、その中で最も新しいものを選んでください。見出しや前置きは不要です。\n\n${newsSource}`
             }]
           }],
           generationConfig: { temperature: 0.2, maxOutputTokens: 180 }
