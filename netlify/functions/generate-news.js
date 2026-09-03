@@ -1,8 +1,8 @@
 const NEWS_PROMPT = `
-ニュース候補から最も新しく重要な記事を1件だけ選んでください。
-候補に書かれている情報だけを使い、候補にない人物名・事件名・数字・日付を絶対に追加しないでください。
-タイトルが文字化けしている、意味を判別できない、またはニュース内容が不明な候補は選ばないでください。
-選んだ記事を日本語の自然な2〜3文で要約してください。見出し・箇条書き・前置き・謝罪・英語の日付表記は不要です。
+以下のニュースタイトルをもとに、読者に伝わる自然な日本語の文章を2〜3文で作ってください。
+タイトルに書かれていない具体的な人物名・数字・経緯・日付は追加しないでください。
+タイトルの内容から確実に言える範囲だけを、簡潔に説明してください。
+見出し・箇条書き・前置き・謝罪・英語の日付表記は不要です。
 `;
 
 const formatNews = (text) => text
@@ -43,10 +43,9 @@ export default async function handler() {
       .trim();
     const newsSource = [...rss.matchAll(/<item>([\s\S]*?)<\/item>/g)]
       .slice(0, 10)
-      .map(([, item], index) => {
+      .map(([, item]) => {
         const title = cleanText(getTag(item, "title"));
-        const publishedAt = cleanText(getTag(item, "pubDate"));
-        return `[${index + 1}] ${title} (公開日時: ${publishedAt})`;
+        return title;
       })
       .join("\n");
 
@@ -54,9 +53,10 @@ export default async function handler() {
       throw new Error("ニュース項目が見つかりませんでした");
     }
 
-    fallbackNews = formatNews(newsSource.split("\n")[0]
+    const latestTitle = newsSource.split("\n")[0]
       .replace(/^\[1\]\s*/, "")
-      .replace(/\s*\(公開日時:.*\)$/, ""));
+      .replace(/\s+-\s+[^-]+$/, "");
+    fallbackNews = latestTitle;
 
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
@@ -67,7 +67,7 @@ export default async function handler() {
         body: JSON.stringify({
           contents: [{
             parts: [{
-          text: `今日は${new Intl.DateTimeFormat("ja-JP", { timeZone: "Asia/Tokyo", dateStyle: "long" }).format(new Date())}です。${NEWS_PROMPT}\n\nニュース候補:\n${newsSource}`
+                text: `${NEWS_PROMPT}\n\nニュースタイトル:\n${latestTitle}`
             }]
           }],
           generationConfig: { temperature: 0.2, maxOutputTokens: 180 }
