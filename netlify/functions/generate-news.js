@@ -6,6 +6,7 @@ const NEWS_PROMPT = `
 `;
 
 export default async function handler() {
+  let fallbackNews = "";
   try {
     const apiKey = globalThis.process?.env?.GEMINI_API_KEY;
     if (!apiKey) {
@@ -46,11 +47,16 @@ export default async function handler() {
       throw new Error("ニュース項目が見つかりませんでした");
     }
 
+    fallbackNews = newsSource.split("\n")[0]
+      .replace(/^\[1\]\s*/, "")
+      .replace(/\s*\(公開日時:.*\)$/, "");
+
     const response = await fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: AbortSignal.timeout(4000),
         body: JSON.stringify({
           contents: [{
             parts: [{
@@ -64,8 +70,7 @@ export default async function handler() {
 
     if (!response.ok) {
       console.error("Gemini API error:", response.status, await response.text());
-      return new Response(JSON.stringify({ error: "ニュースの取得に失敗しました" }), {
-        status: 502,
+      return new Response(JSON.stringify({ news: fallbackNews }), {
         headers: { "Content-Type": "application/json" }
       });
     }
@@ -74,8 +79,7 @@ export default async function handler() {
     const news = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
 
     if (!news) {
-      return new Response(JSON.stringify({ error: "ニュースが生成されませんでした" }), {
-        status: 502,
+      return new Response(JSON.stringify({ news: fallbackNews }), {
         headers: { "Content-Type": "application/json" }
       });
     }
@@ -85,6 +89,11 @@ export default async function handler() {
     });
   } catch (error) {
     console.error("ニュース取得エラー:", error);
+    if (fallbackNews) {
+      return new Response(JSON.stringify({ news: fallbackNews }), {
+        headers: { "Content-Type": "application/json" }
+      });
+    }
     return new Response(JSON.stringify({ error: "ニュースの取得に失敗しました" }), {
       status: 500,
       headers: { "Content-Type": "application/json" }
