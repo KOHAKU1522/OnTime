@@ -8,18 +8,23 @@ export default async function handler() {
       });
     }
 
+    const newsResponse = await fetch("https://www3.nhk.or.jp/rss/news/cat0.xml");
+    if (!newsResponse.ok) {
+      throw new Error(`ニュースソース取得失敗: ${newsResponse.status}`);
+    }
+    const newsSource = (await newsResponse.text()).slice(0, 12000);
+
     const response = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${apiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           contents: [{
             parts: [{
-              text: "今日の日本の時事ニュースを1件、Google検索で確認し、事実ベースで日本語2〜3行に要約してください。見出しは不要です。情報が不確かな場合は、その旨を短く書いてください。"
+                text: `以下はNHKの最新ニュース一覧です。この中から重要なニュースを1件選び、事実ベースで日本語2〜3行に要約してください。見出しは不要です。\n\n${newsSource}`
             }]
           }],
-          tools: [{ google_search: {} }],
           generationConfig: { temperature: 0.2, maxOutputTokens: 180 }
         })
       }
