@@ -1,6 +1,7 @@
 .container {
 	margin-bottom: 20px;
 	padding: 14px 16px;
+	border-radius: 12px;
 	border-left: 3px solid var(--brand);
 	background: var(--bg-card);
 	box-shadow: var(--shadow-card);
