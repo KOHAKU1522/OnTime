@@ -1,0 +1,1 @@
+[[{"Pattern":"return \\[isDark, setIsDark\\];","Replacement":"return /** @type {[boolean, import(\u0022react\u0022).Dispatch\u003Cimport(\u0022react\u0022).SetStateAction\u003Cboolean\u003E\u003E]} */ ([isDark, setIsDark]);"},{"Pattern":"return \\[enabled, update\\];","Replacement":"return /** @type {[boolean, (value: boolean) =\u003E void]} */ ([enabled, update]);"}]]

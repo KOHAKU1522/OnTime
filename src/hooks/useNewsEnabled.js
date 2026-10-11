@@ -22,5 +22,5 @@ export function useNewsEnabled() {
         }
     }, []);
 
-    return [enabled, update];
+    return /** @type {[boolean, (value: boolean) => void]} */ ([enabled, update]);
 }
