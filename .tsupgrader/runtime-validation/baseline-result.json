@@ -1,0 +1,124 @@
+{
+  "planHash": "54036e60bc5feb354ad336c2739373f457f516253a22ac594461b20c07f49c60",
+  "phase": "baseline",
+  "recordedAtUtc": "2026-10-11T18:51:25.0629845Z",
+  "retryCount": 0,
+  "resetBaseline": true,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 0,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "vite-production-build",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E ontime@0.0.0 build\r\n\u003E vite build\r\n\r\n\u001B[36mvite v7.3.1 \u001B[32mbuilding client environment for production...\u001B[36m\u001B[39m\r\ntransforming...\r\n\u001B[32m\u2713\u001B[39m 130 modules transformed.\r\nrendering chunks...\r\ncomputing gzip size...\r\n\u001B[2mdist/\u001B[22m\u001B[32mindex.html                         \u001B[39m\u001B[1m\u001B[2m  0.72 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   0.39 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[35massets/CodeRefPage-DsQUAymQ.css    \u001B[39m\u001B[1m\u001B[2m  2.60 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   0.92 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[35massets/GuidePage-cb_3Q46o.css      \u001B[39m\u001B[1m\u001B[2m  2.80 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   1.00 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[35massets/OtherAppsPage-8y9qqX6t.css  \u001B[39m\u001B[1m\u001B[2m  3.00 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   1.04 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[35massets/MacroPage-66Wgvcx5.css      \u001B[39m\u001B[1m\u001B[2m  5.35 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   1.51 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[35massets/CalendarPage-D9k5Jt54.css   \u001B[39m\u001B[1m\u001B[2m  6.34 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   1.86 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[35massets/SettingPage-j_LIuHXK.css    \u001B[39m\u001B[1m\u001B[2m  7.19 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   1.80 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[35massets/index-BRXO75yb.css          \u001B[39m\u001B[1m\u001B[2m 34.56 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   7.04 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[36massets/GuidePage-Cp_zkh3n.js       \u001B[39m\u001B[1m\u001B[2m  3.58 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   1.70 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[36massets/OtherAppsPage-CVAmuFM2.js   \u001B[39m\u001B[1m\u001B[2m  3.86 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   2.10 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[36massets/CalendarPage-DWWXz28X.js    \u001B[39m\u001B[1m\u001B[2m  8.51 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   3.35 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[36massets/MacroPage-CwVKzoNC.js       \u001B[39m\u001B[1m\u001B[2m 10.38 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   3.83 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[36massets/SettingPage-Cr2DngZk.js     \u001B[39m\u001B[1m\u001B[2m 15.86 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:   5.05 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[36massets/CodeRefPage-fANtaLiW.js     \u001B[39m\u001B[1m\u001B[2m 70.40 kB\u001B[22m\u001B[1m\u001B[22m\u001B[2m \u2502 gzip:  16.32 kB\u001B[22m\r\n\u001B[2mdist/\u001B[22m\u001B[36massets/index-DWIaUIsx.js           \u001B[39m\u001B[1m\u001B[33m649.55 kB\u001B[39m\u001B[22m\u001B[2m \u2502 gzip: 205.45 kB\u001B[22m\r\n\u001B[33m\r\n(!) Some chunks are larger than 500 kB after minification. Consider:\r\n- Using dynamic import() to code-split the application\r\n- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks\r\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\u001B[39m\r\n\u001B[32m\u2713 built in 3.34s\u001B[39m\r\n",
+        "durationMs": 4294
+      },
+      {
+        "name": "eslint-passes",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E ontime@0.0.0 lint\r\n\u003E eslint .\r\n\r\n",
+        "durationMs": 4156
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E ontime@0.0.0 test\r\n\u003E node --test tests/timezone.test.js\r\n\r\n\u25B6 timezone date helpers\r\n  \u2714 adds calendar days across month boundaries (0.7089ms)\r\n  \u2714 clamps month additions to the target month\u0027s last day (0.1513ms)\r\n  \u2714 derives the date in the requested time zone (15.2452ms)\r\n\u2714 timezone date helpers (17.6701ms)\r\n\u2139 tests 3\r\n\u2139 suites 1\r\n\u2139 pass 3\r\n\u2139 fail 0\r\n\u2139 cancelled 0\r\n\u2139 skipped 0\r\n\u2139 todo 0\r\n\u2139 duration_ms 104.8397\r\n",
+        "durationMs": 630,
+        "testResults": {
+          "testFramework": "unknown",
+          "runnerDetectedFrom": "none",
+          "testsTotal": 0,
+          "testsPassed": 0,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": true
+        }
+      },
+      {
+        "name": "home-route-responds",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\r\n\u003Chtml lang=\u0022ja\u0022\u003E\r\n\r\n\u003Chead\u003E\n  \u003Cscript type=\u0022module\u0022\u003Eimport { injectIntoGlobalHook } from \u0022/@react-refresh\u0022;\ninjectIntoGlobalHook(window);\nwindow.$RefreshReg$ = () =\u003E {};\nwindow.$RefreshSig$ = () =\u003E (type) =\u003E type;\u003C/script\u003E\n\n  \u003Cscript type=\u0022module\u0022 src=\u0022/@vite/client\u0022\u003E\u003C/script\u003E\n\r\n  \u003Cmeta charset=\u0022UTF-8\u0022 /\u003E\r\n\r\n  \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1.0, viewport-fit=cover\u0022 /\u003E\r\n  \u003Ctitle\u003EOnTime\u003C/title\u003E\r\n  \u003Clink rel=\u0022manifest\u0022 href=\u0022/manifest.json\u0022 /\u003E\r\n  \u003Clink rel=\u0022apple-touch-icon\u0022 href=\u0022/images/app-logo2.png\u0022 /\u003E\r\n  \u003Cmeta name=\u0022apple-mobile-web-app-capable\u0022 content=\u0022yes\u0022 /\u003E\r\n  \u003Cmeta name=\u0022apple-mobile-web-app-status-bar-style\u0022 content=\u0022default\u0022 /\u003E\r\n  \u003Cmeta name=\u0022apple-mobile-web-app-title\u0022 content=\u0022OnTime\u0022 /\u003E\r\n\u003C/head\u003E\r\n\r\n\u003Cbody\u003E\r\n  \u003Cdiv id=\u0022root\u0022\u003E\u003C/div\u003E\r\n  \u003Cscript type=\u0022module\u0022 src=\u0022/src/main.jsx\u0022\u003E\u003C/script\u003E\r\n\u003C/body\u003E\r\n\r\n\u003C/html\u003E",
+        "durationMs": 11
+      }
+    ],
+    "executions": [
+      {
+        "source": "vite-production-build",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "build"
+        ],
+        "cwd": "c:\\Users\\yuuya\\OneDrive\\Desktop\\projects\\OnTime",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "eslint-passes",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "lint"
+        ],
+        "cwd": "c:\\Users\\yuuya\\OneDrive\\Desktop\\projects\\OnTime",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "test"
+        ],
+        "cwd": "c:\\Users\\yuuya\\OneDrive\\Desktop\\projects\\OnTime",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "home-route-responds",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "dev",
+          "--",
+          "--host",
+          "127.0.0.1"
+        ],
+        "cwd": "c:\\Users\\yuuya\\OneDrive\\Desktop\\projects\\OnTime",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}

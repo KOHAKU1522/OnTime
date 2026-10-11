@@ -1,0 +1,26 @@
+{
+  "generatedAt": "2026-10-12T04:30:00Z",
+  "generatedOnPlatform": "win32",
+  "projectType": "other",
+  "setup": [],
+  "assertions": [
+    {
+      "name": "functions-eslint-passes",
+      "kind": "process",
+      "command": "npm",
+      "args": ["run", "lint"],
+      "verificationMethod": "exit-code",
+      "expected": "0",
+      "timeoutSeconds": 300
+    },
+    {
+      "name": "tests-pass",
+      "kind": "process",
+      "command": "npm",
+      "args": ["test"],
+      "verificationMethod": "test-results",
+      "expected": "0",
+      "timeoutSeconds": 300
+    }
+  ]
+}
