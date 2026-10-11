@@ -2,6 +2,7 @@
 import {onSchedule} from "firebase-functions/v2/scheduler";
 import {logger} from "firebase-functions";
 import admin from "firebase-admin";
+import {getFirestore} from "firebase-admin/firestore";
 import {
   buildMacroTask, isMacroDue, macroTaskId, todayKey,
 } from "./macroSchedule.js";
@@ -45,7 +46,7 @@ const runMacro = async (db, macroRef, now, timeZone) => {
 export const runMacros = onSchedule(
     {schedule: "5 * * * *", timeZone: "Asia/Tokyo", retryCount: 1},
     async () => {
-      const db = admin.firestore();
+      const db = getFirestore();
       const now = new Date();
       const snap = await db.collectionGroup("macros").get();
       const timeZones = new Map();
@@ -53,6 +54,7 @@ export const runMacros = onSchedule(
       let created = 0;
       for (const macroDoc of snap.docs) {
         const userRef = macroDoc.ref.parent.parent;
+        if (!userRef) continue;
         try {
           if (!timeZones.has(userRef.id)) {
             timeZones.set(userRef.id, await getUserTimeZone(userRef));
@@ -73,7 +75,7 @@ export const runMacros = onSchedule(
 export const purgeDeletedTasks = onSchedule(
     {schedule: "30 4 * * *", timeZone: "Asia/Tokyo", retryCount: 1},
     async () => {
-      const db = admin.firestore();
+      const db = getFirestore();
       const cutoff = Date.now() - 60 * 60 * 1000;
       const snap = await db.collectionGroup("deletedTasks").get();
       const stale = snap.docs.filter((d) => {

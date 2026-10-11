@@ -149,3 +149,24 @@ a.title:focus-visible,
 .retryBtn:hover {
 	background: var(--btn-primary-hover);
 }
+
+@media (max-width: 600px) {
+	.container {
+		margin-bottom: 12px;
+		padding: 12px;
+	}
+
+	.featuredTitle,
+	.meta,
+	.error .text {
+		display: block;
+		max-width: 100%;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.error {
+		gap: 6px;
+	}
+}

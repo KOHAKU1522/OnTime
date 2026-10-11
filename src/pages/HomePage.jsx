@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./HomePage.module.css";
 
 import { useOutletContext } from "react-router-dom";
@@ -20,6 +20,28 @@ export default function HomePage({ isGuest }) {
     const { user, tasks, sortType, setSortType, showToast, settings, updateSettings } = useOutletContext();
     const [showMenu, setShowMenu] = useState(false);
     const [newsEnabled] = useNewsEnabled();
+    const [showAiInstructions, setShowAiInstructions] = useState(false);
+    const aiToggleRef = useRef(null);
+    const aiCloseButtonRef = useRef(null);
+
+    useEffect(() => {
+        if (!showAiInstructions) return;
+        const previousOverflow = document.body.style.overflow;
+        const aiToggleButton = aiToggleRef.current;
+        document.body.style.overflow = "hidden";
+
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") setShowAiInstructions(false);
+        };
+        window.addEventListener("keydown", handleKeyDown);
+        aiCloseButtonRef.current?.focus();
+
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            window.removeEventListener("keydown", handleKeyDown);
+            aiToggleButton?.focus();
+        };
+    }, [showAiInstructions]);
 
     const timeZone = settings.timeZone;
     const today = new Date();
@@ -54,6 +76,7 @@ export default function HomePage({ isGuest }) {
                 startDate: parseInput(task.startDate),
                 description: task.description || null,
                 tags: task.tags ?? [],
+                starred: task.starred === true,
                 completed: false,
                 createdAt: new Date()
             };
@@ -75,6 +98,7 @@ export default function HomePage({ isGuest }) {
                     startDate: parseInput(task.startDate),
                     description: task.description || null,
                     tags: task.tags ?? [],
+                    starred: task.starred === true,
                     completed: false,
                     createdAt: new Date()
                 }
@@ -88,7 +112,6 @@ export default function HomePage({ isGuest }) {
 
     return (
         <div className={styles.home}>
-
             <header className={styles.header}>
                 <div>
                     <div className={styles.date}>{dateStr}</div>
@@ -99,8 +122,8 @@ export default function HomePage({ isGuest }) {
                     </div>
                     <div className={styles.periodRow} aria-label="期限が近い未完了タスク数">
                         <span className={todayCount > 0 ? styles.todayBadge : styles.periodBadge}>今日 {todayCount}件</span>
-                        <span className={styles.periodBadge}>今週 {weekCount}件</span>
-                        <span className={styles.periodBadge}>今月 {monthCount}件</span>
+                        <span className={weekCount > 0 ? styles.weekBadge : styles.periodBadge}>今週 {weekCount}件</span>
+                        <span className={monthCount > 0 ? styles.monthBadge : styles.periodBadge}>今月 {monthCount}件</span>
                     </div>
                 </div>
                 <button className={styles.userIcon} onClick={() => setShowMenu(true)}>
@@ -111,10 +134,64 @@ export default function HomePage({ isGuest }) {
                 </button>
             </header>
 
-            {/* オフのときはコンポーネント自体を描画せず、ニュースも取得しない */}
             {newsEnabled && <News timeZone={timeZone} />}
 
-            <NaturalTaskInput onAddTask={handleAddTask} isGuest={isGuest} timeZone={timeZone} weekStartsOn={settings.weekStartsOn} />
+            <button
+                ref={aiToggleRef}
+                type="button"
+                className={`${styles.panelToggle} ${styles.aiPanelToggle}`}
+                onClick={() => setShowAiInstructions(true)}
+                disabled={isGuest}
+                aria-label={isGuest ? "AIへの指示はログイン後に利用できます" : "AIへの指示を開く"}
+                aria-expanded={showAiInstructions && !isGuest}
+                aria-controls="home-ai-instructions-dialog"
+                title={isGuest ? "AIへの指示はログイン後に利用できます" : "AIへの指示を開く"}
+            >
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-9.5A7.5 7.5 0 0 1 10.5 4H12" />
+                    <path d="M18 2v6M15 5h6M16 11v4M14 13h4" />
+                </svg>
+            </button>
+
+            {showAiInstructions && !isGuest && (
+                <div
+                    className={styles.aiBackdrop}
+                    onClick={(event) => {
+                        if (event.target === event.currentTarget) setShowAiInstructions(false);
+                    }}
+                >
+                    <section
+                        id="home-ai-instructions-dialog"
+                        className={styles.aiDialog}
+                        role="dialog"
+                        aria-modal="true"
+                        aria-labelledby="home-ai-instructions-title"
+                    >
+                        <header className={styles.aiDialogHeader}>
+                            <h2 id="home-ai-instructions-title" className={styles.aiDialogTitle}>AIへの指示</h2>
+                            <button
+                                ref={aiCloseButtonRef}
+                                type="button"
+                                className={styles.aiDialogClose}
+                                onClick={() => setShowAiInstructions(false)}
+                                aria-label="AIへの指示を閉じる"
+                                title="閉じる"
+                            >
+                                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                                    <path d="m18 6-12 12M6 6l12 12" />
+                                </svg>
+                            </button>
+                        </header>
+                        <NaturalTaskInput
+                            onAddTask={handleAddTask}
+                            isGuest={isGuest}
+                            timeZone={timeZone}
+                            weekStartsOn={settings.weekStartsOn}
+                            embedded
+                        />
+                    </section>
+                </div>
+            )}
 
             <TaskInput onAddTask={handleAddTask} timeZone={timeZone} allTags={[...new Set(allTasks.flatMap(t => t.tags ?? []))]} />
 

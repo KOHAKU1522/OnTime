@@ -1,13 +1,20 @@
 .container {
-  margin-top: 0px;
+  position: relative;
   display: flex;
-  gap: 0px;
   align-items: center;
+  gap: 6px;
+  width: 40px;
+  min-width: 40px;
+  flex: 0 0 40px;
 }
 
 .micButton {
-  padding: 8px 12px;
-  font-size: 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
   border-radius: 8px;
   border: 1px solid var(--border);
   background: var(--bg-input);
@@ -20,14 +27,56 @@
   color: #efefef;
 }
 
+.micButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.statusText {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 2;
+  width: max-content;
+  max-width: min(280px, calc(100vw - 48px));
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
+  color: var(--brand);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+
 .info {
+  position: absolute;
+  top: calc(100% + 4px);
+  right: 0;
+  z-index: 2;
+  width: max-content;
+  max-width: min(280px, calc(100vw - 48px));
+  padding: 6px 8px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-card);
   font-size: 12px;
   color: var(--text-muted);
+  line-height: 1.4;
+  overflow-wrap: anywhere;
 }
 
 /* ===== スマートフォン向け ===== */
 @media (max-width: 600px), (pointer: coarse) {
     .micButton {
+      width: 44px;
         min-height: 44px;
+      height: 44px;
+    }
+
+    .container {
+      width: 44px;
+      min-width: 44px;
+      flex-basis: 44px;
     }
 }

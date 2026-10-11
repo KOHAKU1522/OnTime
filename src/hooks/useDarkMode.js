@@ -12,5 +12,5 @@ export function useDarkMode() {
         localStorage.setItem("theme", isDark ? "dark" : "light");
     }, [isDark]);
 
-    return [isDark, setIsDark];
+    return /** @type {[boolean, import("react").Dispatch<import("react").SetStateAction<boolean>>]} */ ([isDark, setIsDark]);
 }

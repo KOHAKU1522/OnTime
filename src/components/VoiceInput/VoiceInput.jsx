@@ -192,9 +192,20 @@ export default function VoiceInput({ value, onChange }) {
                 onClick={handleToggle}
                 disabled={!SpeechRecognition}
                 aria-pressed={active}
+                aria-label={active ? "音声入力を停止" : "音声入力を開始"}
+                title={active ? "音声入力を停止" : "音声入力"}
             >
-                {status === "starting" ? "準備中…（停止）" : status === "listening" ? "録音中…（停止）" : "音声入力"}
+                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <rect x="9" y="2" width="6" height="12" rx="3" />
+                    <path d="M5 10a7 7 0 0 0 14 0M12 19v3m-4 0h8" />
+                </svg>
             </button>
+
+            {active && (
+                <span className={styles.statusText} role="status">
+                    {status === "starting" ? "準備中…" : "録音中…"}
+                </span>
+            )}
 
             {errorMessage && <div className={styles.info} role="alert">{errorMessage}</div>}
             {!SpeechRecognition && !errorMessage && (

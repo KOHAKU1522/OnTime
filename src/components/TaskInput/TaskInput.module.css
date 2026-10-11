@@ -1,12 +1,12 @@
 .container {
     background: var(--bg-card);
-    padding: 16px;
+    padding: 12px;
     border-radius: 12px;
     box-shadow: var(--shadow-card);
-    margin-bottom: 20px;
+    margin-bottom: 16px;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 6px;
     overflow: hidden;
 }
 
@@ -21,7 +21,7 @@
     width: 100%;
     min-width: 0;
     max-width: 100%;
-    padding: 10px 12px;
+    padding: 8px 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 0.95rem;
@@ -37,10 +37,19 @@
 }
 
 .taskNameInputWrapper {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 6px;
+}
+
+.taskNameField {
     position: relative;
+    min-width: 0;
 }
 
 .taskNameInput {
+    min-height: 44px;
     padding-right: 38px;
 }
 
@@ -76,7 +85,7 @@
 
 .textarea {
     width: 100%;
-    padding: 10px 12px;
+    padding: 8px 12px;
     border: 1px solid var(--border);
     border-radius: 8px;
     font-size: 0.9rem;
@@ -85,7 +94,7 @@
     color: var(--text-primary);
     background: var(--bg-input);
     resize: vertical;
-    min-height: 64px;
+    min-height: 56px;
     font-family: inherit;
 }
 
@@ -98,7 +107,7 @@
 .section {
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 6px;
 }
 
 .sectionLabel {
@@ -109,15 +118,83 @@
     letter-spacing: 0.05em;
 }
 
-/* ===== プリセットボタン ===== */
+.starOption {
+    display: flex;
+    align-items: center;
+    align-self: flex-start;
+    gap: 6px;
+    min-height: 36px;
+    padding: 0 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card-alt);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.starOption input {
+    appearance: none;
+    display: grid;
+    place-content: center;
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    background: var(--bg-input);
+    cursor: pointer;
+}
+
+.starOption input::after {
+    width: 5px;
+    height: 9px;
+    border: solid #fff;
+    border-width: 0 2px 2px 0;
+    content: "";
+    transform: rotate(45deg) scale(0);
+    transition: transform 0.12s;
+}
+
+.starOption input:checked {
+    border-color: var(--color-warning);
+    background: var(--color-warning);
+}
+
+.starOption input:checked::after {
+    transform: rotate(45deg) scale(1);
+}
+
+.starOptionActive {
+    border-color: var(--color-warning);
+    background: var(--color-warning-bg);
+    color: var(--color-warning);
+}
+
+.starOption:focus-within {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+.optionalActions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px 8px;
+}
+
+.optionalActions > .section {
+    grid-column: 1 / -1;
+}
+
 .presets {
     display: flex;
-    gap: 6px;
+    gap: 4px;
 }
 
 .presetBtn {
     flex: 1;
-    padding: 8px 4px;
+    padding: 6px 4px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: var(--bg-preset);
@@ -156,13 +233,21 @@
 
 /* ===== トグルボタン ===== */
 .toggleBtn {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    min-width: 0;
+    min-height: 34px;
+    padding: 4px 6px;
     background: none;
     border: none;
     color: var(--text-muted);
     font-size: 0.8rem;
     cursor: pointer;
-    padding: 0;
     text-align: left;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+    border-radius: 6px;
 }
 
 .toggleBtn:hover {
@@ -173,7 +258,8 @@
 .addButton {
     background-color: var(--btn-primary-bg);
     color: var(--btn-primary-text);
-    padding: 11px;
+    min-height: 44px;
+    padding: 8px 11px;
     border: none;
     border-radius: 10px;
     width: 100%;
@@ -294,7 +380,7 @@
 }
 
 .formError {
-    margin: 0 0 8px;
+    margin: 0 0 4px;
     color: var(--color-danger);
     font-size: 0.85rem;
 }
@@ -312,9 +398,22 @@
         min-height: 44px;
     }
 
+    .starOption {
+        min-height: 44px;
+    }
+
+    .optionalActions {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        column-gap: 4px;
+    }
+
     .clearButton {
         width: 44px;
         height: 44px;
+    }
+
+    .taskNameInput {
+        padding-right: 52px;
     }
 }
 
@@ -328,6 +427,12 @@
         flex: 1 1 calc(25% - 6px);
         min-width: 0;
         font-size: 0.82rem;
+    }
+}
+
+@media (max-width: 380px) {
+    .optionalActions {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
 

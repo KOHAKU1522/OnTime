@@ -1,0 +1,73 @@
+{
+  "planHash": "b4fa151ca40a93d721122435ed1ae3f76bd1752367726915ffdc3728f3cbbb6e",
+  "phase": "postupgrade",
+  "recordedAtUtc": "2026-10-11T19:20:15.4922691Z",
+  "retryCount": 0,
+  "resetBaseline": false,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 0,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "functions-eslint-passes",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E lint\r\n\u003E eslint .\r\n\r\n",
+        "durationMs": 4738
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E test\r\n\u003E node --test tests/timezone.test.js\r\n\r\n\u25B6 Cloud Functions timezone helpers\r\n  \u2714 adds calendar days across month boundaries (0.8466ms)\r\n  \u2714 clamps month additions to the target month\u0027s last day (0.2033ms)\r\n  \u2714 derives the date in the requested time zone (17.6529ms)\r\n\u2714 Cloud Functions timezone helpers (19.8916ms)\r\n\u2139 tests 3\r\n\u2139 suites 1\r\n\u2139 pass 3\r\n\u2139 fail 0\r\n\u2139 cancelled 0\r\n\u2139 skipped 0\r\n\u2139 todo 0\r\n\u2139 duration_ms 115.1403\r\n",
+        "durationMs": 683,
+        "testResults": {
+          "testFramework": "unknown",
+          "runnerDetectedFrom": "none",
+          "testsTotal": 0,
+          "testsPassed": 0,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": true
+        }
+      }
+    ],
+    "executions": [
+      {
+        "source": "functions-eslint-passes",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "lint"
+        ],
+        "cwd": "c:\\Users\\yuuya\\OneDrive\\Desktop\\projects\\OnTime\\functions",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "test"
+        ],
+        "cwd": "c:\\Users\\yuuya\\OneDrive\\Desktop\\projects\\OnTime\\functions",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}

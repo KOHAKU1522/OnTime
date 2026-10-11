@@ -34,7 +34,9 @@
   --color-danger-bg: #fef2f2;
   --color-danger-border: #fca5a5;
   --color-warning: #f59e0b;
+  --color-warning-bg: #fffbeb;
   --color-success: #4caf50;
+  --color-success-bg: #ecfdf5;
   --color-blue: rgb(59, 130, 246);
 
   --footer-inactive: #aab0bb;
@@ -90,7 +92,9 @@
   --color-danger-bg: #3b1f1f;
   --color-danger-border: #7f1d1d;
   --color-warning: #fbbf24;
+  --color-warning-bg: #3a2d0c;
   --color-success: #34d399;
+  --color-success-bg: #12352b;
   --color-blue: rgb(96, 165, 250);
 
   --footer-inactive: #636366;
