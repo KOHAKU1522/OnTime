@@ -24,3 +24,10 @@
   font-size: 12px;
   color: var(--text-muted);
 }
+
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    .micButton {
+        min-height: 44px;
+    }
+}

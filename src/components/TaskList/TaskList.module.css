@@ -136,3 +136,19 @@
 .completedSection[open] .completedSummary {
     margin-bottom: 8px;
 }
+
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    .searchInput {
+        min-height: 44px;
+    }
+
+    .searchClear {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .tagFilterChip {
+        min-height: 40px;
+    }
+}

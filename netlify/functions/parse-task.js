@@ -1,23 +1,51 @@
 // 自然言語の文章からタスク内容を抽出する（登録はしない。登録はクライアントで利用者が確認した後に行う）
 // GEMINI_API_KEY はサーバー側の環境変数のみで扱い、クライアントには渡さない。
-import {adminAuth, adminDb, isAdminConfigured} from "../lib/firebaseAdmin.js";
+import {adminAuth, adminDb, adminProjectId, getAdminConfigStatus} from "../lib/firebaseAdmin.js";
 import {LIMITS, consume} from "../lib/rateLimit.js";
 import {resolveTimeZone} from "../../src/utils/timezone.js";
 
 const MAX_TURNS = 6;
-const MODEL = "gemini-3.6-flash";
+// モデルは環境変数で切り替えられる（未設定時の既定値）
+const MODEL = (globalThis.process?.env?.GEMINI_MODEL ?? "").trim() || "gemini-3.6-flash";
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), {
   status,
   headers: {"Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store"},
 });
 
+// 診断ログ（秘密情報・トークン・入力本文は出さない）
+const log = (level, event, detail = {}) => console[level](`[parse-task] ${event}`, JSON.stringify(detail));
+
 // Firebase ID トークンを Admin SDK で検証する（署名・有効期限・失効を確認）
+// 戻り値: { uid } または { status, code, error }
 const verifyUser = async (request) => {
   const idToken = request.headers.get("authorization")?.match(/^Bearer (.+)$/)?.[1];
-  if (!idToken) return null;
-  const decoded = await adminAuth().verifyIdToken(idToken, true);
-  return decoded.uid;
+  if (!idToken) return {status: 401, code: "UNAUTHORIZED", error: "ログインが必要です"};
+  try {
+    const decoded = await adminAuth().verifyIdToken(idToken, true);
+    return {uid: decoded.uid};
+  } catch (error) {
+    const code = error?.code ?? "unknown";
+    if (["auth/id-token-expired", "auth/id-token-revoked", "auth/user-disabled", "auth/user-not-found"].includes(code)) {
+      log("warn", "token rejected", {code});
+      return {status: 401, code: "SESSION_EXPIRED", error: "ログインの有効期限が切れました。再ログインしてください"};
+    }
+    // 別プロジェクトのトークン（Web アプリと FIREBASE_PROJECT_ID の不一致）は設定の問題
+    if (code === "auth/argument-error" && /"aud"|audience/i.test(String(error?.message))) {
+      log("error", "project mismatch", {code, hint: "FIREBASE_PROJECT_ID が Web アプリの Firebase プロジェクトと一致しているか確認", adminProject: adminProjectId()});
+      return {status: 503, code: "NOT_CONFIGURED", error: "現在この機能は利用できません"};
+    }
+    if (code === "admin/init-failed" || code.startsWith("app/")) {
+      log("error", "admin init failed", {code, cause: error?.cause, hint: "FIREBASE_CLIENT_EMAIL / FIREBASE_PRIVATE_KEY を確認"});
+      return {status: 503, code: "NOT_CONFIGURED", error: "現在この機能は利用できません"};
+    }
+    if (code === "auth/argument-error" || code === "auth/invalid-id-token") {
+      log("warn", "invalid token", {code});
+      return {status: 401, code: "UNAUTHORIZED", error: "ログインが必要です"};
+    }
+    log("error", "token verification unavailable", {code});
+    return {status: 503, code: "AUTH_UNAVAILABLE", error: "認証サーバーに接続できませんでした。しばらくしてから再度お試しください"};
+  }
 };
 
 const RATE_LIMIT_MESSAGES = {
@@ -89,17 +117,21 @@ export const normalizeResult = (raw) => {
 export default async function handler(request) {
   if (request.method !== "POST") return json({error: "Method Not Allowed"}, 405);
 
-  const apiKey = globalThis.process?.env?.GEMINI_API_KEY;
-  if (!apiKey || !isAdminConfigured()) return json({error: "サーバーの設定が不足しています", code: "NOT_CONFIGURED"}, 500);
+  // 0. サーバー設定の確認（不足している環境変数名だけをログに出す。値は出さない）
+  const apiKey = (globalThis.process?.env?.GEMINI_API_KEY ?? "").trim();
+  const adminStatus = getAdminConfigStatus();
+  if (!apiKey || !adminStatus.ok) {
+    log("error", "not configured", {
+      missing: [...(apiKey ? [] : ["GEMINI_API_KEY"]), ...adminStatus.missing],
+      problem: adminStatus.problem,
+    });
+    return json({error: "現在この機能は利用できません", code: "NOT_CONFIGURED"}, 503);
+  }
 
   // 1. 認証（失敗時は Gemini を呼ばずに拒否）
-  let uid = null;
-  try {
-    uid = await verifyUser(request);
-  } catch (error) {
-    console.warn("auth verify failed:", error?.code ?? error?.message);
-  }
-  if (!uid) return json({error: "ログインが必要です", code: "UNAUTHORIZED"}, 401);
+  const auth = await verifyUser(request);
+  if (!auth.uid) return json({error: auth.error, code: auth.code}, auth.status);
+  const uid = auth.uid;
 
   // 2. 入力検証（不備があれば Gemini を呼ばず、回数も消費しない）
 
@@ -122,7 +154,8 @@ export default async function handler(request) {
   try {
     limit = await consume(adminDb(), uid);
   } catch (error) {
-    console.error("rate limit error:", error);
+    // PERMISSION_DENIED(7) はサービスアカウントの権限不足、それ以外は一時的な障害の可能性
+    log("error", "rate limit store failed", {code: error?.code ?? "unknown", hint: error?.code === 7 ? "サービスアカウントに Firestore への書き込み権限があるか確認" : undefined});
     return json({error: "現在混み合っています。しばらくしてから再度お試しください", code: "UNAVAILABLE"}, 503);
   }
   if (!limit.allowed) {
@@ -165,14 +198,31 @@ export default async function handler(request) {
         },
     );
     if (!response.ok) {
-      console.error("Gemini API error:", response.status);
-      return json({error: "解析に失敗しました", code: "AI_FAILED"}, 502);
+      const detail = await response.json().catch(() => ({}));
+      const apiStatus = detail?.error?.status;
+      log("error", "gemini api error", {httpStatus: response.status, apiStatus, model: MODEL});
+      if (response.status === 429) {
+        return json({error: "AI の利用が集中しています。しばらくしてから再度お試しください", code: "AI_BUSY"}, 503);
+      }
+      if (response.status === 400 && apiStatus === "INVALID_ARGUMENT" && /API key/i.test(detail?.error?.message ?? "")) {
+        log("error", "gemini api key invalid", {hint: "GEMINI_API_KEY を確認"});
+        return json({error: "現在この機能は利用できません", code: "NOT_CONFIGURED"}, 503);
+      }
+      if (response.status === 403 || response.status === 404) {
+        log("error", "gemini access/model problem", {hint: response.status === 404 ? `モデル ${MODEL} が利用できるか確認（GEMINI_MODEL で変更可）` : "API キーの制限・API の有効化を確認"});
+        return json({error: "現在この機能は利用できません", code: "NOT_CONFIGURED"}, 503);
+      }
+      return json({error: "解析に失敗しました。もう一度お試しください", code: "AI_FAILED"}, 502);
     }
     const data = await response.json();
     const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
+    if (!text) {
+      log("warn", "gemini empty response", {blockReason: data.promptFeedback?.blockReason, finishReason: data.candidates?.[0]?.finishReason});
+      return json({error: "内容を読み取れませんでした。表現を変えて再度お試しください", code: "AI_FAILED"}, 502);
+    }
     return json(normalizeResult(JSON.parse(text)));
   } catch (error) {
-    console.error("parse-task error:", error);
-    return json({error: "解析に失敗しました", code: "AI_FAILED"}, 502);
+    log("error", "gemini call failed", {name: error?.name, timeout: error?.name === "TimeoutError"});
+    return json({error: "解析に失敗しました。もう一度お試しください", code: "AI_FAILED"}, 502);
   }
 }

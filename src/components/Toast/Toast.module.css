@@ -66,3 +66,16 @@
     transition: width 0.05s linear;
     border-radius: 0 0 14px 14px;
 }
+
+/* ナビゲーションの上に表示し、ホームバーのある端末では下端と重ならないようにする */
+@supports (bottom: env(safe-area-inset-bottom)) {
+    .toast {
+        bottom: max(105px, calc(93px + env(safe-area-inset-bottom)));
+    }
+}
+
+@media (max-width: 600px), (pointer: coarse) {
+    .undoBtn {
+        min-height: 44px;
+    }
+}

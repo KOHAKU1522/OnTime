@@ -170,3 +170,15 @@
     color: var(--text-primary);
     white-space: pre;
 }
+
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    .backBtn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .copyBtn {
+        min-height: 44px;
+    }
+}

@@ -1,6 +1,7 @@
 import {
     collection, doc, getDocs, query, runTransaction, where, writeBatch,
 } from "firebase/firestore";
+import { reportFirestoreError } from "./firestoreError";
 
 // 取り消しできる時間（トーストの表示時間と同じ5秒）
 export const UNDO_WINDOW_MS = 5000;
@@ -67,8 +68,8 @@ export async function deleteTaskAndOfferUndo(db, uid, taskId, showToast) {
     try {
         token = await deleteTaskWithUndo(db, uid, taskId);
     } catch (err) {
-        console.error("タスク削除エラー:", err);
-        showToast?.("タスクを削除できませんでした。通信状況を確認して、もう一度お試しください");
+        // 退避先（deletedTasks）への書き込みが拒否された場合も permission-denied になる
+        showToast?.(reportFirestoreError("タスクを削除できませんでした", err, `users/${uid}/deletedTasks/${taskId}`));
         return false;
     }
     if (!token) return true; // すでに削除済み（二重操作）
@@ -78,8 +79,7 @@ export async function deleteTaskAndOfferUndo(db, uid, taskId, showToast) {
             const result = await restoreDeletedTask(db, uid, taskId, token);
             if (result === "expired") showToast?.("取り消しできる時間を過ぎたため、復元できませんでした");
         } catch (err) {
-            console.error("タスク復元エラー:", err);
-            showToast?.("元に戻せませんでした。通信状況を確認して、もう一度お試しください");
+            showToast?.(reportFirestoreError("元に戻せませんでした", err, `users/${uid}/deletedTasks/${taskId}`));
         }
     });
     return true;

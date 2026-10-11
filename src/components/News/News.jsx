@@ -13,8 +13,32 @@ const describeError = (code) => {
 const formatTime = (value, timeZone) =>
   formatInZone(value, timeZone, { month: "numeric", day: "numeric", hour: "2-digit", minute: "2-digit" });
 
+// 取得した記事からランダムに1件を選び、先頭に置く（取得・更新のときだけ選び直す）
+const pickFeatured = (items) => {
+  if (items.length <= 1) return items;
+  const index = Math.floor(Math.random() * items.length);
+  return [items[index], ...items.slice(0, index), ...items.slice(index + 1)];
+};
+
+function NewsLink({ item, timeZone, featured = false }) {
+  const meta = [item.source, formatTime(item.pubDate, timeZone)].filter(Boolean).join(" · ");
+  const titleClass = `${styles.title} ${featured ? styles.featuredTitle : ""}`;
+  return (
+    <>
+      {item.link ? (
+        <a className={titleClass} href={item.link} target="_blank" rel="noopener noreferrer">
+          {item.title}
+        </a>
+      ) : (
+        <span className={titleClass}>{item.title}</span>
+      )}
+      {meta && <span className={styles.meta}>{meta}</span>}
+    </>
+  );
+}
+
 export default function News({ timeZone }) {
-  const [items, setItems] = useState([]);
+  const [items, setItems] = useState([]); // items[0] が表示する1件
   const [status, setStatus] = useState("loading"); // loading | success | error
   const [errorCode, setErrorCode] = useState(null);
 
@@ -29,10 +53,10 @@ export default function News({ timeZone }) {
     try {
       const response = await fetch("/.netlify/functions/generate-news");
       const result = await response.json().catch(() => ({}));
-      if (!response.ok || !Array.isArray(result.items)) {
+      if (!response.ok || !Array.isArray(result.items) || result.items.length === 0) {
         throw Object.assign(new Error(result.error ?? `HTTP ${response.status}`), { code: result.code });
       }
-      setItems(result.items);
+      setItems(pickFeatured(result.items));
       setStatus("success");
     } catch (error) {
       console.error("ニュース取得エラー:", error);
@@ -46,9 +70,21 @@ export default function News({ timeZone }) {
     fetchNews();
   }, [fetchNews]);
 
+  const [featured, ...others] = items;
+
   return (
     <section className={styles.container} aria-label="今日のニュース" aria-busy={status === "loading"}>
-      <div className={styles.label}>TODAY'S NEWS</div>
+      <div className={styles.header}>
+        <div className={styles.label}>TODAY'S NEWS</div>
+        {status === "success" && (
+          <button type="button" className={styles.refreshBtn} onClick={fetchNews} aria-label="ニュースを更新">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+              <polyline points="23 4 23 10 17 10" />
+              <path d="M20.49 15A9 9 0 1 1 18.36 5.64L23 10" />
+            </svg>
+          </button>
+        )}
+      </div>
 
       {status === "loading" && <p className={styles.text}>ニュースを読み込んでいます…</p>}
 
@@ -59,23 +95,25 @@ export default function News({ timeZone }) {
         </div>
       )}
 
-      {status === "success" && (
-        <ul className={styles.list}>
-          {items.map((item, i) => (
-            <li key={item.link || i} className={styles.item}>
-              {item.link ? (
-                <a className={styles.title} href={item.link} target="_blank" rel="noopener noreferrer">
-                  {item.title}
-                </a>
-              ) : (
-                <span className={styles.title}>{item.title}</span>
-              )}
-              <span className={styles.meta}>
-                {[item.source, formatTime(item.pubDate, timeZone)].filter(Boolean).join(" · ")}
-              </span>
-            </li>
-          ))}
-        </ul>
+      {status === "success" && featured && (
+        <>
+          <div className={styles.featured}>
+            <NewsLink item={featured} timeZone={timeZone} featured />
+          </div>
+
+          {others.length > 0 && (
+            <details className={styles.more}>
+              <summary className={styles.moreSummary}>ほかのニュース（{others.length}件）</summary>
+              <ul className={styles.list}>
+                {others.map((item, i) => (
+                  <li key={item.link || i} className={styles.item}>
+                    <NewsLink item={item} timeZone={timeZone} />
+                  </li>
+                ))}
+              </ul>
+            </details>
+          )}
+        </>
       )}
     </section>
   );

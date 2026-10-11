@@ -349,3 +349,39 @@ button.macroMain:focus-visible {
 .macroMeta {
     display: block;
 }
+
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    .backBtn,
+    .addBtn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .toggle,
+    .deleteBtn {
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .freqChip,
+    .dayBtn {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 600px) {
+    .freqChips {
+        flex-wrap: wrap;
+    }
+
+    .freqChip {
+        flex: 1 1 calc(50% - 6px);
+    }
+}
+
+@media (max-width: 600px), (pointer: coarse) {
+    .numberInput {
+        min-height: 44px;
+    }
+}

@@ -317,3 +317,40 @@
         transition: none !important;
     }
 }
+
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    .starBtn {
+        min-width: 44px;
+        min-height: 44px;
+        margin: -10px 0 -10px -12px;
+    }
+
+    .expandBtn {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 600px) {
+    /* 狭い画面ではタイトル・期限を全幅にし、残り時間と操作ボタンを下段に並べる */
+    .left {
+        flex: 1 1 100%;
+        min-width: 0;
+    }
+
+    .right {
+        flex: 1 1 100%;
+        flex-direction: row;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .title {
+        overflow-wrap: anywhere;
+    }
+
+    .buttons {
+        flex-wrap: wrap;
+        justify-content: flex-end;
+    }
+}

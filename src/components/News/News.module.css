@@ -6,8 +6,16 @@
 	box-shadow: var(--shadow-card);
 }
 
+.header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	min-height: 32px;
+	margin-bottom: 6px;
+}
+
 .label {
-	margin-bottom: 8px;
 	color: var(--brand);
 	font-size: 0.7rem;
 	font-weight: 700;
@@ -49,6 +57,56 @@
 	font-size: 0.92rem;
 	line-height: 1.5;
 	text-decoration: none;
+	overflow-wrap: anywhere;
+}
+
+.featured {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+}
+
+.featuredTitle {
+	font-size: 1rem;
+	font-weight: 600;
+}
+
+.refreshBtn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	margin: -6px -10px -6px 0;
+	border: none;
+	border-radius: 22px;
+	background: transparent;
+	color: var(--text-muted);
+	cursor: pointer;
+}
+
+.refreshBtn:hover {
+	color: var(--brand);
+}
+
+.more {
+	margin-top: 10px;
+	border-top: 1px solid var(--divider);
+}
+
+.moreSummary {
+	display: flex;
+	align-items: center;
+	min-height: 44px;
+	color: var(--text-secondary);
+	font-size: 0.85rem;
+	font-weight: 600;
+	cursor: pointer;
+	user-select: none;
+}
+
+.more[open] .moreSummary {
+	margin-bottom: 4px;
 }
 
 a.title:hover {
@@ -56,7 +114,9 @@ a.title:hover {
 }
 
 a.title:focus-visible,
-.retryBtn:focus-visible {
+.retryBtn:focus-visible,
+.refreshBtn:focus-visible,
+.moreSummary:focus-visible {
 	outline: 2px solid var(--brand);
 	outline-offset: 2px;
 	border-radius: 4px;

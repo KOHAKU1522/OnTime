@@ -83,3 +83,11 @@
     border-radius: 99px;
     display: inline-block;
 }
+
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    .userIcon {
+        width: 44px;
+        height: 44px;
+    }
+}

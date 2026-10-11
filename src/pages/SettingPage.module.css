@@ -427,3 +427,38 @@
     font-size: 0.78rem;
     cursor: pointer;
 }
+
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    .chartTab,
+    .notifBtn,
+    .notifChip,
+    .customTimingBtn,
+    .customTimingSelect,
+    .customTimingInput {
+        min-height: 44px;
+    }
+}
+
+@media (max-width: 600px) {
+    /* 選択欄が長くても行内に収める */
+    .toggleRow {
+        flex-wrap: wrap;
+    }
+
+    .rowLabel {
+        min-width: 0;
+    }
+
+    /* アイコン分を字下げし、残りの幅に収める */
+    .timeZoneSelect {
+        flex: 0 0 auto;
+        width: calc(100% - 30px);
+        max-width: calc(100% - 30px);
+        margin-left: 30px;
+    }
+
+    .timeZoneHint {
+        padding-left: 46px;
+    }
+}

@@ -1,3 +1,4 @@
+/* 浮いているナビゲーション（高さ 68px + 下余白）にコンテンツが隠れないようにする */
 .content {
-  padding-bottom: 80px;
+    padding-bottom: calc(108px + env(safe-area-inset-bottom, 0px));
 }

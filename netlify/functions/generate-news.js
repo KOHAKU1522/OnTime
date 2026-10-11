@@ -1,6 +1,7 @@
 // Google News の RSS を取得し、内容を加工・要約せずにそのまま返す
 const FEED_URL = "https://news.google.com/rss?hl=ja&gl=JP&ceid=JP:ja";
-const MAX_ITEMS = 5;
+// クライアントで1件をランダム表示し、残りは折りたたみ一覧に出す
+const MAX_ITEMS = 10;
 
 const json = (body, status = 200) => new Response(JSON.stringify(body), {
   status,

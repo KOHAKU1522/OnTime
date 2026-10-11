@@ -298,3 +298,41 @@
     color: var(--color-danger);
     font-size: 0.85rem;
 }
+
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    .presetBtn,
+    .tagAddBtn {
+        min-height: 44px;
+    }
+
+    .toggleBtn {
+        display: inline-flex;
+        align-items: center;
+        min-height: 44px;
+    }
+
+    .clearButton {
+        width: 44px;
+        height: 44px;
+    }
+}
+
+@media (max-width: 600px) {
+    /* 期限の選択肢は4列で折り返し、文字が詰まらないようにする */
+    .presets {
+        flex-wrap: wrap;
+    }
+
+    .presetBtn {
+        flex: 1 1 calc(25% - 6px);
+        min-width: 0;
+        font-size: 0.82rem;
+    }
+}
+
+@media (max-width: 600px), (pointer: coarse) {
+    .tagInputField {
+        min-height: 44px;
+    }
+}

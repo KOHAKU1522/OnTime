@@ -6,6 +6,7 @@ import styles from "./Layout.module.css";
 import { Suspense, useEffect, useState, useRef } from "react";
 import PageLoader from "../PageLoader/PageLoader";
 import { purgeExpiredTrash } from "../../utils/taskTrash";
+import { logFirestoreError, reportFirestoreError } from "../../utils/firestoreError";
 import { db } from "../../firebase";
 import { useAuthUser } from "../../hooks/useAuthUser";
 import { collection, onSnapshot } from "firebase/firestore";
@@ -40,10 +41,7 @@ export default function Layout() {
             (snapshot) => {
                 setTasks(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
             },
-            (err) => {
-                console.error("タスク読み込みエラー:", err);
-                showToast("タスクを読み込めませんでした。再読み込みしてください");
-            }
+            (err) => showToast(reportFirestoreError("タスクを読み込めませんでした", err, tasksRef.path))
         );
 
         return () => unsubscribe();
@@ -56,15 +54,14 @@ export default function Layout() {
         macroCheckedRef.current = true;
 
         runMacrosForUser(db, user.uid, settings.timeZone).catch((err) => {
-            console.error("マクロ実行エラー:", err);
-            showToast("マクロによるタスク追加に失敗しました。通信状況を確認してください");
+            showToast(reportFirestoreError("マクロによるタスク追加に失敗しました", err, `users/${user.uid}/macros`));
         });
     }, [user?.uid, settingsLoaded, settings.timeZone, showToast]);
 
     // 取り消し期限を過ぎた削除済みタスクの退避データを整理する（失敗しても動作に影響しない）
     useEffect(() => {
         if (!user?.uid) return;
-        purgeExpiredTrash(db, user.uid).catch((err) => console.warn("退避データの整理に失敗:", err));
+        purgeExpiredTrash(db, user.uid).catch((err) => logFirestoreError("削除済みタスクの整理", err, `users/${user.uid}/deletedTasks`));
     }, [user?.uid]);
 
     const toggleNotifications = (val) => {

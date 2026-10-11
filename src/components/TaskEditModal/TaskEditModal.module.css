@@ -243,3 +243,10 @@
     font-size: 13px;
     color: #dc2626;
 }
+
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    .tagInputField {
+        min-height: 44px;
+    }
+}

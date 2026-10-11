@@ -99,3 +99,18 @@
 .swatchActive {
     transform: scale(1.1);
 }
+
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    /* 見た目は小さいまま、タップ領域を広げる */
+    .removeBtn {
+        position: relative;
+        padding: 0 2px 0 6px;
+    }
+
+    .removeBtn::after {
+        content: "";
+        position: absolute;
+        inset: -14px -12px;
+    }
+}

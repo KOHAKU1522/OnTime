@@ -10,6 +10,7 @@ import StatsChart from "../components/StatsChart/StatsChart";
 import { getWeeklyCompletions, getMonthlyCompletions } from "../utils/statsUtils";
 import { getTimeZoneOffsetMs, isValidTimeZone } from "../utils/timezone";
 import { useDialog } from "../hooks/useDialog";
+import { useNewsEnabled } from "../hooks/useNewsEnabled";
 
 const Icon = ({ children, ...props }) => (
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -24,6 +25,7 @@ const LogOutIcon = () => <Icon><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" />
 const TagIcon = () => <Icon><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></Icon>;
 const CalendarIcon = () => <Icon><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></Icon>;
 const WEEKDAY_OPTIONS = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
+const NewsIcon = () => <Icon><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2" /><line x1="10" y1="6" x2="18" y2="6" /><line x1="10" y1="10" x2="18" y2="10" /><line x1="10" y1="14" x2="14" y2="14" /></Icon>;
 const GlobeIcon = () => <Icon><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" /></Icon>;
 
 // よく使うタイムゾーン（先頭に表示）と、ブラウザーが対応するすべてのタイムゾーン
@@ -72,6 +74,7 @@ export default function SettingPage() {
     const user = auth.currentUser;
     const { tasks, notificationsEnabled, toggleNotifications, notifyMinutes, changeNotifyMinutes, settings, updateSettings, showToast } = useOutletContext();
     const { confirm } = useDialog();
+    const [newsEnabled, setNewsEnabled] = useNewsEnabled();
     const [isDark, setIsDark] = useDarkMode();
     const [chartTab, setChartTab] = useState("week");
 
@@ -192,6 +195,20 @@ export default function SettingPage() {
                                 type="checkbox"
                                 checked={isDark}
                                 onChange={(e) => setIsDark(e.target.checked)}
+                            />
+                            <span className={styles.toggleSlider} />
+                        </label>
+                    </div>
+                    <div className={styles.divider} />
+                    <div className={styles.toggleRow}>
+                        <span className={styles.rowIcon}><NewsIcon /></span>
+                        <label className={styles.rowLabel} htmlFor="newsEnabled">ホームにニュースを表示</label>
+                        <label className={styles.toggleSwitch}>
+                            <input
+                                id="newsEnabled"
+                                type="checkbox"
+                                checked={newsEnabled}
+                                onChange={(e) => setNewsEnabled(e.target.checked)}
                             />
                             <span className={styles.toggleSlider} />
                         </label>

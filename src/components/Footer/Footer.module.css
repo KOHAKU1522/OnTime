@@ -79,3 +79,18 @@
     background: var(--footer-active-dot);
     margin-top: 1px;
 }
+
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    .footerButton {
+        width: 48px;
+        height: 44px;
+    }
+}
+
+/* ホームバーのある端末では下端に重ならないようにする */
+@supports (bottom: env(safe-area-inset-bottom)) {
+    .footer {
+        bottom: max(20px, calc(8px + env(safe-area-inset-bottom)));
+    }
+}

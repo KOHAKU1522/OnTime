@@ -56,3 +56,27 @@
     border-color: #f59e0b;
     color: #b45309;
 }
+
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    .chip {
+        min-height: 40px;
+        padding: 0 14px;
+    }
+
+    .chips {
+        padding: 2px 0;
+    }
+}
+
+@media (max-width: 600px) {
+    /* 狭い画面では横スクロールせず折り返し、「スター優先」も見えるようにする */
+    .chips {
+        flex-wrap: wrap;
+        overflow-x: visible;
+    }
+
+    .separator {
+        display: none;
+    }
+}

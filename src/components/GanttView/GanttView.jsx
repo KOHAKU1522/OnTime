@@ -7,6 +7,7 @@ import { formatInZone, toDate, toTime } from "../../utils/date";
 import { addDaysToKey, dateKeyInZone, dayNumber, parseDateKey, weekdayOfKey } from "../../utils/timezone";
 import { deleteTaskAndOfferUndo } from "../../utils/taskTrash";
 import { useDialog } from "../../hooks/useDialog";
+import { reportFirestoreError } from "../../utils/firestoreError";
 
 const CELL_WIDTH = 28;
 const DAYS_BEFORE = 14;
@@ -81,8 +82,7 @@ export default function GanttView({ tasks, user, showToast, timeZone, sortType =
         try {
             await updateDoc(taskRef, { completed: true, completedAt: new Date() });
         } catch (err) {
-            console.error("タスク完了エラー:", err);
-            showToast?.("タスクを完了できませんでした。通信状況を確認して、もう一度お試しください");
+            showToast?.(reportFirestoreError("タスクを完了できませんでした", err, taskRef.path));
         }
     };
 

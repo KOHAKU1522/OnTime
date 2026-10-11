@@ -210,3 +210,14 @@ ul {
 .itemSubtitle::-webkit-scrollbar {
     display: none;
 }
+/* ===== スマートフォン向け ===== */
+@media (max-width: 600px), (pointer: coarse) {
+    .backBtn {
+        width: 44px;
+        height: 44px;
+    }
+
+    .copyBtn {
+        min-height: 44px;
+    }
+}

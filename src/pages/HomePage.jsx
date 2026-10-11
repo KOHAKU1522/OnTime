@@ -11,12 +11,15 @@ import TaskInput from "../components/TaskInput/TaskInput";
 import TaskList from "../components/TaskList/TaskList";
 import ProfileMenu from "../components/ProfileMenu/ProfileMenu";
 import News from "../components/News/News";
+import { useNewsEnabled } from "../hooks/useNewsEnabled";
 import NaturalTaskInput from "../components/NaturalTaskInput/NaturalTaskInput";
+import { reportFirestoreError } from "../utils/firestoreError";
 
 export default function HomePage({ isGuest }) {
 
     const { user, tasks, sortType, setSortType, showToast, settings, updateSettings } = useOutletContext();
     const [showMenu, setShowMenu] = useState(false);
+    const [newsEnabled] = useNewsEnabled();
 
     const timeZone = settings.timeZone;
     const today = new Date();
@@ -78,8 +81,7 @@ export default function HomePage({ isGuest }) {
             );
             return true;
         } catch (err) {
-            console.error("タスク追加エラー:", err);
-            showToast("タスクを追加できませんでした。通信状況を確認して、もう一度お試しください");
+            showToast(reportFirestoreError("タスクを追加できませんでした", err, `users/${user.uid}/tasks`));
             return false;
         }
     };
@@ -109,7 +111,8 @@ export default function HomePage({ isGuest }) {
                 </button>
             </header>
 
-            <News timeZone={timeZone} />
+            {/* オフのときはコンポーネント自体を描画せず、ニュースも取得しない */}
+            {newsEnabled && <News timeZone={timeZone} />}
 
             <NaturalTaskInput onAddTask={handleAddTask} isGuest={isGuest} timeZone={timeZone} />
 

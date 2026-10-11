@@ -5,6 +5,7 @@ import { formatInZone, toDate } from "../../utils/date";
 import { db } from "../../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import { deleteTaskAndOfferUndo } from "../../utils/taskTrash";
+import { reportFirestoreError } from "../../utils/firestoreError";
 
 import TaskEditModal from "../TaskEditModal/TaskEditModal";
 import TagChip from "../TagChip/TagChip";
@@ -51,8 +52,7 @@ export default function TaskCard({ task, user, showToast, allTags = [], now = ne
             await operation();
             return true;
         } catch (err) {
-            console.error(errorMessage, err);
-            showToast?.(`${errorMessage}。通信状況を確認して、もう一度お試しください`);
+            showToast?.(reportFirestoreError(errorMessage, err, `users/${user?.uid}/tasks/${task.id}`));
             return false;
         }
     };

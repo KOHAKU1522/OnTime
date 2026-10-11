@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import { doc, onSnapshot, setDoc } from "firebase/firestore";
 import { db } from "../firebase";
 import { DEFAULT_TIME_ZONE, isValidTimeZone } from "../utils/timezone";
+import { reportFirestoreError } from "../utils/firestoreError";
 
 export const DEFAULT_SETTINGS = {
     weekStartsOn: 1,     // 週の開始曜日（0=日曜 … 6=土曜）。初期値は月曜
@@ -35,8 +36,7 @@ export function useUserSettings(uid, onError) {
             },
             (err) => {
                 setLoadedUid(uid);
-                console.error("設定読み込みエラー:", err);
-                onError?.("設定を読み込めませんでした。既定の設定で表示しています");
+                onError?.(reportFirestoreError("設定を読み込めませんでした（既定の設定で表示しています）", err, ref.path));
             }
         );
     }, [uid, onError]);
@@ -50,9 +50,8 @@ export function useUserSettings(uid, onError) {
             await setDoc(doc(db, "users", uid, "settings", "preferences"), next, { merge: true });
             return true;
         } catch (err) {
-            console.error("設定保存エラー:", err);
             setSettings(prev);
-            onError?.("設定を保存できませんでした。通信状況を確認して、もう一度お試しください");
+            onError?.(reportFirestoreError("設定を保存できませんでした", err, `users/${uid}/settings/preferences`));
             return false;
         }
     }, [uid, settings, onError]);

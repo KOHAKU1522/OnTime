@@ -4,6 +4,7 @@ import { doc, updateDoc } from "firebase/firestore";
 import styles from "./TaskEditModal.module.css";
 import TagChip from "../TagChip/TagChip";
 import { fromZonedInputValue, toZonedInputValue } from "../../utils/date";
+import { reportFirestoreError } from "../../utils/firestoreError";
 
 // 日時の入力欄は設定タイムゾーンの時刻で表示・保存する
 export default function TaskEditModal({ task, user, timeZone, onClose, allTags = [] }) {
@@ -45,8 +46,7 @@ export default function TaskEditModal({ task, user, timeZone, onClose, allTags =
             });
             onClose();
         } catch (err) {
-            console.error("タスク更新エラー:", err);
-            setError("保存できませんでした。通信状況を確認して、もう一度お試しください。");
+            setError(reportFirestoreError("保存できませんでした", err, taskRef.path));
         } finally {
             setSaving(false);
         }
@@ -59,8 +59,7 @@ export default function TaskEditModal({ task, user, timeZone, onClose, allTags =
             await updateDoc(taskRef, { completed: false, completedAt: null });
             onClose();
         } catch (err) {
-            console.error("タスク更新エラー:", err);
-            setError("未完了に戻せませんでした。もう一度お試しください。");
+            setError(reportFirestoreError("未完了に戻せませんでした", err, taskRef.path));
         }
     };
 

@@ -9,6 +9,7 @@ import {
 import styles from "./MacroPage.module.css";
 import { getIntervalDays, getNextIntervalKey, isDateKey, todayKey } from "../utils/macroSchedule";
 import { useDialog } from "../hooks/useDialog";
+import { reportFirestoreError } from "../utils/firestoreError";
 
 const FREQ_OPTIONS = [
     { value: "daily", label: "毎日" },
@@ -76,10 +77,7 @@ export default function MacroPage() {
         const unsub = onSnapshot(
             ref,
             snap => setMacros(snap.docs.map(d => ({ id: d.id, ...d.data() }))),
-            err => {
-                console.error("マクロ読み込みエラー:", err);
-                showToast("マクロを読み込めませんでした。再読み込みしてください");
-            }
+            err => showToast(reportFirestoreError("マクロを読み込めませんでした", err, `users/${uid}/macros`))
         );
         return () => unsub();
     }, [uid, showToast]);
@@ -90,8 +88,7 @@ export default function MacroPage() {
             await operation();
             return true;
         } catch (err) {
-            console.error(errorMessage, err);
-            showToast(`${errorMessage}。もう一度お試しください`);
+            showToast(reportFirestoreError(errorMessage, err, `users/${uid}/macros`));
             return false;
         }
     };
