@@ -26,7 +26,7 @@ const formatDateTime = (value, timeZone) => {
 };
 
 // 自然言語からタスクを読み取り、利用者の確認後にだけ登録する
-export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekStartsOn = 1 }) {
+export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekStartsOn = 1, embedded = false }) {
     const [text, setText] = useState("");
     const [turns, setTurns] = useState([]); // AI との会話履歴（最初の依頼文・質問・回答）
     // これまでに分かった内容（タスク名・期限）。回答を元の依頼と結び付けるためにサーバーへ送り返す
@@ -35,6 +35,7 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekSta
     const [proposal, setProposal] = useState(null); // { task, notes }
     const [status, setStatus] = useState("idle"); // idle | parsing | saving
     const [error, setError] = useState("");
+    const [starred, setStarred] = useState(false);
 
     const reset = () => {
         setText("");
@@ -44,6 +45,7 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekSta
         setProposal(null);
         setError("");
         setStatus("idle");
+        setStarred(false);
     };
 
     const handleParse = async (e) => {
@@ -100,7 +102,7 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekSta
     const handleConfirm = async () => {
         if (!proposal || status !== "idle") return;
         setStatus("saving");
-        const ok = await onAddTask({ ...proposal.task, createdAt: new Date(), completed: false });
+        const ok = await onAddTask({ ...proposal.task, starred, createdAt: new Date(), completed: false });
         if (ok === false) {
             setStatus("idle");
             return;
@@ -126,7 +128,7 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekSta
     const busy = status !== "idle";
 
     return (
-        <section className={styles.container} aria-label="文章でタスクを追加">
+        <section className={`${styles.container} ${embedded ? styles.embedded : ""}`} aria-label="文章でタスクを追加">
             {!proposal && (
                 <form onSubmit={handleParse} className={styles.form}>
                     {question && <p className={styles.question} role="status">{question}</p>}
@@ -168,6 +170,14 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekSta
                             {proposal.notes.map((note, i) => <li key={i}>{note}</li>)}
                         </ul>
                     )}
+                    <label className={styles.starOption}>
+                        <input
+                            type="checkbox"
+                            checked={starred}
+                            onChange={(e) => setStarred(e.target.checked)}
+                        />
+                        <span>★ スターを付ける</span>
+                    </label>
                     <div className={styles.actions}>
                         <button type="button" className={styles.textBtn} onClick={reset} disabled={busy}>キャンセル</button>
                         <button type="button" className={styles.secondaryBtn} onClick={handleRevise} disabled={busy}>修正する</button>

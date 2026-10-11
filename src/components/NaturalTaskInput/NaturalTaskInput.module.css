@@ -6,6 +6,14 @@
     box-shadow: var(--shadow-card);
 }
 
+.embedded {
+    margin-bottom: 0;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
 .form {
     display: flex;
     flex-direction: column;
@@ -123,6 +131,24 @@
     color: var(--text-secondary);
     font-size: 0.82rem;
     line-height: 1.5;
+}
+
+.starOption {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 36px;
+    margin-bottom: 12px;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+}
+
+.starOption input {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+    accent-color: var(--color-warning);
 }
 
 .actions {

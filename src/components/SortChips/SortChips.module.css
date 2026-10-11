@@ -24,19 +24,16 @@
     white-space: nowrap;
 }
 
-.chip:hover {
-    border-color: var(--brand);
-    color: var(--brand);
+.chip:hover:not(.starActive) {
+    background: var(--btn-primary-hover);
+    border-color: var(--btn-primary-hover);
+    color: var(--btn-primary-text);
 }
 
 .active {
-    background: var(--brand);
-    border-color: var(--brand);
-    color: #fff;
-}
-
-.active:hover {
-    color: #fff;
+    background: var(--btn-primary-bg);
+    border-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
 }
 
 .separator {

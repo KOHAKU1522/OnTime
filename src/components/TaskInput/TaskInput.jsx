@@ -27,6 +27,7 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
     const [showStartDate, setShowStartDate] = useState(false);
     const [description, setDescription] = useState("");
     const [showDescription, setShowDescription] = useState(false);
+    const [starred, setStarred] = useState(false);
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState("");
     const [showTags, setShowTags] = useState(false);
@@ -82,6 +83,7 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
             startDate: startDate || null,
             description: description || null,
             tags,
+            starred,
             createdAt: new Date(),
             completed: false
         });
@@ -90,6 +92,7 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
         setDeadline("");
         setStartDate("");
         setDescription("");
+        setStarred(false);
         setTags([]);
         setTagInput("");
         setSelectedPreset(null);
@@ -111,27 +114,28 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
             <h2 className={styles.title}>タスク追加</h2>
 
             <div className={styles.taskNameInputWrapper}>
-                <input
-                    type="text"
-                    placeholder="タスク名"
-                    value={taskName}
-                    onChange={(e) => setTaskName(e.target.value)}
-                    className={`${styles.input} ${styles.taskNameInput}`}
-                />
-                {taskName && (
-                    <button
-                        type="button"
-                        onClick={() => setTaskName("")}
-                        className={styles.clearButton}
-                        aria-label="タスク名をクリア"
-                        title="タスク名をクリア"
-                    >
-                        ×
-                    </button>
-                )}
+                <div className={styles.taskNameField}>
+                    <input
+                        type="text"
+                        placeholder="タスク名"
+                        value={taskName}
+                        onChange={(e) => setTaskName(e.target.value)}
+                        className={`${styles.input} ${styles.taskNameInput}`}
+                    />
+                    {taskName && (
+                        <button
+                            type="button"
+                            onClick={() => setTaskName("")}
+                            className={styles.clearButton}
+                            aria-label="タスク名をクリア"
+                            title="タスク名をクリア"
+                        >
+                            ×
+                        </button>
+                    )}
+                </div>
+                <VoiceInput value={taskName} onChange={setTaskName}/>
             </div>
-
-            <VoiceInput value={taskName} onChange={setTaskName}/>
 
             <div className={styles.section}>
                 <div className={styles.sectionLabel}>期限</div>
@@ -187,9 +191,10 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
                 )}
             </div>
 
+            <div className={styles.optionalActions}>
             {!showStartDate ? (
                 <button className={styles.toggleBtn} onClick={() => setShowStartDate(true)}>
-                    ＋ 開始日を設定（任意）
+                        ＋ 開始日を設定
                 </button>
             ) : (
                 <div className={styles.section}>
@@ -205,7 +210,7 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
 
             {!showDescription ? (
                 <button className={styles.toggleBtn} onClick={() => setShowDescription(true)}>
-                    ＋ メモを追加（任意）
+                        ＋ メモを追加
                 </button>
             ) : (
                 <div className={styles.section}>
@@ -221,7 +226,7 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
 
             {!showTags ? (
                 <button className={styles.toggleBtn} onClick={() => setShowTags(true)}>
-                    ＋ タグを追加（任意）
+                        ＋ タグを追加
                 </button>
             ) : (
                 <div className={styles.section}>
@@ -258,7 +263,18 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
                 </div>
             )}
 
+            </div>
+
             {formError && <p className={styles.formError} role="alert">{formError}</p>}
+
+            <label className={`${styles.starOption} ${starred ? styles.starOptionActive : ""}`}>
+                <input
+                    type="checkbox"
+                    checked={starred}
+                    onChange={(e) => setStarred(e.target.checked)}
+                />
+                <span>スターを付ける</span>
+            </label>
 
             <button onClick={handleAdd} className={styles.addButton}>
                 ＋ 追加する
