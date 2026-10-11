@@ -224,6 +224,7 @@ export default function TaskCard({ task, user, showToast, allTags = [], now = ne
                 <div
                     className={`
                     ${styles.card}
+                    ${!hasDeadline && !task.completed ? styles.noDeadline : ""}
                     ${isDanger ? styles.danger : ""}
                     ${isExpired ? styles.expired : ""}
                     ${task.completed ? styles.completed : ""}

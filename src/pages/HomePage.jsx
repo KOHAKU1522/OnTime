@@ -147,9 +147,20 @@ export default function HomePage({ isGuest }) {
                 aria-controls="home-ai-instructions-dialog"
                 title={isGuest ? "AIへの指示はログイン後に利用できます" : "AIへの指示を開く"}
             >
-                <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d="M20 11.5a7.5 7.5 0 0 1-7.5 7.5H6l-3 2v-9.5A7.5 7.5 0 0 1 10.5 4H12" />
-                    <path d="M18 2v6M15 5h6M16 11v4M14 13h4" />
+                <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="url(#ai-brain-rainbow)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <defs>
+                        <linearGradient id="ai-brain-rainbow" x1="3" y1="5" x2="21" y2="19" gradientUnits="userSpaceOnUse">
+                            <stop stopColor="#ef4444" />
+                            <stop offset="0.2" stopColor="#f59e0b" />
+                            <stop offset="0.4" stopColor="#eab308" />
+                            <stop offset="0.6" stopColor="#22c55e" />
+                            <stop offset="0.8" stopColor="#3b82f6" />
+                            <stop offset="1" stopColor="#a855f7" />
+                        </linearGradient>
+                    </defs>
+                    <path d="M12 5.1a3.2 3.2 0 0 0-5.9 1.6 3.3 3.3 0 0 0-1.5 5.8 3.2 3.2 0 0 0 2.1 5.3 3.1 3.1 0 0 0 5.3 1.2V5.1Z" />
+                    <path d="M12 5.1a3.2 3.2 0 0 1 5.9 1.6 3.3 3.3 0 0 1 1.5 5.8 3.2 3.2 0 0 1-2.1 5.3 3.1 3.1 0 0 1-5.3 1.2V5.1Z" />
+                    <path d="M12 5v14M8 8.5h2M7.3 12h3M8.5 15.5h2M16 8.5h-2m2.7 3.5h-3m2.5 3.5h-2" />
                 </svg>
             </button>
 

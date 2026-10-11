@@ -59,6 +59,55 @@
     background-color: var(--color-danger-bg);
 }
 
+.noDeadline {
+    border: 1px solid var(--color-no-deadline-border);
+    background-color: var(--color-no-deadline-bg);
+    color: var(--color-no-deadline-text);
+}
+
+.noDeadline .title,
+.noDeadline .deadline,
+.noDeadline .time,
+.noDeadline .descriptionText {
+    color: var(--color-no-deadline-text);
+}
+
+.noDeadline .starBtn {
+    color: rgba(255, 255, 255, 0.75);
+}
+
+.noDeadline .starBtn:hover,
+.noDeadline .starred {
+    color: #fbbf24;
+}
+
+.noDeadline .expandBtn,
+.noDeadline .editBtn {
+    border-color: rgba(255, 255, 255, 0.45);
+    color: #dbeafe;
+}
+
+.noDeadline .deleteBtn {
+    border-color: #fecaca;
+    color: #fecaca;
+}
+
+.noDeadline .doneBtn {
+    border-color: #86efac;
+    color: #86efac;
+}
+
+.noDeadline .doneBtn:hover {
+    background-color: #22c55e;
+    color: #fff;
+}
+
+.noDeadline .descriptionTextarea {
+    border-color: rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--color-no-deadline-text);
+}
+
 .titleRow {
     display: flex;
     align-items: center;
