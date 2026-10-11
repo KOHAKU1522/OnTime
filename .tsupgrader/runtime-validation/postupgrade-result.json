@@ -1,0 +1,124 @@
+{
+  "planHash": "54036e60bc5feb354ad336c2739373f457f516253a22ac594461b20c07f49c60",
+  "phase": "postupgrade",
+  "recordedAtUtc": "2026-10-11T19:20:02.3181766Z",
+  "retryCount": 2,
+  "resetBaseline": false,
+  "complete": true,
+  "result": {
+    "setupSucceeded": true,
+    "setupDurationMs": 0,
+    "setupFailureOutput": null,
+    "assertions": [
+      {
+        "name": "vite-production-build",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E ontime@0.0.0 build\r\n\u003E vite build\r\n\r\n\u001B[36mvite v8.3.4 \u001B[32mbuilding client environment for production...\u001B[36m\u001B[39m\r\ntransforming...\r\n\u2713 114 modules transformed.\r\nrendering chunks...\r\ncomputing gzip size...\r\ndist/index.html                           0.80 kB \u2502 gzip:   0.42 kB\r\ndist/assets/CodeRefPage-GbMvG6ff.css      2.58 kB \u2502 gzip:   0.92 kB\r\ndist/assets/GuidePage-BSkztrOV.css        2.78 kB \u2502 gzip:   1.00 kB\r\ndist/assets/OtherAppsPage-DuXhx7Js.css    2.95 kB \u2502 gzip:   1.04 kB\r\ndist/assets/MacroPage-Dv0El7g1.css        5.32 kB \u2502 gzip:   1.52 kB\r\ndist/assets/CalendarPage-D4nAqY5C.css     6.30 kB \u2502 gzip:   1.84 kB\r\ndist/assets/SettingPage-Cm0WBI9C.css      7.14 kB \u2502 gzip:   1.79 kB\r\ndist/assets/index-CyABfqFQ.css           34.02 kB \u2502 gzip:   6.91 kB\r\ndist/assets/GuidePage-BZoFXfu9.js         3.76 kB \u2502 gzip:   1.72 kB\r\ndist/assets/OtherAppsPage-DMXq2uGA.js     4.23 kB \u2502 gzip:   2.21 kB\r\ndist/assets/CalendarPage-DSYS-AWn.js      8.46 kB \u2502 gzip:   3.09 kB\r\ndist/assets/MacroPage-8StyjrjJ.js        10.48 kB \u2502 gzip:   3.66 kB\r\ndist/assets/SettingPage-BigfsXaf.js      16.27 kB \u2502 gzip:   4.78 kB\r\ndist/assets/jsx-runtime-CfsX8sa8.js      48.42 kB \u2502 gzip:  17.22 kB\r\ndist/assets/CodeRefPage-CiisZdHc.js      70.50 kB \u2502 gzip:  16.26 kB\r\ndist/assets/index-R4gOGznM.js           850.40 kB \u2502 gzip: 257.65 kB\r\n\r\n\u001B[33m[plugin builtin:vite-reporter] \r\n(!) Some chunks are larger than 500 kB after minification. Consider:\r\n- Using dynamic import() to code-split the application\r\n- Use build.rolldownOptions.output.codeSplitting to improve chunking: https://rolldown.rs/reference/OutputOptions.codeSplitting\r\n- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.\u001B[39m\r\n\u001B[32m\u2713 built in 633ms\u001B[39m\r\n",
+        "durationMs": 1439
+      },
+      {
+        "name": "eslint-passes",
+        "kind": "process",
+        "verificationMethod": "exit-code",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E ontime@0.0.0 lint\r\n\u003E eslint .\r\n\r\n",
+        "durationMs": 4176
+      },
+      {
+        "name": "tests-pass",
+        "kind": "process",
+        "verificationMethod": "test-results",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": 0,
+        "outputSample": "\r\n\u003E ontime@0.0.0 test\r\n\u003E node --test tests/timezone.test.js\r\n\r\n\u25B6 timezone date helpers\r\n  \u2714 adds calendar days across month boundaries (0.8502ms)\r\n  \u2714 clamps month additions to the target month\u0027s last day (0.1707ms)\r\n  \u2714 derives the date in the requested time zone (16.4647ms)\r\n\u2714 timezone date helpers (19.1713ms)\r\n\u2139 tests 3\r\n\u2139 suites 1\r\n\u2139 pass 3\r\n\u2139 fail 0\r\n\u2139 cancelled 0\r\n\u2139 skipped 0\r\n\u2139 todo 0\r\n\u2139 duration_ms 108.6594\r\n",
+        "durationMs": 699,
+        "testResults": {
+          "testFramework": "unknown",
+          "runnerDetectedFrom": "none",
+          "testsTotal": 0,
+          "testsPassed": 0,
+          "testsFailed": 0,
+          "testsSkipped": 0,
+          "parseFailed": true
+        }
+      },
+      {
+        "name": "home-route-responds",
+        "kind": "http-probe",
+        "verificationMethod": "http-status",
+        "passed": true,
+        "timedOut": false,
+        "skipped": false,
+        "skippedReason": null,
+        "exitCode": null,
+        "outputSample": "HTTP 200\n\u003C!doctype html\u003E\r\n\u003Chtml lang=\u0022ja\u0022\u003E\r\n\r\n\u003Chead\u003E\n  \u003Cscript type=\u0022module\u0022\u003Eimport { injectIntoGlobalHook } from \u0022/@react-refresh\u0022;\ninjectIntoGlobalHook(window);\nwindow.$RefreshReg$ = () =\u003E {};\nwindow.$RefreshSig$ = () =\u003E (type) =\u003E type;\u003C/script\u003E\n\n  \u003Cscript type=\u0022module\u0022 src=\u0022/@vite/client\u0022\u003E\u003C/script\u003E\n\r\n  \u003Cmeta charset=\u0022UTF-8\u0022 /\u003E\r\n\r\n  \u003Cmeta name=\u0022viewport\u0022 content=\u0022width=device-width, initial-scale=1.0, viewport-fit=cover\u0022 /\u003E\r\n  \u003Ctitle\u003EOnTime\u003C/title\u003E\r\n  \u003Clink rel=\u0022manifest\u0022 href=\u0022/manifest.json\u0022 /\u003E\r\n  \u003Clink rel=\u0022apple-touch-icon\u0022 href=\u0022/images/app-logo2.png\u0022 /\u003E\r\n  \u003Cmeta name=\u0022apple-mobile-web-app-capable\u0022 content=\u0022yes\u0022 /\u003E\r\n  \u003Cmeta name=\u0022apple-mobile-web-app-status-bar-style\u0022 content=\u0022default\u0022 /\u003E\r\n  \u003Cmeta name=\u0022apple-mobile-web-app-title\u0022 content=\u0022OnTime\u0022 /\u003E\r\n\u003C/head\u003E\r\n\r\n\u003Cbody\u003E\r\n  \u003Cdiv id=\u0022root\u0022\u003E\u003C/div\u003E\r\n  \u003Cscript type=\u0022module\u0022 src=\u0022/src/main.jsx\u0022\u003E\u003C/script\u003E\r\n\u003C/body\u003E\r\n\r\n\u003C/html\u003E\n--- server output ---\n\r\n\u003E ontime@0.0.0 dev\r\n\u003E vite --host 127.0.0.1\r\n\r\n\r\n  \u001B[32m\u001B[1mVITE\u001B[22m v8.3.4\u001B[39m  \u001B[2mready in \u001B[0m\u001B[1m276\u001B[22m\u001B[2m\u001B[0m ms\u001B[22m\r\n\r\n  \u001B[32m\u279C\u001B[39m  \u001B[1mLocal\u001B[22m:   \u001B[36mhttp://127.0.0.1:\u001B[1m5173\u001B[22m/\u001B[39m\r\n",
+        "durationMs": 1039
+      }
+    ],
+    "executions": [
+      {
+        "source": "vite-production-build",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "build"
+        ],
+        "cwd": "c:\\Users\\yuuya\\OneDrive\\Desktop\\projects\\OnTime",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "eslint-passes",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "lint"
+        ],
+        "cwd": "c:\\Users\\yuuya\\OneDrive\\Desktop\\projects\\OnTime",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "tests-pass",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "test"
+        ],
+        "cwd": "c:\\Users\\yuuya\\OneDrive\\Desktop\\projects\\OnTime",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      },
+      {
+        "source": "home-route-responds",
+        "resolvedExecutable": "C:\\Program Files\\nodejs\\npm.CMD",
+        "args": [
+          "run",
+          "dev",
+          "--",
+          "--host",
+          "127.0.0.1"
+        ],
+        "cwd": "c:\\Users\\yuuya\\OneDrive\\Desktop\\projects\\OnTime",
+        "env": {},
+        "prependPath": [],
+        "platform": "win32"
+      }
+    ]
+  }
+}

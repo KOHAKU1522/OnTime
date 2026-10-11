@@ -1,6 +1,6 @@
 import styles from "./TaskCard.module.css";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { formatInZone, toDate } from "../../utils/date";
 import { db } from "../../firebase";
 import { doc, updateDoc } from "firebase/firestore";
@@ -15,6 +15,7 @@ export default function TaskCard({ task, user, showToast, allTags = [], now = ne
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [description, setDescription] = useState(task.description ?? "");
+    const [previousTaskDescription, setPreviousTaskDescription] = useState(task.description);
     const [showEdit, setShowEdit] = useState(false);
 
     const [swipeX, setSwipeX] = useState(0);
@@ -26,10 +27,10 @@ export default function TaskCard({ task, user, showToast, allTags = [], now = ne
     // ここいじれば誤爆率下げられる。X軸が10px動くまで判定しない。
     const DIRECTION_THRESHOLD = 10;
 
-    // descriptionがtask側から変更された場合（編集後）に同期
-    useEffect(() => {
+    if (task.description !== previousTaskDescription) {
+        setPreviousTaskDescription(task.description);
         setDescription(task.description ?? "");
-    }, [task.description]);
+    }
 
     const deadline = toDate(task.deadline);
     const hasDeadline = !!deadline;

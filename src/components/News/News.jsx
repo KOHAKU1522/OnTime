@@ -67,7 +67,7 @@ export default function News({ timeZone }) {
 
   useEffect(() => {
     // 初回取得
-    fetchNews();
+    queueMicrotask(fetchNews);
   }, [fetchNews]);
 
   const [featured, ...others] = items;
