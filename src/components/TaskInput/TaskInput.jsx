@@ -262,11 +262,6 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
                     )}
                 </div>
             )}
-
-            </div>
-
-            {formError && <p className={styles.formError} role="alert">{formError}</p>}
-
             <label className={`${styles.starOption} ${starred ? styles.starOptionActive : ""}`}>
                 <input
                     type="checkbox"
@@ -275,6 +270,9 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
                 />
                 <span>スターを付ける</span>
             </label>
+            </div>
+
+            {formError && <p className={styles.formError} role="alert">{formError}</p>}
 
             <button onClick={handleAdd} className={styles.addButton}>
                 ＋ 追加する

@@ -41,7 +41,18 @@
     right: 16px;
     bottom: calc(100px + env(safe-area-inset-bottom, 0px));
     z-index: 90;
+    width: 56px;
+    height: 56px;
+    border: 2px solid var(--border);
+    border-radius: 50%;
+    background: var(--bg-card);
     box-shadow: var(--shadow-footer);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.aiPanelToggle:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(0, 0, 0, 0.24);
 }
 
 .aiBackdrop {

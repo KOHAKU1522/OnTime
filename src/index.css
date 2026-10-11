@@ -38,6 +38,9 @@
   --color-success: #4caf50;
   --color-success-bg: #ecfdf5;
   --color-blue: rgb(59, 130, 246);
+  --color-no-deadline-bg: #1e3a8a;
+  --color-no-deadline-text: #eff6ff;
+  --color-no-deadline-border: #3b82f6;
 
   --footer-inactive: #aab0bb;
   --footer-active-bg: #f0f0f5;
@@ -96,6 +99,9 @@
   --color-success: #34d399;
   --color-success-bg: #12352b;
   --color-blue: rgb(96, 165, 250);
+  --color-no-deadline-bg: #172554;
+  --color-no-deadline-text: #eff6ff;
+  --color-no-deadline-border: #3b82f6;
 
   --footer-inactive: #636366;
   --footer-active-bg: #2c2c2e;
