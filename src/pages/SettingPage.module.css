@@ -402,3 +402,28 @@
     cursor: pointer;
     white-space: nowrap;
 }
+
+.timeZoneSelect {
+    max-width: 55%;
+}
+
+.timeZoneHint {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    padding: 0 16px 12px 48px;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+}
+
+.timeZoneHintBtn {
+    min-height: 32px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    background: transparent;
+    color: var(--brand);
+    font-size: 0.78rem;
+    cursor: pointer;
+}

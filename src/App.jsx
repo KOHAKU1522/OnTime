@@ -1,21 +1,26 @@
 import { Route, Routes } from 'react-router-dom';
 import { ROUTES } from './const';
 
+// 初期表示に必要なページ（ログイン・ホーム）は通常読み込み
 import HomePage from './pages/HomePage';
 import LoginPage from './pages/LoginPage';
-import CalendarPage from "./pages/CalendarPage";
-import SettingPage from "./pages/SettingPage";
-import MacroPage from "./pages/MacroPage";
-import CodeRefPage from "./pages/CodeRefPage";
-import GuidePage from './pages/GuidePage';
-import OtherAppsPage from "./pages/OtherAppsPage"
 
 import './App.css';
 import ProtectedRoute from './components/ProtectedRoute';
 
 import Layout from "./components/Layout/Layout";
+import DialogProvider from "./components/Dialog/DialogProvider";
 import { useDarkMode } from "./hooks/useDarkMode";
-import { useState } from 'react';
+import { lazy, useState } from 'react';
+
+// それ以外のページは開いたときに読み込む（読み込み中表示は Layout の Suspense）
+const CalendarPage = lazy(() => import("./pages/CalendarPage"));
+const SettingPage = lazy(() => import("./pages/SettingPage"));
+const MacroPage = lazy(() => import("./pages/MacroPage"));
+const GuidePage = lazy(() => import("./pages/GuidePage"));
+const OtherAppsPage = lazy(() => import("./pages/OtherAppsPage"));
+// codes.js（大きな静的データ）を含む
+const CodeRefPage = lazy(() => import("./pages/CodeRefPage"));
 
 function App() {
 
@@ -25,10 +30,10 @@ function App() {
   const [guestTasks, setGuestTasks] = useState([]);
 
   return (
-    <>
+    <DialogProvider>
       <Routes>
         <Route path={ROUTES.LOGIN}
-          element={<LoginPage isGuest={isGuest} setIsGuest={setIsGuest} />}
+          element={<LoginPage setIsGuest={setIsGuest} />}
         />
 
         <Route
@@ -53,7 +58,7 @@ function App() {
           <Route path={ROUTES.OTHER_APPS} element={<OtherAppsPage />} />
         </Route>
       </Routes>
-    </>
+    </DialogProvider>
   );
 }
 

@@ -1,6 +1,6 @@
 .swipeContainer {
     position: relative;
-    border-radius: 12px;
+    border-radius: 16px;
     margin-bottom: 10px;
     overflow: hidden;
 }
@@ -37,7 +37,7 @@
     padding: 12px 16px;
     margin-bottom: 0;
     user-select: none;
-    border-radius: 12px;
+    border-radius: 16px;
     box-shadow: var(--shadow-card);
     background-color: var(--bg-card);
     display: flex;
@@ -52,7 +52,7 @@
 }
 
 .card:hover {
-    transform: translateY(-3px) scale(1.01);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
 }
 
 .danger {
@@ -122,7 +122,6 @@
 .expired {
     background-color: var(--completed-bg);
     color: var(--completed-text);
-    border-left: 4px solid var(--completed-border);
     opacity: 0.6;
 }
 
@@ -133,8 +132,9 @@
 
 .doneBtn {
     border: 1px solid var(--color-success);
-    padding: 4px 10px;
-    border-radius: 6px;
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 22px;
     background: transparent;
     color: var(--color-success);
     font-size: 0.78rem;
@@ -155,8 +155,9 @@
 
 .deleteBtn {
     border: 1px solid var(--color-danger-border);
-    padding: 4px 10px;
-    border-radius: 6px;
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 22px;
     background: transparent;
     color: var(--color-danger);
     font-size: 0.78rem;
@@ -171,8 +172,9 @@
 
 .editBtn {
     border: 1px solid var(--border);
-    padding: 4px 10px;
-    border-radius: 6px;
+    min-height: 44px;
+    padding: 0 14px;
+    border-radius: 22px;
     background: transparent;
     color: var(--text-muted);
     font-size: 0.78rem;
@@ -206,7 +208,7 @@
     height: 3.3px;
     background-color: var(--gauge-bg);
 
-    border-radius: 0 0 12px 12px;
+    border-radius: 0 0 16px 16px;
     overflow: hidden;
 }
 
@@ -300,4 +302,18 @@
 .removing {
     opacity: 0;
     transition: all 0.3s ease;
+}
+.starBtn:focus-visible,
+.doneBtn:focus-visible,
+.deleteBtn:focus-visible,
+.editBtn:focus-visible,
+.expandBtn:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card {
+        transition: none !important;
+    }
 }

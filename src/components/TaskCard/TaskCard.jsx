@@ -1,20 +1,20 @@
 import styles from "./TaskCard.module.css";
 
 import { useState, useEffect, useRef } from "react";
+import { formatInZone, toDate } from "../../utils/date";
 import { db } from "../../firebase";
-import { doc, updateDoc, deleteDoc } from "firebase/firestore";
-import { useAuthUser } from "../../hooks/useAuthUser";
+import { doc, updateDoc } from "firebase/firestore";
+import { deleteTaskAndOfferUndo } from "../../utils/taskTrash";
 
 import TaskEditModal from "../TaskEditModal/TaskEditModal";
 import TagChip from "../TagChip/TagChip";
 
-export default function TaskCard({ task, showToast, allTags = [] }) {
+// user: 親で取得したログインユーザー（ゲストは null）。カードごとに認証リスナーを登録しない
+export default function TaskCard({ task, user, showToast, allTags = [], now = new Date(), timeZone }) {
 
-    const [now, setNow] = useState(new Date());
     const [isExpanded, setIsExpanded] = useState(false);
     const [description, setDescription] = useState(task.description ?? "");
     const [showEdit, setShowEdit] = useState(false);
-    const pendingDeleteRef = useRef(null);
 
     const [swipeX, setSwipeX] = useState(0);
     const [isDragging, setIsDragging] = useState(false);
@@ -25,27 +25,18 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
     // ここいじれば誤爆率下げられる。X軸が10px動くまで判定しない。
     const DIRECTION_THRESHOLD = 10;
 
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setNow(new Date());
-        }, 60000);
-        return () => clearInterval(timer);
-    }, []);
-
     // descriptionがtask側から変更された場合（編集後）に同期
     useEffect(() => {
         setDescription(task.description ?? "");
     }, [task.description]);
 
-    const getDate = (val) => {
-        if (typeof val?.toDate === "function") return val.toDate();
-        return new Date(val);
-    };
+    const deadline = toDate(task.deadline);
+    const hasDeadline = !!deadline;
+    const createdAt = toDate(task.createdAt) ?? deadline;
+    const hasMemo = !!task.description;
 
-    const deadline = getDate(task.deadline);
-    const createdAt = getDate(task.createdAt);
-
-    const diffMs = deadline.getTime() - now.getTime();
+    // 期限なしタスクは残り時間を無限大として扱う（期限切れ・危険表示にならない）
+    const diffMs = hasDeadline ? deadline.getTime() - now.getTime() : Infinity;
     const diffMinutes = Math.ceil(diffMs / (1000 * 60));
     const diffHours = Math.ceil(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffHours / 24);
@@ -54,7 +45,17 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
     const isExpired = diffHours <= 0 && !task.completed;
     const isDanger = diffHours > 0 && diffHours <= 24 && !task.completed;
 
-    const user = useAuthUser();
+    // Firestore 操作を実行し、失敗したら利用者に通知する
+    const runTaskOp = async (operation, errorMessage) => {
+        try {
+            await operation();
+            return true;
+        } catch (err) {
+            console.error(errorMessage, err);
+            showToast?.(`${errorMessage}。通信状況を確認して、もう一度お試しください`);
+            return false;
+        }
+    };
 
     // ===== スワイプで完了 =====
     const handleDragStart = (clientX, clientY) => {
@@ -115,19 +116,23 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
         e.stopPropagation();
         if (!user) return;
         const taskRef = doc(db, "users", user.uid, "tasks", task.id);
-        await updateDoc(taskRef, { starred: !task.starred });
+        await runTaskOp(() => updateDoc(taskRef, { starred: !task.starred }), "重要マークを変更できませんでした");
     };
 
     // ===== 完了（アンドゥ付き）=====
     const completeTask = async () => {
         if (!user) return;
         const taskRef = doc(db, "users", user.uid, "tasks", task.id);
-        await updateDoc(taskRef, { completed: true, completedAt: new Date() });
+        const ok = await runTaskOp(
+            () => updateDoc(taskRef, { completed: true, completedAt: new Date() }),
+            "タスクを完了できませんでした"
+        );
 
-        if (showToast) {
-            showToast("タスクを完了しました", async () => {
-                await updateDoc(taskRef, { completed: false, completedAt: null });
-            });
+        if (ok && showToast) {
+            showToast("タスクを完了しました", () => runTaskOp(
+                () => updateDoc(taskRef, { completed: false, completedAt: null }),
+                "元に戻せませんでした"
+            ));
         }
     };
 
@@ -135,12 +140,16 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
     const uncompleteTask = async () => {
         if (!user) return;
         const taskRef = doc(db, "users", user.uid, "tasks", task.id);
-        await updateDoc(taskRef, { completed: false, completedAt: null });
+        const ok = await runTaskOp(
+            () => updateDoc(taskRef, { completed: false, completedAt: null }),
+            "未完了に戻せませんでした"
+        );
 
-        if (showToast) {
-            showToast("未完了に戻しました", async () => {
-                await updateDoc(taskRef, { completed: true, completedAt: new Date() });
-            });
+        if (ok && showToast) {
+            showToast("未完了に戻しました", () => runTaskOp(
+                () => updateDoc(taskRef, { completed: true, completedAt: new Date() }),
+                "元に戻せませんでした"
+            ));
         }
     };
 
@@ -148,37 +157,23 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
     const deleteTask = () => {
         if (!user) return;
 
-        const taskRef = doc(db, "users", user.uid, "tasks", task.id);
-
-        // 既存の保留を解除
-        if (pendingDeleteRef.current) {
-            clearTimeout(pendingDeleteRef.current);
-        }
-
-        pendingDeleteRef.current = setTimeout(async () => {
-            await deleteDoc(taskRef);
-            pendingDeleteRef.current = null;
-        }, 5000);
-
-        if (showToast) {
-            showToast("タスクを削除しました", () => {
-                if (pendingDeleteRef.current) {
-                    clearTimeout(pendingDeleteRef.current);
-                    pendingDeleteRef.current = null;
-                }
-            });
-        }
+        // サーバーから即時削除し、5秒以内なら「元に戻す」で復元できる
+        deleteTaskAndOfferUndo(db, user.uid, task.id, showToast);
     };
 
     // ===== 説明欄の保存 =====
     const handleDescriptionBlur = async () => {
         if (!user) return;
         const taskRef = doc(db, "users", user.uid, "tasks", task.id);
-        await updateDoc(taskRef, { description: description || null });
+        await runTaskOp(
+            () => updateDoc(taskRef, { description: description || null }),
+            "メモを保存できませんでした"
+        );
     };
 
     const formatRemain = () => {
         if (task.completed) return "完了済み";
+        if (!hasDeadline) return "期限なし";
         if (isExpired) return "期限切れ";
         if (diffMinutes < 60) return `残り ${diffMinutes}分`;
         if (diffDays > 0) return `残り ${diffDays}日${remainHours}時間`;
@@ -186,10 +181,12 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
     };
 
     // ===== 進捗バー =====
-    const totalMs = deadline.getTime() - createdAt.getTime();
-    const elapsedMs = now.getTime() - createdAt.getTime();
-    let progress = elapsedMs / totalMs;
-    progress = Math.min(Math.max(progress, 0), 1);
+    let progress = 0;
+    if (hasDeadline) {
+        const totalMs = deadline.getTime() - createdAt.getTime();
+        const elapsedMs = now.getTime() - createdAt.getTime();
+        progress = Math.min(Math.max(elapsedMs / totalMs, 0), 1);
+    }
     const remainRatio = 1 - progress;
 
     let baseColor = "59, 130, 246";
@@ -200,7 +197,7 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
     }
 
     const backgroundStyle =
-        task.completed
+        task.completed || !hasDeadline
             ? undefined
             : isExpired
                 ? undefined
@@ -249,13 +246,15 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
                                 className={`${styles.starBtn} ${task.starred ? styles.starred : ""}`}
                                 onClick={toggleStar}
                                 title={task.starred ? "重要から外す" : "重要に追加"}
+                                aria-label={task.starred ? "重要から外す" : "重要に追加"}
+                                aria-pressed={!!task.starred}
                             >
                                 {task.starred ? "★" : "☆"}
                             </button>
                             <div className={styles.title}>{task.taskName}</div>
                         </div>
                         <div className={styles.deadline}>
-                            期限: {deadline.toLocaleString()}
+                            期限: {hasDeadline ? formatInZone(deadline, timeZone) : "なし"}
                         </div>
                         {tags.length > 0 && (
                             <div className={styles.tagList}>
@@ -267,7 +266,7 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
                     </div>
 
                     <div className={styles.right}>
-                        <div className={styles.time}>{formatRemain()}</div>
+                        <div className={styles.time} aria-live="off">{formatRemain()}</div>
                         <div className={styles.buttons}>
                             {!task.completed && (
                                 <button className={styles.doneBtn} onClick={completeTask}>完了</button>
@@ -278,17 +277,21 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
                     </div>
 
                     {/* 説明欄トグル */}
-                    <div className={styles.expandRow}>
-                        <button
-                            className={styles.expandBtn}
-                            onClick={() => setIsExpanded(v => !v)}
-                        >
-                            <span className={`${styles.expandIcon} ${isExpanded ? styles.open : ""}`}>▼</span>
-                            {description ? "メモあり" : "メモを追加"}
-                        </button>
-                    </div>
+                    {/* メモがあるタスクは常に表示、ないタスクだけ追加ボタンで開く */}
+                    {!hasMemo && (
+                        <div className={styles.expandRow}>
+                            <button
+                                className={styles.expandBtn}
+                                onClick={() => setIsExpanded(v => !v)}
+                                aria-expanded={isExpanded}
+                            >
+                                <span className={`${styles.expandIcon} ${isExpanded ? styles.open : ""}`}>▼</span>
+                                メモを追加
+                            </button>
+                        </div>
+                    )}
 
-                    {isExpanded && (
+                    {(hasMemo || isExpanded) && (
                         <div className={styles.expandedArea}>
                             <textarea
                                 className={styles.descriptionTextarea}
@@ -300,7 +303,7 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
                         </div>
                     )}
 
-                    {!task.completed && !isExpired && (
+                    {!task.completed && !isExpired && hasDeadline && (
                         <div className={styles.gaugeWrapper}>
                             <div
                                 className={styles.gauge}
@@ -321,6 +324,8 @@ export default function TaskCard({ task, showToast, allTags = [] }) {
             {showEdit && (
                 <TaskEditModal
                     task={task}
+                    user={user}
+                    timeZone={timeZone}
                     onClose={() => setShowEdit(false)}
                     allTags={allTags}
                 />

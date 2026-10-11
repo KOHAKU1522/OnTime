@@ -3,13 +3,11 @@ import styles from "./Toast.module.css";
 
 const DURATION = 5000;
 
-export default function Toast({ toast, onDismiss }) {
+// トーストごとに key を変えて作り直すことで、進捗を初期値から始める
+function ToastBody({ toast, onDismiss }) {
     const [progress, setProgress] = useState(100);
 
     useEffect(() => {
-        if (!toast) return;
-        setProgress(100);
-
         const start = Date.now();
         const interval = setInterval(() => {
             const elapsed = Date.now() - start;
@@ -22,9 +20,7 @@ export default function Toast({ toast, onDismiss }) {
         }, 50);
 
         return () => clearInterval(interval);
-    }, [toast?.id]);
-
-    if (!toast) return null;
+    }, [onDismiss]);
 
     const handleUndo = () => {
         if (toast.onUndo) toast.onUndo();
@@ -32,7 +28,7 @@ export default function Toast({ toast, onDismiss }) {
     };
 
     return (
-        <div className={styles.toast}>
+        <div className={styles.toast} role="status" aria-live="polite">
             <span className={styles.message}>{toast.message}</span>
             {toast.onUndo && (
                 <button className={styles.undoBtn} onClick={handleUndo}>元に戻す</button>
@@ -42,4 +38,9 @@ export default function Toast({ toast, onDismiss }) {
             </div>
         </div>
     );
+}
+
+export default function Toast({ toast, onDismiss }) {
+    if (!toast) return null;
+    return <ToastBody key={toast.id} toast={toast} onDismiss={onDismiss} />;
 }

@@ -1,24 +1,20 @@
 import { useState } from "react";
-import { db, auth } from "../../firebase";
+import { db } from "../../firebase";
 import { doc, updateDoc } from "firebase/firestore";
 import styles from "./TaskEditModal.module.css";
 import TagChip from "../TagChip/TagChip";
+import { fromZonedInputValue, toZonedInputValue } from "../../utils/date";
 
-const pad = (n) => String(n).padStart(2, "0");
-const toDatetimeLocal = (date) => {
-    if (!date) return "";
-    const d = typeof date?.toDate === "function" ? date.toDate() : new Date(date);
-    return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
-};
-
-export default function TaskEditModal({ task, onClose, allTags = [] }) {
+// 日時の入力欄は設定タイムゾーンの時刻で表示・保存する
+export default function TaskEditModal({ task, user, timeZone, onClose, allTags = [] }) {
     const [taskName, setTaskName] = useState(task.taskName);
-    const [deadline, setDeadline] = useState(toDatetimeLocal(task.deadline));
-    const [startDate, setStartDate] = useState(toDatetimeLocal(task.startDate));
+    const [deadline, setDeadline] = useState(toZonedInputValue(task.deadline, timeZone));
+    const [startDate, setStartDate] = useState(toZonedInputValue(task.startDate, timeZone));
     const [description, setDescription] = useState(task.description ?? "");
     const [tags, setTags] = useState(task.tags ?? []);
     const [tagInput, setTagInput] = useState("");
     const [saving, setSaving] = useState(false);
+    const [error, setError] = useState("");
 
     const addTag = () => {
         const t = tagInput.trim();
@@ -33,29 +29,39 @@ export default function TaskEditModal({ task, onClose, allTags = [] }) {
     };
 
     const handleSave = async () => {
-        if (!taskName || !deadline) return;
-        const user = auth.currentUser;
+        if (!taskName) return;
         if (!user) return;
 
         setSaving(true);
+        setError("");
         const taskRef = doc(db, "users", user.uid, "tasks", task.id);
-        await updateDoc(taskRef, {
-            taskName,
-            deadline: new Date(deadline),
-            startDate: startDate ? new Date(startDate) : null,
-            description: description || null,
-            tags,
-        });
-        setSaving(false);
-        onClose();
+        try {
+            await updateDoc(taskRef, {
+                taskName,
+                deadline: deadline ? fromZonedInputValue(deadline, timeZone) : null,
+                startDate: startDate ? fromZonedInputValue(startDate, timeZone) : null,
+                description: description || null,
+                tags,
+            });
+            onClose();
+        } catch (err) {
+            console.error("タスク更新エラー:", err);
+            setError("保存できませんでした。通信状況を確認して、もう一度お試しください。");
+        } finally {
+            setSaving(false);
+        }
     };
 
     const handleUncomplete = async () => {
-        const user = auth.currentUser;
         if (!user) return;
         const taskRef = doc(db, "users", user.uid, "tasks", task.id);
-        await updateDoc(taskRef, { completed: false, completedAt: null });
-        onClose();
+        try {
+            await updateDoc(taskRef, { completed: false, completedAt: null });
+            onClose();
+        } catch (err) {
+            console.error("タスク更新エラー:", err);
+            setError("未完了に戻せませんでした。もう一度お試しください。");
+        }
     };
 
     return (
@@ -76,7 +82,7 @@ export default function TaskEditModal({ task, onClose, allTags = [] }) {
                     </div>
 
                     <div className={styles.field}>
-                        <label className={styles.label}>期限</label>
+                        <label className={styles.label}>期限（空欄で期限なし）</label>
                         <input
                             type="datetime-local"
                             className={styles.input}
@@ -138,6 +144,7 @@ export default function TaskEditModal({ task, onClose, allTags = [] }) {
                         )}
                     </div>
 
+                    {error && <p className={styles.error} role="alert">{error}</p>}
                     {task.completed && (
                         <button className={styles.uncompleteBtn} onClick={handleUncomplete}>
                             未完了に戻す
@@ -146,7 +153,7 @@ export default function TaskEditModal({ task, onClose, allTags = [] }) {
                     <button
                         className={styles.saveBtn}
                         onClick={handleSave}
-                        disabled={saving || !taskName || !deadline}
+                        disabled={saving || !taskName}
                     >
                         {saving ? "保存中..." : "保存する"}
                     </button>

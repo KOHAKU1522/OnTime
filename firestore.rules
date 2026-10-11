@@ -1,0 +1,14 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 本人のデータ（tasks / macros など）のみ読み書き可能
+    match /users/{uid}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+    // rateLimits/{uid}（利用回数の記録）は下の全面拒否に含まれ、Admin SDK からのみ更新される
+    // それ以外はすべて拒否（Cloud Functions の Admin SDK はルールの対象外）
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

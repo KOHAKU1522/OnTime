@@ -38,3 +38,21 @@
 .active:hover {
     color: #fff;
 }
+
+.separator {
+    flex-shrink: 0;
+    width: 1px;
+    margin: 4px 2px;
+    background: var(--border);
+}
+
+.starActive {
+    background: var(--bg-card);
+    border-color: #f59e0b;
+    color: #b45309;
+}
+
+.starActive:hover {
+    border-color: #f59e0b;
+    color: #b45309;
+}

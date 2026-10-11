@@ -110,3 +110,29 @@
     border-color: var(--tag-bg);
     color: var(--tag-text);
 }
+
+.completedSection {
+    margin-top: 16px;
+}
+
+.completedSummary {
+    display: flex;
+    align-items: center;
+    min-height: 44px;
+    padding: 0 4px;
+    color: var(--text-secondary);
+    font-size: 0.88rem;
+    font-weight: 600;
+    cursor: pointer;
+    user-select: none;
+}
+
+.completedSummary:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+
+.completedSection[open] .completedSummary {
+    margin-bottom: 8px;
+}

@@ -1,5 +1,10 @@
 /* ===== CSS Variables (Light / Dark) ===== */
 :root {
+  /* 主要ボタン（濃い紺 + 白文字。コントラスト比 約14:1） */
+  --btn-primary-bg: #1b2a4e;
+  --btn-primary-hover: #26396a;
+  --btn-primary-text: #ffffff;
+
   --bg-page: #f8f8f8;
   --bg-card: #ffffff;
   --bg-card-alt: #f3f4f6;
@@ -51,6 +56,11 @@
 }
 
 [data-theme="dark"] {
+  /* 暗い背景上でも識別できる紺（白文字とのコントラスト比 約8:1） */
+  --btn-primary-bg: #2b4a8b;
+  --btn-primary-hover: #34579f;
+  --btn-primary-text: #ffffff;
+
   --bg-page: #0f0f0f;
   --bg-card: #1c1c1e;
   --bg-card-alt: #2c2c2e;

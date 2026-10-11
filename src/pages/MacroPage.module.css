@@ -77,8 +77,8 @@
 .emptyAddBtn {
     margin-top: 8px;
     padding: 10px 24px;
-    background: var(--brand);
-    color: #fff;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
     border: none;
     border-radius: 10px;
     font-size: 0.9rem;
@@ -298,8 +298,8 @@
 .saveBtn {
     width: 100%;
     padding: 13px;
-    background: var(--brand);
-    color: #fff;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
     border: none;
     border-radius: 12px;
     font-size: 0.95rem;
@@ -312,4 +312,40 @@
 .safeArea {
     height: env(safe-area-inset-bottom, 20px);
     min-height: 20px;
+}
+
+/* 編集可能なマクロ本文（ボタン化に伴うリセット） */
+button.macroMain {
+    border: none;
+    background: transparent;
+    padding: 0;
+    text-align: left;
+    font: inherit;
+    color: inherit;
+    cursor: pointer;
+    min-height: 44px;
+}
+
+button.macroMain:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 8px;
+}
+
+.hint {
+    margin: 6px 0 0;
+    color: var(--text-muted);
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
+
+.formError {
+    margin: 0 0 8px;
+    color: var(--color-danger);
+    font-size: 0.85rem;
+}
+
+.macroName,
+.macroMeta {
+    display: block;
 }

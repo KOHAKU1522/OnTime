@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { toDate } from "../utils/date";
 
 export function useNotifications(tasks, enabled, notifyMinutes = 1440) {
     const notifiedRef = useRef(new Set());
@@ -12,9 +13,8 @@ export function useNotifications(tasks, enabled, notifyMinutes = 1440) {
             const now = new Date();
             tasks.forEach(task => {
                 if (task.completed) return;
-                const deadline = typeof task.deadline?.toDate === "function"
-                    ? task.deadline.toDate()
-                    : new Date(task.deadline);
+                const deadline = toDate(task.deadline);
+                if (!deadline) return;
                 const diffMs = deadline - now;
                 const diffMin = diffMs / 60000;
 

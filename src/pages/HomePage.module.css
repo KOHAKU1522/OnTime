@@ -66,3 +66,20 @@
     object-fit: cover;
     border-radius: 50%;
 }
+
+.periodRow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.periodBadge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--bg-card-alt);
+    padding: 2px 7px;
+    border-radius: 99px;
+    display: inline-block;
+}

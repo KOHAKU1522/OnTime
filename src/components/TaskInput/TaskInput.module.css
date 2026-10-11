@@ -171,8 +171,8 @@
 
 /* ===== 追加ボタン ===== */
 .addButton {
-    background-color: var(--brand);
-    color: white;
+    background-color: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
     padding: 11px;
     border: none;
     border-radius: 10px;
@@ -184,7 +184,7 @@
 }
 
 .addButton:hover {
-    background-color: var(--brand-hover);
+    background-color: var(--btn-primary-hover);
 }
 
 /* ===== タグ入力 ===== */
@@ -277,4 +277,24 @@
     display: flex;
     flex-wrap: wrap;
     gap: 6px;
+}
+
+/* カスタム期限（日付 + 時刻） */
+.customDeadline {
+    display: flex;
+    gap: 8px;
+}
+
+.customDeadline .input:first-child {
+    flex: 2;
+}
+
+.customDeadline .input:last-child {
+    flex: 1;
+}
+
+.formError {
+    margin: 0 0 8px;
+    color: var(--color-danger);
+    font-size: 0.85rem;
 }

@@ -1,0 +1,24 @@
+# 依存ライブラリ（すでに除外対象ですが念のため）
+node_modules/
+
+# ビルド成果物（ここが数百MBを占めている可能性が高いです）
+dist/
+build/
+.next/
+out/
+
+# メディアファイル（Claudeが読めず、トークンの無駄になります）
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.svg
+*.mp3
+*.wav
+*.mp4
+*.webm
+
+# その他、キャッシュや一時ファイル
+.pnpm-store/
+.yarn/
+.cache/

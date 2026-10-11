@@ -8,8 +8,10 @@ import styles from "./SettingPage.module.css";
 import { useDarkMode } from "../hooks/useDarkMode";
 import StatsChart from "../components/StatsChart/StatsChart";
 import { getWeeklyCompletions, getMonthlyCompletions } from "../utils/statsUtils";
+import { getTimeZoneOffsetMs, isValidTimeZone } from "../utils/timezone";
+import { useDialog } from "../hooks/useDialog";
 
-const Icon = ({ d, d2, children, ...props }) => (
+const Icon = ({ children, ...props }) => (
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
         {children}
     </svg>
@@ -20,6 +22,32 @@ const BellIcon = () => <Icon><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"
 const RepeatIcon = () => <Icon><polyline points="17 1 21 5 17 9" /><path d="M3 11V9a4 4 0 014-4h14" /><polyline points="7 23 3 19 7 15" /><path d="M21 13v2a4 4 0 01-4 4H3" /></Icon>;
 const LogOutIcon = () => <Icon><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></Icon>;
 const TagIcon = () => <Icon><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></Icon>;
+const CalendarIcon = () => <Icon><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></Icon>;
+const WEEKDAY_OPTIONS = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
+const GlobeIcon = () => <Icon><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" /></Icon>;
+
+// よく使うタイムゾーン（先頭に表示）と、ブラウザーが対応するすべてのタイムゾーン
+const COMMON_TIME_ZONES = [
+    "Asia/Tokyo", "UTC", "Asia/Seoul", "Asia/Shanghai", "Asia/Singapore", "Asia/Kolkata",
+    "Europe/London", "Europe/Paris", "America/New_York", "America/Chicago",
+    "America/Los_Angeles", "Pacific/Honolulu", "Australia/Sydney",
+].filter(isValidTimeZone);
+const ALL_TIME_ZONES = (() => {
+    try {
+        return Intl.supportedValuesOf("timeZone").filter(tz => !COMMON_TIME_ZONES.includes(tz));
+    } catch {
+        return [];
+    }
+})();
+const DEVICE_TIME_ZONE = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+const formatOffset = (timeZone) => {
+    const minutes = Math.round(getTimeZoneOffsetMs(new Date(), timeZone) / 60000);
+    const sign = minutes >= 0 ? "+" : "-";
+    const abs = Math.abs(minutes);
+    return `UTC${sign}${String(Math.floor(abs / 60)).padStart(2, "0")}:${String(abs % 60).padStart(2, "0")}`;
+};
+const timeZoneLabel = (timeZone) => `${timeZone}（${formatOffset(timeZone)}）`;
 const InfoIcon = () => <Icon><circle cx="12" cy="12" r="10" /><line x1="12" y1="8" x2="12" y2="12" /><line x1="12" y1="16" x2="12.01" y2="16" /></Icon>;
 
 const GuideIcon = () => (
@@ -42,7 +70,8 @@ const AppsIcon = () => (
 export default function SettingPage() {
     const navigate = useNavigate();
     const user = auth.currentUser;
-    const { tasks, notificationsEnabled, toggleNotifications, notifyMinutes, changeNotifyMinutes } = useOutletContext();
+    const { tasks, notificationsEnabled, toggleNotifications, notifyMinutes, changeNotifyMinutes, settings, updateSettings, showToast } = useOutletContext();
+    const { confirm } = useDialog();
     const [isDark, setIsDark] = useDarkMode();
     const [chartTab, setChartTab] = useState("week");
 
@@ -55,31 +84,37 @@ export default function SettingPage() {
     const completedTasks = tasks.filter(t => t.completed).length;
     const completionRate = totalTasks > 0 ? Math.round((completedTasks / totalTasks) * 100) : 0;
 
-    const weeklyData = getWeeklyCompletions(tasks);
-    const monthlyData = getMonthlyCompletions(tasks);
+    // 週の区切りは設定の開始曜日・タイムゾーンに合わせる（ホームの「今週」と同じ期間）
+    const statsOptions = { weekStartsOn: settings.weekStartsOn, timeZone: settings.timeZone };
+    const weeklyData = getWeeklyCompletions(tasks, statsOptions);
+    const monthlyData = getMonthlyCompletions(tasks, statsOptions);
     const chartData = chartTab === "week" ? weeklyData : monthlyData;
 
     const thisWeekCount = weeklyData.reduce((sum, d) => sum + d.count, 0);
     const thisMonthCount = monthlyData.reduce((sum, d) => sum + d.count, 0);
 
     const handleLogout = async () => {
-        if (!window.confirm("ログアウトしますか？")) return;
+        const ok = await confirm({ title: "ログアウトしますか？", confirmLabel: "ログアウト", danger: true });
+        if (!ok) return;
         await signOut(auth);
         navigate("/");
     };
 
     const requestNotificationPermission = async () => {
         if (!("Notification" in window)) {
-            alert("このブラウザは通知に対応していません");
+            showToast("このブラウザは通知に対応していません");
             return;
         }
         const perm = await Notification.requestPermission();
         if (perm === "granted") {
             toggleNotifications(true);
         } else {
-            alert("通知が拒否されました。ブラウザの設定から許可してください。");
+            showToast("通知が拒否されました。ブラウザの設定から許可してください");
         }
     };
+
+    const timeZoneOptionsHasCurrent =
+        COMMON_TIME_ZONES.includes(settings.timeZone) || ALL_TIME_ZONES.includes(settings.timeZone);
 
     const notifPermission = "Notification" in window ? Notification.permission : "unsupported";
 
@@ -139,7 +174,7 @@ export default function SettingPage() {
                     <div className={styles.chartSummary}>
                         {chartTab === "week"
                             ? `今週の完了: ${thisWeekCount}件`
-                            : `過去4週の完了: ${thisMonthCount}件`
+                            : `今週を含む直近4週の完了: ${thisMonthCount}件`
                         }
                     </div>
                 </div>
@@ -161,6 +196,56 @@ export default function SettingPage() {
                             <span className={styles.toggleSlider} />
                         </label>
                     </div>
+                    <div className={styles.divider} />
+                    <div className={styles.toggleRow}>
+                        <span className={styles.rowIcon}><CalendarIcon /></span>
+                        <label className={styles.rowLabel} htmlFor="weekStartsOn">週の開始曜日</label>
+                        <select
+                            id="weekStartsOn"
+                            className={styles.customTimingSelect}
+                            value={settings.weekStartsOn}
+                            onChange={(e) => updateSettings({ weekStartsOn: Number(e.target.value) })}
+                        >
+                            {WEEKDAY_OPTIONS.map((label, day) => (
+                                <option key={day} value={day}>{label}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className={styles.divider} />
+                    <div className={styles.toggleRow}>
+                        <span className={styles.rowIcon}><GlobeIcon /></span>
+                        <label className={styles.rowLabel} htmlFor="timeZone">タイムゾーン</label>
+                        <select
+                            id="timeZone"
+                            className={`${styles.customTimingSelect} ${styles.timeZoneSelect}`}
+                            value={settings.timeZone}
+                            onChange={(e) => updateSettings({ timeZone: e.target.value })}
+                        >
+                            {!timeZoneOptionsHasCurrent && (
+                                <option value={settings.timeZone}>{timeZoneLabel(settings.timeZone)}</option>
+                            )}
+                            <optgroup label="よく使うタイムゾーン">
+                                {COMMON_TIME_ZONES.map(tz => <option key={tz} value={tz}>{timeZoneLabel(tz)}</option>)}
+                            </optgroup>
+                            {ALL_TIME_ZONES.length > 0 && (
+                                <optgroup label="すべて">
+                                    {ALL_TIME_ZONES.map(tz => <option key={tz} value={tz}>{timeZoneLabel(tz)}</option>)}
+                                </optgroup>
+                            )}
+                        </select>
+                    </div>
+                    {DEVICE_TIME_ZONE && DEVICE_TIME_ZONE !== settings.timeZone && isValidTimeZone(DEVICE_TIME_ZONE) && (
+                        <div className={styles.timeZoneHint}>
+                            この端末のタイムゾーンは {DEVICE_TIME_ZONE} です。
+                            <button
+                                type="button"
+                                className={styles.timeZoneHintBtn}
+                                onClick={() => updateSettings({ timeZone: DEVICE_TIME_ZONE })}
+                            >
+                                端末に合わせる
+                            </button>
+                        </div>
+                    )}
                 </div>
             </section>
 

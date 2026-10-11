@@ -7,7 +7,7 @@ const OPTIONS = [
     { value: "completed", label: "完了済み" },
 ];
 
-export default function SortChips({ value, onChange }) {
+export default function SortChips({ value, onChange, starredFirst, onStarredFirstChange }) {
     return (
         <div className={styles.chips}>
             {OPTIONS.map(opt => (
@@ -19,6 +19,19 @@ export default function SortChips({ value, onChange }) {
                     {opt.label}
                 </button>
             ))}
+            {onStarredFirstChange && (
+                <>
+                    <span className={styles.separator} aria-hidden="true" />
+                    <button
+                        className={`${styles.chip} ${starredFirst ? styles.starActive : ""}`}
+                        onClick={() => onStarredFirstChange(!starredFirst)}
+                        aria-pressed={starredFirst}
+                        title="スター付きタスクを最上部に表示します"
+                    >
+                        ★ スター優先
+                    </button>
+                </>
+            )}
         </div>
     );
 }

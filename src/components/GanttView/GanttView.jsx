@@ -1,49 +1,40 @@
 import styles from "./GanttView.module.css";
 import { useRef, useEffect, useState } from "react";
 import { db } from "../../firebase";
-import { doc, updateDoc, deleteDoc } from "firebase/firestore";
-import { useAuthUser } from "../../hooks/useAuthUser";
+import { doc, updateDoc } from "firebase/firestore";
 import TagChip from "../TagChip/TagChip";
+import { formatInZone, toDate, toTime } from "../../utils/date";
+import { addDaysToKey, dateKeyInZone, dayNumber, parseDateKey, weekdayOfKey } from "../../utils/timezone";
+import { deleteTaskAndOfferUndo } from "../../utils/taskTrash";
+import { useDialog } from "../../hooks/useDialog";
 
-export default function GanttView({ tasks, sortType = "short" }) {
-    const user = useAuthUser();
+const CELL_WIDTH = 28;
+const DAYS_BEFORE = 14;
+const DAYS_AFTER = 30;
+
+// 日付の区切りは設定タイムゾーンの暦日で計算する
+export default function GanttView({ tasks, user, showToast, timeZone, sortType = "short", starredFirst = true }) {
     const scrollRef = useRef(null);
     const [popupTask, setPopupTask] = useState(null);
+    const { confirm } = useDialog();
 
-    const getDate = (date) => {
-        if (typeof date?.toDate === "function") return date.toDate();
-        return new Date(date);
+    const getDate = (date) => toDate(date) ?? new Date(NaN);
+
+    const todayKey = dateKeyInZone(new Date(), timeZone);
+    const minKey = addDaysToKey(todayKey, -DAYS_BEFORE);
+
+    // minKey からの日数（変換できない値は NaN）
+    const getOffsetDays = (value) => {
+        const d = toDate(value);
+        if (!d) return NaN;
+        return dayNumber(dateKeyInZone(d, timeZone)) - dayNumber(minKey);
     };
 
-    const normalizeDate = (date) => {
-        const d = getDate(date);
-        d.setHours(0, 0, 0, 0);
-        return d;
-    };
-
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const minDate = new Date(today);
-    minDate.setDate(today.getDate() - 14);
-
-    const maxDate = new Date(today);
-    maxDate.setDate(today.getDate() + 30);
-
-    const CELL_WIDTH = 28;
-
-    const getOffsetDays = (date) => {
-        return Math.floor(
-            (normalizeDate(date) - normalizeDate(minDate)) /
-            (1000 * 60 * 60 * 24)
-        );
-    };
-
-    const todayOffset = getOffsetDays(today);
+    const todayOffset = DAYS_BEFORE;
 
     useEffect(() => {
         if (scrollRef.current) {
-            const scrollTo = Math.max(0, (todayOffset - 4) * CELL_WIDTH);
+            const scrollTo = Math.max(0, (DAYS_BEFORE - 4) * CELL_WIDTH);
             scrollRef.current.scrollLeft = scrollTo;
         }
     }, []);
@@ -52,9 +43,11 @@ export default function GanttView({ tasks, sortType = "short" }) {
     if (tasks.length === 0) return <div className={styles.empty}>タスクがありません</div>;
 
     // TaskList と同じ並び順ロジック
-    const getDeadline = (task) => normalizeDate(task.deadline);
+    const getDeadline = (task) => toTime(task.deadline);
 
-    const starFirst = (arr) => [...arr.filter(t => t.starred), ...arr.filter(t => !t.starred)];
+    const starFirst = (arr) => starredFirst
+        ? [...arr.filter(t => t.starred), ...arr.filter(t => !t.starred)]
+        : arr;
 
     let sortedTasks = [];
 
@@ -66,9 +59,7 @@ export default function GanttView({ tasks, sortType = "short" }) {
         sortedTasks = [...starFirst(incomplete), ...completed];
     } else if (sortType === "recent") {
         const sorted = [...tasks].sort((a, b) => {
-            const aTime = a.createdAt?.toDate ? a.createdAt.toDate() : new Date(a.createdAt);
-            const bTime = b.createdAt?.toDate ? b.createdAt.toDate() : new Date(b.createdAt);
-            return bTime - aTime;
+            return toTime(b.createdAt) - toTime(a.createdAt);
         });
         const incomplete = sorted.filter(t => !t.completed);
         const completed  = sorted.filter(t => t.completed);
@@ -82,28 +73,33 @@ export default function GanttView({ tasks, sortType = "short" }) {
         sortedTasks = tasks.filter(t => t.completed);
     }
 
-    const dateList = [];
-    let current = new Date(minDate);
-    while (current <= maxDate) {
-        dateList.push(new Date(current));
-        current.setDate(current.getDate() + 1);
-    }
+    const dateList = Array.from({ length: DAYS_BEFORE + DAYS_AFTER + 1 }, (_, i) => addDaysToKey(minKey, i));
 
     const handleComplete = async (task) => {
         if (!user) return;
         const taskRef = doc(db, "users", user.uid, "tasks", task.id);
-        await updateDoc(taskRef, { completed: true, completedAt: new Date() });
+        try {
+            await updateDoc(taskRef, { completed: true, completedAt: new Date() });
+        } catch (err) {
+            console.error("タスク完了エラー:", err);
+            showToast?.("タスクを完了できませんでした。通信状況を確認して、もう一度お試しください");
+        }
     };
 
     const handleDelete = async (task) => {
         if (!user) return;
-        if (!window.confirm("このタスクを削除しますか？")) return;
-        const taskRef = doc(db, "users", user.uid, "tasks", task.id);
-        await deleteDoc(taskRef);
+        const ok = await confirm({
+            title: "タスクを削除しますか？",
+            message: `「${task.taskName}」を削除します。削除後5秒間は元に戻せます。`,
+            confirmLabel: "削除",
+            danger: true,
+        });
+        if (!ok) return;
+        await deleteTaskAndOfferUndo(db, user.uid, task.id, showToast);
     };
 
     const popupDl = popupTask ? getDate(popupTask.deadline) : null;
-    const popupDaysLeft = popupDl ? Math.ceil((popupDl - new Date()) / (1000 * 60 * 60 * 24)) : 0;
+    const popupDaysLeft = popupTask ? getOffsetDays(popupTask.deadline) - todayOffset : 0;
     const popupRemain = !popupTask ? "" : popupTask.completed ? "完了済み" : popupDaysLeft < 0 ? "期限切れ" : popupDaysLeft === 0 ? "今日まで" : `残り ${popupDaysLeft}日`;
     const popupTags = popupTask?.tags ?? [];
 
@@ -115,8 +111,7 @@ export default function GanttView({ tasks, sortType = "short" }) {
             <div className={styles.left}>
                 <div className={styles.leftHeader}>タスク</div>
                 {sortedTasks.map(task => {
-                    const deadline = getDeadline(task);
-                    const daysLeft = Math.ceil((deadline - today) / (1000 * 60 * 60 * 24));
+                    const daysLeft = getOffsetDays(task.deadline) - todayOffset;
                     const isDanger = daysLeft <= 1 && !task.completed;
 
                     return (
@@ -174,10 +169,11 @@ export default function GanttView({ tasks, sortType = "short" }) {
 
                     {/* 日付ヘッダー */}
                     <div className={styles.header}>
-                        {dateList.map((date, i) => {
-                            const isToday = date.getTime() === today.getTime();
-                            const isMonthStart = date.getDate() === 1;
-                            const weekDay = date.getDay();
+                        {dateList.map((key, i) => {
+                            const { month, day } = parseDateKey(key);
+                            const isToday = key === todayKey;
+                            const isMonthStart = day === 1;
+                            const weekDay = weekdayOfKey(key);
                             const weekLabels = ["日", "月", "火", "水", "木", "金", "土"];
                             const isSun = weekDay === 0;
                             const isSat = weekDay === 6;
@@ -189,10 +185,10 @@ export default function GanttView({ tasks, sortType = "short" }) {
                                 >
                                     {isMonthStart && (
                                         <span className={styles.monthLabel}>
-                                            {date.getMonth() + 1}月
+                                            {month + 1}月
                                         </span>
                                     )}
-                                    <span className={styles.dayLabel}>{date.getDate()}</span>
+                                    <span className={styles.dayLabel}>{day}</span>
                                     <span
                                         className={styles.weekLabel}
                                         style={{
@@ -278,7 +274,7 @@ export default function GanttView({ tasks, sortType = "short" }) {
                     </div>
                     <div className={styles.popupRow}>
                         <span className={styles.popupLabel}>期限</span>
-                        <span className={styles.popupValue}>{popupDl.toLocaleString("ja-JP", { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
+                        <span className={styles.popupValue}>{formatInZone(popupDl, timeZone, { month: "long", day: "numeric", hour: "2-digit", minute: "2-digit" })}</span>
                     </div>
                     <div className={styles.popupRow}>
                         <span className={styles.popupLabel}>状態</span>

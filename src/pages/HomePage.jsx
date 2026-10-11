@@ -5,47 +5,50 @@ import { useOutletContext } from "react-router-dom";
 
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
+import { toDate, getDayRange, getWeekRange, getMonthRange, isInRange, formatInZone, fromZonedInputValue } from "../utils/date";
 
 import TaskInput from "../components/TaskInput/TaskInput";
 import TaskList from "../components/TaskList/TaskList";
 import ProfileMenu from "../components/ProfileMenu/ProfileMenu";
 import News from "../components/News/News";
+import NaturalTaskInput from "../components/NaturalTaskInput/NaturalTaskInput";
 
 export default function HomePage({ isGuest }) {
 
-    const { user, tasks, sortType, setSortType, showToast } = useOutletContext();
+    const { user, tasks, sortType, setSortType, showToast, settings, updateSettings } = useOutletContext();
     const [showMenu, setShowMenu] = useState(false);
 
+    const timeZone = settings.timeZone;
     const today = new Date();
-    const dateStr = today.toLocaleDateString("ja-JP", {
+    const dateStr = formatInZone(today, timeZone, {
         month: "long",
         day: "numeric",
         weekday: "short",
     });
 
-    const activeCount = tasks.filter(t => !t.completed).length;
+    // 入力欄の "YYYY-MM-DDTHH:mm" を設定タイムゾーンの時刻として解釈する
+    const parseInput = (value) => (value ? fromZonedInputValue(value, timeZone) : null);
 
-    const todayCount = tasks.filter(t => {
-        if (t.completed) return false;
-        const dl = t.deadline?.toDate ? t.deadline.toDate() : new Date(t.deadline);
-        return (
-            dl.getFullYear() === today.getFullYear() &&
-            dl.getMonth() === today.getMonth() &&
-            dl.getDate() === today.getDate()
-        );
-    }).length;
+    const activeCount = tasks.filter(t => !t.completed).length;
 
     // ゲストモード用の追加タスク
     const [guestTasks, setGuestTasks] = useState([]);
     const allTasks = isGuest ? [...tasks, ...guestTasks] : tasks;
+
+    // 期限が今日・今週・今月の範囲にある未完了タスク数（週は設定した開始曜日から）
+    const activeDeadlines = allTasks.filter(t => !t.completed).map(t => toDate(t.deadline)).filter(Boolean);
+    const countIn = (range) => activeDeadlines.filter(d => isInRange(d, range)).length;
+    const todayCount = countIn(getDayRange(today, timeZone));
+    const weekCount = countIn(getWeekRange(today, settings.weekStartsOn, timeZone));
+    const monthCount = countIn(getMonthRange(today, timeZone));
 
     const handleAddTask = async (task) => {
 
         if (isGuest) {
             const newTask = {
                 taskName: task.taskName,
-                deadline: new Date(task.deadline),
-                startDate: task.startDate ? new Date(task.startDate) : null,
+                deadline: parseInput(task.deadline),
+                startDate: parseInput(task.startDate),
                 description: task.description || null,
                 tags: task.tags ?? [],
                 completed: false,
@@ -55,23 +58,30 @@ export default function HomePage({ isGuest }) {
             showToast("ゲストモード：保存されません");
             
             setGuestTasks(prev => [...prev, newTask]);
-            return;
+            return true;
         }
 
-        if (!user) return;
+        if (!user) return false;
 
-        await addDoc(
-            collection(db, "users", user.uid, "tasks"),
-            {
-                taskName: task.taskName,
-                deadline: new Date(task.deadline),
-                startDate: task.startDate ? new Date(task.startDate) : null,
-                description: task.description || null,
-                tags: task.tags ?? [],
-                completed: false,
-                createdAt: new Date()
-            }
-        );
+        try {
+            await addDoc(
+                collection(db, "users", user.uid, "tasks"),
+                {
+                    taskName: task.taskName,
+                    deadline: parseInput(task.deadline),
+                    startDate: parseInput(task.startDate),
+                    description: task.description || null,
+                    tags: task.tags ?? [],
+                    completed: false,
+                    createdAt: new Date()
+                }
+            );
+            return true;
+        } catch (err) {
+            console.error("タスク追加エラー:", err);
+            showToast("タスクを追加できませんでした。通信状況を確認して、もう一度お試しください");
+            return false;
+        }
     };
 
     return (
@@ -84,9 +94,11 @@ export default function HomePage({ isGuest }) {
                         <span className={styles.taskCount}>
                             {activeCount === 0 ? "タスクはありません" : `${activeCount}件のタスク`}
                         </span>
-                        {todayCount > 0 && (
-                            <span className={styles.todayBadge}>今日 {todayCount}件</span>
-                        )}
+                    </div>
+                    <div className={styles.periodRow} aria-label="期限が近い未完了タスク数">
+                        <span className={todayCount > 0 ? styles.todayBadge : styles.periodBadge}>今日 {todayCount}件</span>
+                        <span className={styles.periodBadge}>今週 {weekCount}件</span>
+                        <span className={styles.periodBadge}>今月 {monthCount}件</span>
                     </div>
                 </div>
                 <button className={styles.userIcon} onClick={() => setShowMenu(true)}>
@@ -97,11 +109,22 @@ export default function HomePage({ isGuest }) {
                 </button>
             </header>
 
-            <News></News>
+            <News timeZone={timeZone} />
 
-            <TaskInput onAddTask={handleAddTask} allTags={[...new Set(allTasks.flatMap(t => t.tags ?? []))]} />
+            <NaturalTaskInput onAddTask={handleAddTask} isGuest={isGuest} timeZone={timeZone} />
 
-            <TaskList tasks={allTasks} sortType={sortType} setSortType={setSortType} showToast={showToast} />
+            <TaskInput onAddTask={handleAddTask} timeZone={timeZone} allTags={[...new Set(allTasks.flatMap(t => t.tags ?? []))]} />
+
+            <TaskList
+                tasks={allTasks}
+                user={user}
+                timeZone={timeZone}
+                sortType={sortType}
+                setSortType={setSortType}
+                showToast={showToast}
+                starredFirst={settings.starredFirst}
+                onStarredFirstChange={(value) => updateSettings({ starredFirst: value })}
+            />
 
             {showMenu && <ProfileMenu onClose={() => setShowMenu(false)} />}
 

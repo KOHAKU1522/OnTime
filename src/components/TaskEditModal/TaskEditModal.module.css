@@ -212,8 +212,8 @@
 .saveBtn {
     width: 100%;
     padding: 13px;
-    background: var(--brand);
-    color: #fff;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
     border: none;
     border-radius: 12px;
     font-size: 0.95rem;
@@ -225,7 +225,7 @@
 }
 
 .saveBtn:hover:not(:disabled) {
-    background: var(--brand-hover);
+    background: var(--btn-primary-hover);
 }
 
 .saveBtn:disabled {
@@ -236,4 +236,10 @@
 .safeArea {
     height: env(safe-area-inset-bottom, 20px);
     min-height: 20px;
+}
+
+.error {
+    margin: 0 0 8px;
+    font-size: 13px;
+    color: #dc2626;
 }

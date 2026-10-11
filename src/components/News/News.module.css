@@ -1,14 +1,13 @@
 .container {
 	margin-bottom: 20px;
-	padding: 14px 16px;
-	border-radius: 12px;
-	border-left: 3px solid var(--brand);
+	padding: 16px;
+	border-radius: 16px;
 	background: var(--bg-card);
 	box-shadow: var(--shadow-card);
 }
 
 .label {
-	margin-bottom: 6px;
+	margin-bottom: 8px;
 	color: var(--brand);
 	font-size: 0.7rem;
 	font-weight: 700;
@@ -20,5 +19,73 @@
 	color: var(--text-secondary);
 	font-size: 0.88rem;
 	line-height: 1.65;
-	white-space: pre-line;
+}
+
+.list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.item {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	padding: 10px 0;
+	border-top: 1px solid var(--divider);
+}
+
+.item:first-child {
+	padding-top: 0;
+	border-top: none;
+}
+
+.item:last-child {
+	padding-bottom: 0;
+}
+
+.title {
+	color: var(--text-primary);
+	font-size: 0.92rem;
+	line-height: 1.5;
+	text-decoration: none;
+}
+
+a.title:hover {
+	text-decoration: underline;
+}
+
+a.title:focus-visible,
+.retryBtn:focus-visible {
+	outline: 2px solid var(--brand);
+	outline-offset: 2px;
+	border-radius: 4px;
+}
+
+.meta {
+	color: var(--text-muted);
+	font-size: 0.75rem;
+}
+
+.error {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-start;
+	gap: 10px;
+}
+
+.retryBtn {
+	min-height: 44px;
+	padding: 0 20px;
+	border: none;
+	border-radius: 22px;
+	background: var(--btn-primary-bg);
+	color: var(--btn-primary-text);
+	font-size: 0.88rem;
+	font-weight: 600;
+	cursor: pointer;
+}
+
+.retryBtn:hover {
+	background: var(--btn-primary-hover);
 }

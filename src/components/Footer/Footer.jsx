@@ -53,7 +53,8 @@ export default function Footer() {
     return (
         <footer className={styles.footer}>
             <ul className={styles.footerItems}>
-                {NAV_ITEMS.map(({ route, label, Icon }) => {
+                {NAV_ITEMS.map((item) => {
+                    const { route, label, Icon } = item;
                     const active = location.pathname === `/${route}` || location.pathname === route;
                     return (
                         <li key={route} className={styles.footerItem}>

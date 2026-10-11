@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./GuidePage.module.css";
 import { guide } from "../guide.js";

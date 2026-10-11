@@ -1,43 +1,90 @@
 // index.js
-import * as functions from "firebase-functions";
+import {onSchedule} from "firebase-functions/v2/scheduler";
+import {logger} from "firebase-functions";
 import admin from "firebase-admin";
+import {
+  buildMacroTask, isMacroDue, macroTaskId, todayKey,
+} from "./macroSchedule.js";
+import {resolveTimeZone} from "./timezone.js";
 
 admin.initializeApp();
 
-// 1分ごとに期限が近いタスクを通知する例
-export const notifyTaskDeadline = functions.pubsub
-  .schedule("every 1 minutes")
-  .onRun(async () => {
-    try {
+// ユーザー設定のタイムゾーン（未設定・不正値は Asia/Tokyo）
+const getUserTimeZone = async (userRef) => {
+  const snap = await userRef.collection("settings").doc("preferences").get();
+  return resolveTimeZone(snap.data()?.timeZone);
+};
+
+// マクロからタスクを生成する。
+// トランザクション内でマクロを読み直して判定し（設定変更・一時停止の直後でも最新の状態で判断）、
+// タスクIDを「macro_{macroId}_{設定タイムゾーンの日付}」に固定するため、
+// 定期実行のリトライやクライアント側の実行と重なっても同じ日に二重追加されない。
+const runMacro = async (db, macroRef, now, timeZone) => {
+  const taskRef = macroRef.parent.parent
+      .collection("tasks").doc(macroTaskId(macroRef.id, now, timeZone));
+
+  return db.runTransaction(async (tx) => {
+    const [macroSnap, existing] = await Promise.all([
+      tx.get(macroRef), tx.get(taskRef),
+    ]);
+    if (!macroSnap.exists) return false;
+    const macro = macroSnap.data();
+    if (existing.exists || !isMacroDue(macro, now, timeZone)) return false;
+
+    tx.set(taskRef, buildMacroTask(macroRef.id, macro, now, timeZone));
+    tx.update(macroRef, {
+      lastTriggered: now,
+      lastTriggeredKey: todayKey(now, timeZone),
+    });
+    return true;
+  });
+};
+
+// アプリを開いていなくても、毎時マクロを確認してタスクを追加する
+// （スケジュールの timeZone は起動時刻の基準。日付の判定はユーザーごとのタイムゾーンで行う）
+export const runMacros = onSchedule(
+    {schedule: "5 * * * *", timeZone: "Asia/Tokyo", retryCount: 1},
+    async () => {
       const db = admin.firestore();
       const now = new Date();
+      const snap = await db.collectionGroup("macros").get();
+      const timeZones = new Map();
 
-      // ここでは全ユーザーのタスクを対象にする例
-      const usersSnap = await db.collection("users").get();
-
-      for (const userDoc of usersSnap.docs) {
-        const userId = userDoc.id;
-        const tasksSnap = await db.collection("users").doc(userId).collection("tasks").get();
-
-        tasksSnap.docs.forEach(taskDoc => {
-          const task = taskDoc.data();
-          if (task.completed) return;
-
-          const deadline = task.deadline?.toDate ? task.deadline.toDate() : new Date(task.deadline);
-          const diffMs = deadline - now;
-          const diffMinutes = diffMs / (1000 * 60);
-
-          // ここでは24時間以内のタスクを通知する例
-          if (diffMinutes > 0 && diffMinutes <= 1440) {
-            console.log(`ユーザー ${userId} のタスク "${task.taskName}" が期限間近です`);
-            // 実際の通知処理はここで追加（メールやPushなど）
+      let created = 0;
+      for (const macroDoc of snap.docs) {
+        const userRef = macroDoc.ref.parent.parent;
+        try {
+          if (!timeZones.has(userRef.id)) {
+            timeZones.set(userRef.id, await getUserTimeZone(userRef));
           }
-        });
+          const timeZone = timeZones.get(userRef.id);
+          // 明らかに対象外のものはトランザクションを開かずに飛ばす
+          if (!isMacroDue(macroDoc.data(), now, timeZone)) continue;
+          if (await runMacro(db, macroDoc.ref, now, timeZone)) created++;
+        } catch (err) {
+          logger.error("runMacro failed", {path: macroDoc.ref.path, err});
+        }
       }
+      logger.info("runMacros done", {checked: snap.size, created});
+    },
+);
 
-      return null;
-    } catch (err) {
-      console.error("notifyTaskDeadline error:", err);
-      return null;
-    }
-  });
+// 取り消し期限を過ぎた削除済みタスクの退避データを整理する（1日1回）
+export const purgeDeletedTasks = onSchedule(
+    {schedule: "30 4 * * *", timeZone: "Asia/Tokyo", retryCount: 1},
+    async () => {
+      const db = admin.firestore();
+      const cutoff = Date.now() - 60 * 60 * 1000;
+      const snap = await db.collectionGroup("deletedTasks").get();
+      const stale = snap.docs.filter((d) => {
+        const expiresAt = d.data().expiresAt?.toDate?.();
+        return !expiresAt || expiresAt.getTime() < cutoff;
+      });
+      for (let i = 0; i < stale.length; i += 400) {
+        const batch = db.batch();
+        stale.slice(i, i + 400).forEach((d) => batch.delete(d.ref));
+        await batch.commit();
+      }
+      logger.info("purgeDeletedTasks done", {purged: stale.length});
+    },
+);

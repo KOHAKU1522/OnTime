@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { toDate, isSameDayInZone } from "../utils/date";
 import { useOutletContext } from "react-router-dom";
 import GanttView from "../components/GanttView/GanttView";
 import SortChips from "../components/SortChips/SortChips";
@@ -6,7 +7,7 @@ import styles from "./CalendarPage.module.css";
 import { getTagStyle } from "../utils/tagColors";
 
 export default function CalendarPage({ isGuest, guestTasks }) {
-    const { tasks, sortType, setSortType } = useOutletContext();
+    const { user, tasks, sortType, setSortType, settings, updateSettings, showToast } = useOutletContext();
     const [selectedTags, setSelectedTags] = useState([]);
 
     const today = new Date();
@@ -28,12 +29,7 @@ export default function CalendarPage({ isGuest, guestTasks }) {
     const activeCount = filteredTasks.filter(t => !t.completed).length;
     const todayCount = filteredTasks.filter(t => {
         if (t.completed) return false;
-        const dl = t.deadline?.toDate ? t.deadline.toDate() : new Date(t.deadline);
-        return (
-            dl.getFullYear() === today.getFullYear() &&
-            dl.getMonth() === today.getMonth() &&
-            dl.getDate() === today.getDate()
-        );
+        return isSameDayInZone(toDate(t.deadline), today, settings.timeZone);
     }).length;
 
     return (
@@ -69,9 +65,22 @@ export default function CalendarPage({ isGuest, guestTasks }) {
                 </div>
             )}
 
-            <SortChips value={sortType} onChange={setSortType} />
+            <SortChips
+                value={sortType}
+                onChange={setSortType}
+                starredFirst={settings.starredFirst}
+                onStarredFirstChange={(value) => updateSettings({ starredFirst: value })}
+            />
             <div className={styles.ganttWrapper}>
-                <GanttView tasks={filteredTasks} sortType={sortType} />
+                {/* 期限なしタスクは日付軸に配置できないためガントチャートには表示しない */}
+                <GanttView
+                    tasks={filteredTasks.filter(t => toDate(t.deadline))}
+                    sortType={sortType}
+                    starredFirst={settings.starredFirst}
+                    timeZone={settings.timeZone}
+                    user={user}
+                    showToast={showToast}
+                />
             </div>
         </div>
     );

@@ -1,0 +1,85 @@
+.overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.dialog {
+    width: 100%;
+    max-width: 340px;
+    padding: 20px;
+    border-radius: 16px;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-footer);
+}
+
+.title {
+    margin: 0 0 8px;
+    color: var(--text-primary);
+    font-size: 1.05rem;
+    font-weight: 700;
+}
+
+.message {
+    margin: 0 0 4px;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+    line-height: 1.6;
+    white-space: pre-line;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 16px;
+}
+
+.cancelBtn,
+.primaryBtn,
+.dangerBtn {
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 22px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.cancelBtn {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+}
+
+.primaryBtn {
+    border: none;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+}
+
+.primaryBtn:hover {
+    background: var(--btn-primary-hover);
+}
+
+.dangerBtn {
+    border: none;
+    background: #dc2626;
+    color: #fff;
+}
+
+.dangerBtn:hover {
+    background: #b91c1c;
+}
+
+.cancelBtn:focus-visible,
+.primaryBtn:focus-visible,
+.dangerBtn:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}

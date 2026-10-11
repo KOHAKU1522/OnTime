@@ -1,0 +1,139 @@
+.container {
+    margin-bottom: 20px;
+    padding: 16px;
+    border-radius: 16px;
+    background: var(--bg-card);
+    box-shadow: var(--shadow-card);
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.row {
+    display: flex;
+    gap: 8px;
+}
+
+.input {
+    flex: 1;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 16px;
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--border-focus);
+    box-shadow: 0 0 0 3px var(--brand-focus-ring);
+}
+
+.question {
+    margin: 0;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.primaryBtn,
+.secondaryBtn,
+.textBtn {
+    min-height: 44px;
+    padding: 0 18px;
+    border-radius: 22px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.primaryBtn {
+    border: none;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+}
+
+.primaryBtn:hover:not(:disabled) {
+    background: var(--btn-primary-hover);
+}
+
+.secondaryBtn {
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--brand);
+}
+
+.textBtn {
+    align-self: flex-start;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+}
+
+.primaryBtn:disabled,
+.secondaryBtn:disabled,
+.textBtn:disabled {
+    opacity: 0.5;
+    cursor: default;
+}
+
+.primaryBtn:focus-visible,
+.secondaryBtn:focus-visible,
+.textBtn:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+}
+
+.confirmTitle {
+    margin: 0 0 12px;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.fields {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 6px 16px;
+    margin: 0 0 12px;
+    font-size: 0.9rem;
+}
+
+.fields dt {
+    color: var(--text-muted);
+}
+
+.fields dd {
+    margin: 0;
+    color: var(--text-primary);
+    word-break: break-word;
+}
+
+.notes {
+    margin: 0 0 12px;
+    padding: 10px 12px 10px 28px;
+    border-radius: 12px;
+    background: var(--bg-card-alt);
+    color: var(--text-secondary);
+    font-size: 0.82rem;
+    line-height: 1.5;
+}
+
+.actions {
+    display: flex;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.error {
+    margin: 8px 0 0;
+    color: var(--color-danger);
+    font-size: 0.85rem;
+}

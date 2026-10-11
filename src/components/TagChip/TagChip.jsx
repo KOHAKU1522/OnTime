@@ -7,7 +7,6 @@ export default function TagChip({ tag, onRemove, onSelect, readonly = false }) {
     const [showPicker, setShowPicker] = useState(false);
     const ref = useRef(null);
 
-    const colorDef = TAG_COLORS.find(c => c.key === colorKey) ?? TAG_COLORS[0];
     const tagStyle = getTagStyle(tag);
 
     // カラーキーが変わったら再計算

@@ -4,10 +4,12 @@ import { signOut } from "firebase/auth";
 import { auth } from "../../firebase";
 import { ROUTES } from "../../const";
 import styles from "./ProfileMenu.module.css";
+import { useDialog } from "../../hooks/useDialog";
 
 export default function ProfileMenu({ onClose }) {
     const navigate = useNavigate();
     const user = auth.currentUser;
+    const { confirm } = useDialog();
 
     useEffect(() => {
         document.body.style.overflow = "hidden";
@@ -15,7 +17,8 @@ export default function ProfileMenu({ onClose }) {
     }, []);
 
     const handleLogout = async () => {
-        if (!window.confirm("ログアウトしますか？")) return;
+        const ok = await confirm({ title: "ログアウトしますか？", confirmLabel: "ログアウト", danger: true });
+        if (!ok) return;
         await signOut(auth);
         navigate(ROUTES.LOGIN);
     };

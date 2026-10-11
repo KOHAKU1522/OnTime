@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./OtherAppsPage.module.css";
 import { otherApps } from "../OtherApps.js";
@@ -9,7 +9,7 @@ const BackIcon = () => (
     </svg>
 );
 
-export default function CodeRefPage() {
+export default function OtherAppsPage() {
 
     useEffect(() => {
         window.scrollTo(0, 0);
