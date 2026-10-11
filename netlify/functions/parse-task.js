@@ -3,8 +3,10 @@
 import {adminAuth, adminDb, adminProjectId, getAdminConfigStatus} from "../lib/firebaseAdmin.js";
 import {LIMITS, consume} from "../lib/rateLimit.js";
 import {resolveTimeZone} from "../../src/utils/timezone.js";
+import {RESPONSE_SCHEMA, buildPrompt, resolveTask, sanitizeDraft, trimTurns} from "../lib/taskParse.js";
 
-const MAX_TURNS = 6;
+// クライアントから受け取る会話の最大件数（これを超える分は古いものから捨てる。最初の依頼文は残す）
+const MAX_INPUT_TURNS = 30;
 // モデルは環境変数で切り替えられる（未設定時の既定値）
 const MODEL = (globalThis.process?.env?.GEMINI_MODEL ?? "").trim() || "gemini-3.6-flash";
 
@@ -53,65 +55,54 @@ const RATE_LIMIT_MESSAGES = {
   DAY: () => `本日の利用上限（${LIMITS.perDay}回）に達しました。明日（日本時間0時以降）に再度お試しください。`,
 };
 
-const RESPONSE_SCHEMA = {
-  type: "OBJECT",
-  properties: {
-    status: {type: "STRING", enum: ["ok", "need_info"]},
-    question: {type: "STRING"},
-    taskName: {type: "STRING"},
-    deadline: {type: "STRING"},
-    startDate: {type: "STRING"},
-    description: {type: "STRING"},
-    tags: {type: "ARRAY", items: {type: "STRING"}},
-    notes: {type: "ARRAY", items: {type: "STRING"}},
-  },
-  required: ["status"],
-};
-
-const buildPrompt = (now, timeZone) => `
-あなたはタスク管理アプリの入力補助です。利用者の文章からタスクを1件抽出してください。
-現在日時: ${now}（タイムゾーン: ${timeZone}）
-
-規則:
-- taskName: やることを簡潔に。deadline: 期限を "YYYY-MM-DDTHH:mm"（${timeZone} の現地時刻）で。
-- 時刻の指定がない期限は 23:59 にする。startDate は開始日時の指定がある場合のみ同じ形式で。
-- 「来週」「月末」「明後日」など相対的・曖昧な表現は、現在日時から具体的な日付に変換し、
-  notes に「『来週金曜』を 10月16日(金) と解釈しました」のように解釈内容を必ず書く。
-- タスク内容または期限が文章から判断できない場合は status を "need_info" にし、
-  question に不足している点を尋ねる日本語の質問を1つだけ書く。推測で埋めない。
-- description と tags は文章に明示されている場合のみ。書かれていない情報を作らない。
-`;
-
-const pad = (n) => String(n).padStart(2, "0");
-const isValidLocalDateTime = (value) => {
-  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}$/.test(value ?? "")) return false;
-  const d = new Date(`${value}:00Z`);
-  return !Number.isNaN(d.getTime()) &&
-    `${d.getUTCFullYear()}-${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}T${pad(d.getUTCHours())}:${pad(d.getUTCMinutes())}` === value;
-};
-
-// AI の出力をそのまま信用せず、形式を検証・正規化する
-export const normalizeResult = (raw) => {
-  const taskName = typeof raw?.taskName === "string" ? raw.taskName.trim().slice(0, 100) : "";
-  const deadline = isValidLocalDateTime(raw?.deadline) ? raw.deadline : "";
-  if (raw?.status !== "ok" || !taskName || !deadline) {
-    return {
-      status: "need_info",
-      question: (typeof raw?.question === "string" && raw.question.trim()) ||
-        (!taskName ? "どのようなタスクを追加しますか？" : "期限はいつにしますか？"),
-    };
+// Gemini を呼び出して JSON を返す。失敗した場合は null（原因はログに記録）
+const callGemini = async (apiKey, {turns, draft, now, timeZone, weekStartsOn}) => {
+  try {
+    const response = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
+        {
+          method: "POST",
+          headers: {"Content-Type": "application/json", "x-goog-api-key": apiKey},
+          signal: AbortSignal.timeout(15000),
+          body: JSON.stringify({
+            systemInstruction: {parts: [{text: buildPrompt({now, timeZone, weekStartsOn, draft})}]},
+            contents: turns.map((t) => ({role: t.role, parts: [{text: t.text}]})),
+            // Gemini 3 系は temperature を下げると出力が崩れやすいため既定値のまま使う
+            generationConfig: {responseMimeType: "application/json", responseSchema: RESPONSE_SCHEMA},
+          }),
+        },
+    );
+    if (!response.ok) {
+      const detail = await response.json().catch(() => ({}));
+      log("error", "gemini api error", {
+        httpStatus: response.status,
+        apiStatus: detail?.error?.status,
+        model: MODEL,
+        hint: response.status === 404 ? `モデル ${MODEL} が利用できるか確認（GEMINI_MODEL で変更可）` :
+          response.status === 403 || response.status === 400 ? "GEMINI_API_KEY・API キーの制限を確認" : undefined,
+      });
+      return null;
+    }
+    const data = await response.json();
+    // 思考過程（thought）を除いた本文だけを使う
+    const text = (data.candidates?.[0]?.content?.parts ?? [])
+        .filter((part) => !part.thought && typeof part.text === "string")
+        .map((part) => part.text).join("").trim()
+        .replace(/^```(?:json)?\s*|\s*```$/g, "");
+    if (!text) {
+      log("warn", "gemini empty response", {blockReason: data.promptFeedback?.blockReason, finishReason: data.candidates?.[0]?.finishReason});
+      return null;
+    }
+    try {
+      return JSON.parse(text);
+    } catch {
+      log("warn", "gemini invalid json", {length: text.length});
+      return null;
+    }
+  } catch (error) {
+    log("error", "gemini call failed", {name: error?.name, timeout: error?.name === "TimeoutError"});
+    return null;
   }
-  return {
-    status: "ok",
-    task: {
-      taskName,
-      deadline,
-      startDate: isValidLocalDateTime(raw.startDate) ? raw.startDate : null,
-      description: typeof raw.description === "string" && raw.description.trim() ? raw.description.trim().slice(0, 500) : null,
-      tags: Array.isArray(raw.tags) ? raw.tags.filter((t) => typeof t === "string" && t.trim()).map((t) => t.trim().slice(0, 20)).slice(0, 5) : [],
-    },
-    notes: Array.isArray(raw.notes) ? raw.notes.filter((n) => typeof n === "string").slice(0, 5) : [],
-  };
 };
 
 export default async function handler(request) {
@@ -136,18 +127,26 @@ export default async function handler(request) {
   // 2. 入力検証（不備があれば Gemini を呼ばず、回数も消費しない）
 
   const body = await request.json().catch(() => null);
-  const turns = Array.isArray(body?.turns) ? body.turns.slice(-MAX_TURNS) : [];
-  // 会話は利用者の発言から始める
-  while (turns.length && turns[0]?.role !== "user") turns.shift();
-  const valid = turns.length > 0 && turns.every((t) =>
-    (t.role === "user" || t.role === "model") &&
+  const allTurns = Array.isArray(body?.turns) ? body.turns : [];
+  // 件数が多すぎる場合も最初の依頼文は残す
+  const rawTurns = allTurns.length > MAX_INPUT_TURNS ?
+    [allTurns[0], ...allTurns.slice(-(MAX_INPUT_TURNS - 1))] : allTurns;
+  const valid = rawTurns.length > 0 && rawTurns.every((t) =>
+    (t?.role === "user" || t?.role === "model") &&
     typeof t.text === "string" && t.text.trim() && t.text.length <= LIMITS.maxInputLength);
-  if (!valid) {
+  const turns = valid ? trimTurns(rawTurns) : [];
+  if (!valid || turns.length === 0) {
     return json({
       error: `入力内容が正しくないか、${LIMITS.maxInputLength}文字を超えています`,
       code: "BAD_REQUEST",
     }, 400);
   }
+  // 前回までに分かった内容（タスク名・期限）。質問への回答を元の依頼と結び付けるために使う
+  const draft = sanitizeDraft(body.draft);
+  const timeZone = resolveTimeZone(typeof body.timeZone === "string" ? body.timeZone.slice(0, 64) : "");
+  const weekStartsOn = Number.isInteger(body.weekStartsOn) && body.weekStartsOn >= 0 && body.weekStartsOn <= 6 ?
+    body.weekStartsOn : 1;
+  const now = new Date();
 
   // 3. 利用回数の確認と記録（トランザクション）。記録できない場合は安全側に倒して拒否する
   let limit;
@@ -174,55 +173,7 @@ export default async function handler(request) {
     });
   }
 
-  // 4. Gemini 呼び出し
-  const now = typeof body.now === "string" ? body.now.slice(0, 100) : new Date().toISOString();
-  // 利用者が設定したタイムゾーン（不正な値は既定の Asia/Tokyo）
-  const timeZone = resolveTimeZone(typeof body.timeZone === "string" ? body.timeZone.slice(0, 64) : "");
-
-  try {
-    const response = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`,
-        {
-          method: "POST",
-          headers: {"Content-Type": "application/json", "x-goog-api-key": apiKey},
-          signal: AbortSignal.timeout(15000),
-          body: JSON.stringify({
-            systemInstruction: {parts: [{text: buildPrompt(now, timeZone)}]},
-            contents: turns.map((t) => ({role: t.role, parts: [{text: t.text}]})),
-            generationConfig: {
-              responseMimeType: "application/json",
-              responseSchema: RESPONSE_SCHEMA,
-              temperature: 0.1,
-            },
-          }),
-        },
-    );
-    if (!response.ok) {
-      const detail = await response.json().catch(() => ({}));
-      const apiStatus = detail?.error?.status;
-      log("error", "gemini api error", {httpStatus: response.status, apiStatus, model: MODEL});
-      if (response.status === 429) {
-        return json({error: "AI の利用が集中しています。しばらくしてから再度お試しください", code: "AI_BUSY"}, 503);
-      }
-      if (response.status === 400 && apiStatus === "INVALID_ARGUMENT" && /API key/i.test(detail?.error?.message ?? "")) {
-        log("error", "gemini api key invalid", {hint: "GEMINI_API_KEY を確認"});
-        return json({error: "現在この機能は利用できません", code: "NOT_CONFIGURED"}, 503);
-      }
-      if (response.status === 403 || response.status === 404) {
-        log("error", "gemini access/model problem", {hint: response.status === 404 ? `モデル ${MODEL} が利用できるか確認（GEMINI_MODEL で変更可）` : "API キーの制限・API の有効化を確認"});
-        return json({error: "現在この機能は利用できません", code: "NOT_CONFIGURED"}, 503);
-      }
-      return json({error: "解析に失敗しました。もう一度お試しください", code: "AI_FAILED"}, 502);
-    }
-    const data = await response.json();
-    const text = data.candidates?.[0]?.content?.parts?.[0]?.text ?? "";
-    if (!text) {
-      log("warn", "gemini empty response", {blockReason: data.promptFeedback?.blockReason, finishReason: data.candidates?.[0]?.finishReason});
-      return json({error: "内容を読み取れませんでした。表現を変えて再度お試しください", code: "AI_FAILED"}, 502);
-    }
-    return json(normalizeResult(JSON.parse(text)));
-  } catch (error) {
-    log("error", "gemini call failed", {name: error?.name, timeout: error?.name === "TimeoutError"});
-    return json({error: "解析に失敗しました。もう一度お試しください", code: "AI_FAILED"}, 502);
-  }
+  // 4. Gemini 呼び出し。失敗・不正な出力でも、決まったルールでの読み取りと下書きで補う
+  const raw = await callGemini(apiKey, {turns, draft, now, timeZone, weekStartsOn});
+  return json(resolveTask(raw, {turns, draft, now, timeZone, weekStartsOn}));
 }

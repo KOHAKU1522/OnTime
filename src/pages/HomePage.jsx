@@ -114,7 +114,7 @@ export default function HomePage({ isGuest }) {
             {/* オフのときはコンポーネント自体を描画せず、ニュースも取得しない */}
             {newsEnabled && <News timeZone={timeZone} />}
 
-            <NaturalTaskInput onAddTask={handleAddTask} isGuest={isGuest} timeZone={timeZone} />
+            <NaturalTaskInput onAddTask={handleAddTask} isGuest={isGuest} timeZone={timeZone} weekStartsOn={settings.weekStartsOn} />
 
             <TaskInput onAddTask={handleAddTask} timeZone={timeZone} allTags={[...new Set(allTasks.flatMap(t => t.tags ?? []))]} />
 

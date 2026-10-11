@@ -26,9 +26,11 @@ const formatDateTime = (value, timeZone) => {
 };
 
 // 自然言語からタスクを読み取り、利用者の確認後にだけ登録する
-export default function NaturalTaskInput({ onAddTask, isGuest, timeZone }) {
+export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekStartsOn = 1 }) {
     const [text, setText] = useState("");
-    const [turns, setTurns] = useState([]); // AI との会話履歴（不足情報の質問と回答）
+    const [turns, setTurns] = useState([]); // AI との会話履歴（最初の依頼文・質問・回答）
+    // これまでに分かった内容（タスク名・期限）。回答を元の依頼と結び付けるためにサーバーへ送り返す
+    const [draft, setDraft] = useState(null);
     const [question, setQuestion] = useState("");
     const [proposal, setProposal] = useState(null); // { task, notes }
     const [status, setStatus] = useState("idle"); // idle | parsing | saving
@@ -37,6 +39,7 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone }) {
     const reset = () => {
         setText("");
         setTurns([]);
+        setDraft(null);
         setQuestion("");
         setProposal(null);
         setError("");
@@ -58,14 +61,8 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone }) {
             const response = await fetch("/.netlify/functions/parse-task", {
                 method: "POST",
                 headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-                body: JSON.stringify({
-                    turns: nextTurns,
-                    now: formatInZone(new Date(), timeZone, {
-                        year: "numeric", month: "long", day: "numeric", weekday: "long",
-                        hour: "2-digit", minute: "2-digit",
-                    }),
-                    timeZone,
-                }),
+                // 現在日時はサーバー側で設定タイムゾーンから求める
+                body: JSON.stringify({ turns: nextTurns, draft, timeZone, weekStartsOn }),
             });
             const result = await response.json().catch(() => ({}));
             if (!response.ok) {
@@ -77,12 +74,14 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone }) {
             }
 
             setText("");
+            setDraft(result.draft ?? null);
             if (result.status === "need_info") {
                 setTurns([...nextTurns, { role: "model", text: result.question }]);
                 setQuestion(result.question);
             } else {
                 setTurns(nextTurns);
                 setQuestion("");
+                // ここでは登録しない。確認画面で「追加する」を押したときだけ onAddTask を呼ぶ
                 setProposal({ task: result.task, notes: result.notes ?? [] });
             }
         } catch (err) {
@@ -114,6 +113,8 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone }) {
         const { task } = proposal;
         setProposal(null);
         setQuestion("どこを修正しますか？（例：期限は金曜の18時）");
+        // 現在の解釈を下書きとして引き継ぎ、指示された部分だけを変更する
+        setDraft({ taskName: task.taskName, deadline: task.deadline });
         setTurns(prev => [...prev, {
             role: "model",
             text: `タスク「${task.taskName}」、期限 ${task.deadline} と解釈しました。どこを修正しますか？`,
