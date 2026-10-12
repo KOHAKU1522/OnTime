@@ -2,21 +2,25 @@ import { useState } from "react";
 import styles from "./TaskInput.module.css";
 import TagChip from "../TagChip/TagChip";
 import VoiceInput from "../VoiceInput/VoiceInput.jsx";
-import { endOfDayAfter, endOfDayAfterMonths, formatInZone, fromZonedInputValue, toZonedInputValue } from "../../utils/date";
+import { endOfDayAfter, endOfDayAfterMonths, formatInZone, fromZonedInputValue, getMonthRange, getWeekRange, toZonedInputValue } from "../../utils/date";
 
 // 期限の選択肢（いずれも設定タイムゾーンでその日の 23:59）
 const PRESETS = [
-    { key: "none", label: "期限なし", getDate: () => null },
     { key: "today", label: "今日中", getDate: (tz) => endOfDayAfter(new Date(), 0, tz) },
     { key: "tomorrow", label: "明日", getDate: (tz) => endOfDayAfter(new Date(), 1, tz) },
     { key: "3days", label: "3日後", getDate: (tz) => endOfDayAfter(new Date(), 3, tz) },
     { key: "1week", label: "1週間後", getDate: (tz) => endOfDayAfter(new Date(), 7, tz) },
     // 30日後ではなくカレンダー上の1か月後（月末は丸める）
     { key: "1month", label: "1ヶ月後", getDate: (tz) => endOfDayAfterMonths(new Date(), 1, tz) },
+    { key: "thisWeek", label: "今週中", getDate: (tz, weekStartsOn) => endOfDayAfter(new Date(getWeekRange(new Date(), weekStartsOn, tz).end.getTime() - 1), 0, tz) },
+    { key: "thisMonth", label: "今月中", getDate: (tz) => endOfDayAfter(new Date(getMonthRange(new Date(), tz).end.getTime() - 1), 0, tz) },
+    { key: "none", label: "期限なし", getDate: () => null },
 ];
+const QUICK_PRESETS = PRESETS.slice(0, 3);
+const MORE_PRESETS = PRESETS.slice(3);
 
 // 入力値（deadline など）は設定タイムゾーンの "YYYY-MM-DDTHH:mm" で保持し、保存時に変換する
-export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
+export default function TaskInput({ onAddTask, allTags = [], timeZone, weekStartsOn = 1 }) {
     const [taskName, setTaskName] = useState("");
     const [deadline, setDeadline] = useState("");
     const [selectedPreset, setSelectedPreset] = useState(null);
@@ -33,7 +37,7 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
     const [showTags, setShowTags] = useState(false);
 
     const handlePreset = (preset) => {
-        const date = preset.getDate(timeZone);
+        const date = preset.getDate(timeZone, weekStartsOn);
         setDeadline(date ? toZonedInputValue(date, timeZone) : "");
         setSelectedPreset(preset.key);
         setFormError("");
@@ -43,6 +47,15 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
         setSelectedPreset("custom");
         setDeadline("");
         setFormError("");
+    };
+
+    const handleMorePresetChange = (e) => {
+        if (e.target.value === "custom") {
+            handleCustom();
+            return;
+        }
+        const preset = MORE_PRESETS.find((option) => option.key === e.target.value);
+        if (preset) handlePreset(preset);
     };
 
     const addTag = () => {
@@ -108,6 +121,7 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
         : deadline
             ? formatInZone(fromZonedInputValue(deadline, timeZone), timeZone, { month: "long", day: "numeric", weekday: "short", hour: "2-digit", minute: "2-digit" })
             : null;
+    const selectedMorePreset = MORE_PRESETS.some((preset) => preset.key === selectedPreset);
 
     return (
         <div className={styles.container}>
@@ -140,7 +154,7 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
             <div className={styles.section}>
                 <div className={styles.sectionLabel}>期限</div>
                 <div className={styles.presets}>
-                    {PRESETS.map((preset) => (
+                    {QUICK_PRESETS.map((preset) => (
                         <button
                             key={preset.key}
                             className={`${styles.presetBtn} ${selectedPreset === preset.key ? styles.presetSelected : ""}`}
@@ -150,13 +164,19 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone }) {
                             {preset.label}
                         </button>
                     ))}
-                    <button
-                        className={`${styles.presetBtn} ${selectedPreset === "custom" ? styles.presetSelected : ""}`}
-                        onClick={handleCustom}
-                        aria-pressed={selectedPreset === "custom"}
+                    <select
+                        className={`${styles.presetSelect} ${selectedMorePreset || selectedPreset === "custom" ? styles.presetSelected : ""}`}
+                        value={selectedMorePreset || selectedPreset === "custom" ? selectedPreset : ""}
+                        onChange={handleMorePresetChange}
+                        aria-label="その他の期限"
                     >
-                        カスタム
-                    </button>
+                        <option value="">その他</option>
+                        {MORE_PRESETS.filter((preset) => preset.key !== "none").map((preset) => (
+                            <option key={preset.key} value={preset.key}>{preset.label}</option>
+                        ))}
+                        <option value="custom">日時を指定</option>
+                        <option value="none">期限なし</option>
+                    </select>
                 </div>
 
                 {selectedPreset === "custom" && (

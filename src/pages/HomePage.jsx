@@ -204,7 +204,7 @@ export default function HomePage({ isGuest }) {
                 </div>
             )}
 
-            <TaskInput onAddTask={handleAddTask} timeZone={timeZone} allTags={[...new Set(allTasks.flatMap(t => t.tags ?? []))]} />
+            <TaskInput onAddTask={handleAddTask} timeZone={timeZone} weekStartsOn={settings.weekStartsOn} allTags={[...new Set(allTasks.flatMap(t => t.tags ?? []))]} />
 
             <TaskList
                 tasks={allTasks}

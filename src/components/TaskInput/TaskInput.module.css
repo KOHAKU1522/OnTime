@@ -188,22 +188,42 @@
 }
 
 .presets {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 4px;
 }
 
 .presetBtn {
-    flex: 1;
-    padding: 6px 4px;
+    width: 100%;
+    min-width: 0;
+    padding: 6px 2px;
     border: 1px solid var(--border);
     border-radius: 8px;
     background: var(--bg-preset);
     color: var(--text-primary);
-    font-size: 0.78rem;
+    font-size: 0.76rem;
     font-weight: 500;
     cursor: pointer;
     transition: border-color 0.15s, color 0.15s;
     white-space: nowrap;
+}
+
+.presetSelect {
+    width: 100%;
+    min-width: 0;
+    padding: 6px 20px 6px 7px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-preset);
+    color: var(--text-primary);
+    font: inherit;
+    font-size: 0.76rem;
+    cursor: pointer;
+}
+
+.presetSelect:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 1px;
 }
 
 .presetBtn:hover {
@@ -388,6 +408,7 @@
 /* ===== スマートフォン向け ===== */
 @media (max-width: 600px), (pointer: coarse) {
     .presetBtn,
+    .presetSelect,
     .tagAddBtn {
         min-height: 44px;
     }
@@ -418,15 +439,12 @@
 }
 
 @media (max-width: 600px) {
-    /* 期限の選択肢は4列で折り返し、文字が詰まらないようにする */
-    .presets {
-        flex-wrap: wrap;
+    .presetBtn {
+        font-size: 0.74rem;
     }
 
-    .presetBtn {
-        flex: 1 1 calc(25% - 6px);
-        min-width: 0;
-        font-size: 0.82rem;
+    .presetSelect {
+        font-size: 0.74rem;
     }
 }
 
