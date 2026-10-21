@@ -1,3 +1,4 @@
+import { useOutletContext } from "react-router-dom";
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
@@ -9,6 +10,7 @@ import { useDialog } from "../../hooks/useDialog";
 export default function ProfileMenu({ onClose }) {
     const navigate = useNavigate();
     const user = auth.currentUser;
+    const { settings } = useOutletContext();
     const { confirm } = useDialog();
 
     useEffect(() => {
@@ -36,13 +38,13 @@ export default function ProfileMenu({ onClose }) {
                 {/* ユーザー情報 */}
                 <div className={styles.userSection}>
                     <div className={styles.avatar}>
-                        {user?.photoURL
-                            ? <img src={user.photoURL} alt="avatar" className={styles.avatarImg} />
+                        {(settings.profileImage ?? user?.photoURL)
+                            ? <img src={settings.profileImage ?? user.photoURL} alt="avatar" className={styles.avatarImg} />
                             : <span>👤</span>
                         }
                     </div>
                     <div className={styles.userInfo}>
-                        <div className={styles.userName}>{user?.displayName || "ユーザー"}</div>
+                        <div className={styles.userName}>{settings.profileName || user?.displayName || "ユーザー"}</div>
                         <div className={styles.userEmail}>{user?.email}</div>
                     </div>
                 </div>

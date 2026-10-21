@@ -5,6 +5,8 @@ import { DEFAULT_TIME_ZONE, isValidTimeZone } from "../utils/timezone";
 import { reportFirestoreError } from "../utils/firestoreError";
 
 export const DEFAULT_SETTINGS = {
+    profileName: null,
+    profileImage: null,
     weekStartsOn: 1,     // 週の開始曜日（0=日曜 … 6=土曜）。初期値は月曜
     starredFirst: true,  // スター付きタスクを最上部に表示
     starIcon: "star",
@@ -20,6 +22,11 @@ export const STAR_ICON_OPTIONS = [
 
 // 値を検証して既定値で補う（古いデータや不正値でも壊れないように）
 const normalize = (data) => ({
+    profileName: typeof data?.profileName === "string" && data.profileName.trim()
+        ? data.profileName.trim().slice(0, 50) : null,
+    profileImage: data?.profileImage === "" ? "" :
+        typeof data?.profileImage === "string" && data.profileImage.length <= 100000 &&
+        /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(data.profileImage) ? data.profileImage : null,
     weekStartsOn: Number.isInteger(data?.weekStartsOn) && data.weekStartsOn >= 0 && data.weekStartsOn <= 6
         ? data.weekStartsOn : DEFAULT_SETTINGS.weekStartsOn,
     starredFirst: typeof data?.starredFirst === "boolean" ? data.starredFirst : DEFAULT_SETTINGS.starredFirst,

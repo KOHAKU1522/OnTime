@@ -1,6 +1,6 @@
 export const TAG_COLORS = [
     { key: "blue",   bg: "#dbeafe", text: "#1d4ed8", darkBg: "#1e3a5f", darkText: "#93c5fd" },
-    { key: "purple", bg: "#ede9fe", text: "#6d28d9", darkBg: "#3b2d6e", darkText: "#c4b5fd" },
+    { key: "purple", bg: "var(--btn-primary-bg)", text: "var(--btn-primary-text)", darkBg: "var(--btn-primary-bg)", darkText: "var(--btn-primary-text)" },
     { key: "green",  bg: "#dcfce7", text: "#15803d", darkBg: "#14532d", darkText: "#86efac" },
     { key: "orange", bg: "#ffedd5", text: "#c2410c", darkBg: "#431407", darkText: "#fdba74" },
     { key: "red",    bg: "#fee2e2", text: "#b91c1c", darkBg: "#450a0a", darkText: "#fca5a5" },

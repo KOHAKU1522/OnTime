@@ -22,7 +22,21 @@
 
 .row {
     display: flex;
+    align-items: center;
+    flex-wrap: wrap;
     gap: 8px;
+}
+
+.inputGroup {
+    display: flex;
+    align-items: center;
+    flex: 1 1 220px;
+    min-width: 0;
+    gap: 8px;
+}
+
+.row > .primaryBtn {
+    margin-left: auto;
 }
 
 .input {

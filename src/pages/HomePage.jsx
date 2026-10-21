@@ -127,8 +127,8 @@ export default function HomePage({ isGuest }) {
                     </div>
                 </div>
                 <button className={styles.userIcon} onClick={() => setShowMenu(true)}>
-                    {user?.photoURL
-                        ? <img src={user.photoURL} alt="user" className={styles.userPhoto} />
+                    {(settings.profileImage ?? user?.photoURL)
+                        ? <img src={settings.profileImage ?? user.photoURL} alt="user" className={styles.userPhoto} />
                         : "👤"
                     }
                 </button>
@@ -155,7 +155,7 @@ export default function HomePage({ isGuest }) {
                             <stop offset="0.4" stopColor="#eab308" />
                             <stop offset="0.6" stopColor="#22c55e" />
                             <stop offset="0.8" stopColor="#3b82f6" />
-                            <stop offset="1" stopColor="#a855f7" />
+                            <stop offset="1" stopColor="var(--btn-primary-bg)" />
                         </linearGradient>
                     </defs>
                     <path d="M12 5.1a3.2 3.2 0 0 0-5.9 1.6 3.3 3.3 0 0 0-1.5 5.8 3.2 3.2 0 0 0 2.1 5.3 3.1 3.1 0 0 0 5.3 1.2V5.1Z" />

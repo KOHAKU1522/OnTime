@@ -3,6 +3,7 @@ import { auth } from "../../firebase";
 import styles from "./NaturalTaskInput.module.css";
 import { formatInZone, fromZonedInputValue } from "../../utils/date";
 import StarIcon from "../StarIcon/StarIcon";
+import VoiceInput from "../VoiceInput/VoiceInput.jsx";
 
 // サーバーのエラーコードごとの案内（内部の原因は画面に出さない）
 const ERROR_MESSAGES = {
@@ -29,6 +30,7 @@ const formatDateTime = (value, timeZone) => {
 // 自然言語からタスクを読み取り、利用者の確認後にだけ登録する
 export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekStartsOn = 1, embedded = false, starIcon = "star", starName = "スター" }) {
     const [text, setText] = useState("");
+    const [voiceSession, setVoiceSession] = useState(0);
     const [turns, setTurns] = useState([]); // AI との会話履歴（最初の依頼文・質問・回答）
     // これまでに分かった内容（タスク名・期限）。回答を元の依頼と結び付けるためにサーバーへ送り返す
     const [draft, setDraft] = useState(null);
@@ -39,6 +41,7 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekSta
     const [starred, setStarred] = useState(false);
 
     const reset = () => {
+        setVoiceSession(value => value + 1);
         setText("");
         setTurns([]);
         setDraft(null);
@@ -134,6 +137,7 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekSta
                 <form onSubmit={handleParse} className={styles.form}>
                     {question && <p className={styles.question} role="status">{question}</p>}
                     <div className={styles.row}>
+                        <div className={styles.inputGroup}>
                         <input
                             className={styles.input}
                             type="text"
@@ -144,6 +148,8 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekSta
                             aria-label={question ? "質問への回答" : "タスクを文章で入力"}
                             disabled={busy}
                         />
+                        {!busy && <VoiceInput key={voiceSession} value={text} onChange={value => setText(value.slice(0, 1000))} />}
+                        </div>
                         <button className={styles.primaryBtn} type="submit" disabled={busy || !text.trim()}>
                             {status === "parsing" ? "読み取り中…" : question ? "回答" : "読み取る"}
                         </button>

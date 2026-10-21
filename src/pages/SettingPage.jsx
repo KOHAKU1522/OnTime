@@ -1,3 +1,4 @@
+import ProfileEditor from "../components/ProfileEditor/ProfileEditor";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useOutletContext } from "react-router-dom";
@@ -135,18 +136,21 @@ export default function SettingPage() {
             {/* ユーザー情報 */}
             <div className={styles.userCard}>
                 <div className={styles.userAvatar}>
-                    {user?.photoURL
-                        ? <img src={user.photoURL} alt="avatar" className={styles.userPhoto} />
+                    {(settings.profileImage ?? user?.photoURL)
+                        ? <img src={settings.profileImage ?? user.photoURL} alt="avatar" className={styles.userPhoto} />
                         : <span>👤</span>
                     }
                 </div>
                 <div className={styles.userInfo}>
                     <div className={styles.userName}>
-                        {user?.displayName || "ユーザー"}
+                        {settings.profileName || user?.displayName || "ユーザー"}
                     </div>
                     <div className={styles.userEmail}>{user?.email}</div>
                 </div>
+                {user ? <ProfileEditor key={user.uid} user={user} settings={settings} updateSettings={updateSettings} showToast={showToast} /> : <p className={styles.profileHint}>名前とアイコンの編集はログイン後に利用できます。</p>}
             </div>
+
+
 
             {/* 実績 */}
             <section className={styles.section}>
