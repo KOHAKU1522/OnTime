@@ -1,4 +1,5 @@
 import styles from "./TaskCard.module.css";
+import StarIcon from "../StarIcon/StarIcon";
 
 import { useState, useRef } from "react";
 import { formatInZone, toDate } from "../../utils/date";
@@ -11,7 +12,7 @@ import TaskEditModal from "../TaskEditModal/TaskEditModal";
 import TagChip from "../TagChip/TagChip";
 
 // user: 親で取得したログインユーザー（ゲストは null）。カードごとに認証リスナーを登録しない
-export default function TaskCard({ task, user, showToast, allTags = [], now = new Date(), timeZone }) {
+export default function TaskCard({ task, user, showToast, allTags = [], now = new Date(), timeZone, starIcon = "star", starName = "スター" }) {
 
     const [isExpanded, setIsExpanded] = useState(false);
     const [description, setDescription] = useState(task.description ?? "");
@@ -247,11 +248,11 @@ export default function TaskCard({ task, user, showToast, allTags = [], now = ne
                             <button
                                 className={`${styles.starBtn} ${task.starred ? styles.starred : ""}`}
                                 onClick={toggleStar}
-                                title={task.starred ? "重要から外す" : "重要に追加"}
-                                aria-label={task.starred ? "重要から外す" : "重要に追加"}
+                                title={`${starName}を${task.starred ? "外す" : "付ける"}`}
+                                aria-label={`${starName}を${task.starred ? "外す" : "付ける"}`}
                                 aria-pressed={!!task.starred}
                             >
-                                {task.starred ? "★" : "☆"}
+                                <StarIcon name={starIcon} active={!!task.starred} size={18} />
                             </button>
                             <div className={styles.title}>{task.taskName}</div>
                         </div>

@@ -49,6 +49,12 @@
     color: #b45309;
 }
 
+.starChip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
 .starActive:hover {
     border-color: #f59e0b;
     color: #b45309;

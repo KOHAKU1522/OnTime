@@ -135,13 +135,13 @@ a.title:focus-visible,
 }
 
 .retryBtn {
-	min-height: 44px;
-	padding: 0 20px;
+	min-height: 36px;
+	padding: 0 12px;
 	border: none;
-	border-radius: 22px;
+	border-radius: 8px;
 	background: var(--btn-primary-bg);
 	color: var(--btn-primary-text);
-	font-size: 0.88rem;
+	font-size: 0.78rem;
 	font-weight: 600;
 	cursor: pointer;
 }

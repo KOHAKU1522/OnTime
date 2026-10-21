@@ -376,6 +376,22 @@
     border-color: var(--brand);
 }
 
+.starNameInput {
+    width: 132px;
+    min-width: 0;
+    padding: 7px 10px;
+    border: 1.5px solid var(--border);
+    border-radius: 8px;
+    outline: none;
+    background: var(--bg-input);
+    color: var(--text-primary);
+    font-size: 0.88rem;
+}
+
+.starNameInput:focus {
+    border-color: var(--brand);
+}
+
 .customTimingSelect {
     padding: 7px 8px;
     border: 1.5px solid var(--border);

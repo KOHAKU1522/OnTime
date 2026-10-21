@@ -20,7 +20,7 @@ const compareDeadline = (a, b, direction = 1) => {
     return (da - db) * direction;
 };
 
-export default function TaskList({ tasks, user, timeZone, sortType, setSortType, showToast, starredFirst = true, onStarredFirstChange }) {
+export default function TaskList({ tasks, user, timeZone, sortType, setSortType, showToast, starredFirst = true, starIcon = "star", starName = "スター", onStarredFirstChange }) {
 
     const [searchQuery, setSearchQuery] = useState("");
     const [debouncedQuery, setDebouncedQuery] = useState("");
@@ -102,7 +102,7 @@ export default function TaskList({ tasks, user, timeZone, sortType, setSortType,
 
     const hasFilter = debouncedQuery || selectedTags.length > 0;
     const renderCard = (task) => (
-        <TaskCard key={task.id} task={task} user={user} timeZone={timeZone} showToast={showToast} allTags={allTags} now={now} />
+        <TaskCard key={task.id} task={task} user={user} timeZone={timeZone} showToast={showToast} allTags={allTags} now={now} starIcon={starIcon} starName={starName} />
     );
 
     return (
@@ -151,6 +151,8 @@ export default function TaskList({ tasks, user, timeZone, sortType, setSortType,
                 value={sortType}
                 onChange={setSortType}
                 starredFirst={starredFirst}
+                starIcon={starIcon}
+                starName={starName}
                 onStarredFirstChange={onStarredFirstChange}
             />
 

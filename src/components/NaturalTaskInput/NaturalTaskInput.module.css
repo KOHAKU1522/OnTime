@@ -134,21 +134,29 @@
 }
 
 .starOption {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 8px;
-    min-height: 36px;
+    justify-content: center;
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
     margin-bottom: 12px;
-    color: var(--text-secondary);
-    font-size: 0.85rem;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card-alt);
+    color: var(--color-warning);
     cursor: pointer;
 }
 
-.starOption input {
-    width: 18px;
-    height: 18px;
-    margin: 0;
-    accent-color: var(--color-warning);
+.starOptionActive {
+    border-color: var(--color-warning);
+    background: var(--color-warning-bg);
+}
+
+.starOption:focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
 }
 
 .actions {

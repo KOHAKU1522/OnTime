@@ -7,14 +7,25 @@ import { reportFirestoreError } from "../utils/firestoreError";
 export const DEFAULT_SETTINGS = {
     weekStartsOn: 1,     // 週の開始曜日（0=日曜 … 6=土曜）。初期値は月曜
     starredFirst: true,  // スター付きタスクを最上部に表示
+    starIcon: "star",
+    starName: "スター",
     timeZone: DEFAULT_TIME_ZONE, // 日付の区切り・表示に使うタイムゾーン。初期値は Asia/Tokyo
 };
+
+export const STAR_ICON_OPTIONS = [
+    { value: "star", label: "星" },
+    { value: "heart", label: "ハート" },
+    { value: "bookmark", label: "ブックマーク" },
+];
 
 // 値を検証して既定値で補う（古いデータや不正値でも壊れないように）
 const normalize = (data) => ({
     weekStartsOn: Number.isInteger(data?.weekStartsOn) && data.weekStartsOn >= 0 && data.weekStartsOn <= 6
         ? data.weekStartsOn : DEFAULT_SETTINGS.weekStartsOn,
     starredFirst: typeof data?.starredFirst === "boolean" ? data.starredFirst : DEFAULT_SETTINGS.starredFirst,
+    starIcon: STAR_ICON_OPTIONS.some(option => option.value === data?.starIcon) ? data.starIcon : DEFAULT_SETTINGS.starIcon,
+    starName: typeof data?.starName === "string" && data.starName.trim()
+        ? data.starName.trim().slice(0, 16) : DEFAULT_SETTINGS.starName,
     timeZone: isValidTimeZone(data?.timeZone) ? data.timeZone : DEFAULT_SETTINGS.timeZone,
 });
 

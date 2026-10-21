@@ -1,5 +1,26 @@
 export const otherApps = [
     {
+        title: "StyleShift",
+        subtitle: `「StyleShift」はGeminiの頭脳と懐かしのビジュアルで、いつもの文章を多彩なキャラクターに変身させる新感覚テキスト変換アプリです。
+
+[ ブラウザ (React + Vite) ]
+       │
+       ├─ UIデザイン: フルティガー・エアロ（Frutiger Aero）風
+       ├─ 状態管理・履歴: ローカルストレージ（localStorage）
+       │
+       ▼ API通信 / データ永続化
+[ バックエンド / BaaS (Firebase) ]
+       │
+       ▼ テキスト変換処理
+[ Gemini API (Google AI) ]
+       │
+       ▼ ホスティング＆配信
+[ Netlify ]
+`,
+        imageSrc: "/images/styleshift.png",
+        link: "https://styleshift-web-app.netlify.app/",
+    },
+    {
         title: "Number Hunt",
         subtitle: `「Number Hunt」は画面上に散らばった数字の中から、指定されたナンバーを見つけ出すゲームです。スコアが上がるにつれてタイル数が増える、動的な難易度変化が特徴です。
 
@@ -41,5 +62,12 @@ export const otherApps = [
         `,
         imageSrc: "/images/TabacoScale.png",
         link: "https://tabacoscale-web.netlify.app/",
+    },
+    {
+        title: "Smart Change Calculator",
+        subtitle: `「Smart Change Calculator」は、硬貨の枚数を最小限に抑えてお釣りを出すための計算ツールです。ユーザーが入力した金額と商品の価格から、最適な硬貨の組み合わせを自動的に計算し、お釣りを出すのに必要な硬貨の枚数を表示します。
+`,
+        imageSrc: "/images/SmartChangeCalculator.png",
+        link: "https://smartchangecalculator.netlify.app/",
     },
 ]

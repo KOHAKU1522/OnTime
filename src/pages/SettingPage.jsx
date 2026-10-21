@@ -11,6 +11,8 @@ import { getWeeklyCompletions, getMonthlyCompletions } from "../utils/statsUtils
 import { getTimeZoneOffsetMs, isValidTimeZone } from "../utils/timezone";
 import { useDialog } from "../hooks/useDialog";
 import { useNewsEnabled } from "../hooks/useNewsEnabled";
+import { STAR_ICON_OPTIONS } from "../hooks/useUserSettings";
+import StarIcon from "../components/StarIcon/StarIcon";
 
 const Icon = ({ children, ...props }) => (
     <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -77,7 +79,6 @@ export default function SettingPage() {
     const [newsEnabled, setNewsEnabled] = useNewsEnabled();
     const [isDark, setIsDark] = useDarkMode();
     const [chartTab, setChartTab] = useState("week");
-
     const PRESET_MINUTES = [60, 180, 360, 720, 1440, 4320];
     const isCustom = !PRESET_MINUTES.includes(notifyMinutes);
     const [customValue, setCustomValue] = useState(() => isCustom ? String(Math.round(notifyMinutes / 60)) : "");
@@ -120,6 +121,12 @@ export default function SettingPage() {
         COMMON_TIME_ZONES.includes(settings.timeZone) || ALL_TIME_ZONES.includes(settings.timeZone);
 
     const notifPermission = "Notification" in window ? Notification.permission : "unsupported";
+
+    const saveStarName = (event) => {
+        const starName = event.currentTarget.value.trim().slice(0, 16) || "スター";
+        event.currentTarget.value = starName;
+        if (starName !== settings.starName) updateSettings({ starName });
+    };
 
     return (
         <div className={styles.page}>
@@ -212,6 +219,36 @@ export default function SettingPage() {
                             />
                             <span className={styles.toggleSlider} />
                         </label>
+                    </div>
+                    <div className={styles.divider} />
+                    <div className={styles.toggleRow}>
+                        <span className={styles.rowIcon}><StarIcon name={settings.starIcon} active size={18} /></span>
+                        <label className={styles.rowLabel} htmlFor="starIcon">スターアイコン</label>
+                        <select
+                            id="starIcon"
+                            className={styles.customTimingSelect}
+                            value={settings.starIcon}
+                            onChange={(e) => updateSettings({ starIcon: e.target.value })}
+                        >
+                            {STAR_ICON_OPTIONS.map(option => (
+                                <option key={option.value} value={option.value}>{option.label}</option>
+                            ))}
+                        </select>
+                    </div>
+                    <div className={styles.divider} />
+                    <div className={styles.toggleRow}>
+                        <span className={styles.rowIcon}><StarIcon name={settings.starIcon} active size={18} /></span>
+                        <label className={styles.rowLabel} htmlFor="starName">スターの名前</label>
+                        <input
+                            id="starName"
+                            className={styles.starNameInput}
+                            key={settings.starName}
+                            defaultValue={settings.starName}
+                            maxLength={16}
+                            onBlur={saveStarName}
+                            onKeyDown={(e) => { if (e.key === "Enter") e.currentTarget.blur(); }}
+                            aria-label="スターの名前"
+                        />
                     </div>
                     <div className={styles.divider} />
                     <div className={styles.toggleRow}>
