@@ -1,0 +1,25 @@
+.editButton, .button, .saveButton {
+    min-height: 44px;
+    padding: 8px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font: inherit;
+    cursor: pointer;
+}
+.editButton { margin-left: auto; max-width: 140px; color: var(--brand); font-size: .8rem; }
+.editor { grid-column: 1 / -1; min-width: 0; margin: 0; padding: 16px; border-radius: 14px; background: var(--bg-card); box-shadow: var(--shadow-card); color: var(--text-primary); }
+.fields { border: 0; padding: 0; margin: 0; min-width: 0; }
+.fields legend { font-weight: 600; margin-bottom: 12px; }
+.imageRow, .actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.avatar { width: 64px; height: 64px; border-radius: 50%; overflow: hidden; display: grid; place-items: center; background: var(--bg-card-alt); font-size: 28px; }
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.fileInput { display: none; }
+.hint { font-size: .78rem; color: var(--text-muted); line-height: 1.6; }
+.nameInput { display: block; box-sizing: border-box; width: 100%; margin: 8px 0 16px; padding: 10px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg-input); color: var(--text-primary); font: inherit; }
+.actions { justify-content: flex-end; }
+.saveButton { background: var(--brand); border-color: var(--brand); color: white; }
+.error { color: var(--color-danger); font-size: .85rem; }
+.button:disabled, .saveButton:disabled { opacity: .6; cursor: wait; }
+.nameInput:focus-visible, .button:focus-visible, .saveButton:focus-visible, .editButton:focus-visible { outline: 2px solid var(--brand); outline-offset: 3px; }

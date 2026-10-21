@@ -25,3 +25,5 @@ dist-ssr
 
 # .env
 .env
+# Generated Netlify function bundles
+/netlify/build/

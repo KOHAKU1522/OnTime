@@ -1,8 +1,7 @@
 /* ===== CSS Variables (Light / Dark) ===== */
 :root {
-  /* 主要ボタン（濃い紺 + 白文字。コントラスト比 約14:1） */
-  --btn-primary-bg: #1b2a4e;
-  --btn-primary-hover: #26396a;
+  --btn-primary-bg: #6c5ce7;
+  --btn-primary-hover: var(--btn-primary-bg);
   --btn-primary-text: #ffffff;
 
   --bg-page: #f8f8f8;
@@ -19,12 +18,12 @@
   --text-deadline: #666666;
 
   --border: #e5e7eb;
-  --border-focus: #6c5ce7;
+  --border-focus: var(--btn-primary-bg);
   --divider: #f3f4f6;
 
-  --brand: #6c5ce7;
-  --brand-hover: #5941c7;
-  --brand-focus-ring: rgba(108, 92, 231, 0.15);
+  --brand: var(--btn-primary-bg);
+  --brand-hover: var(--btn-primary-bg);
+  --brand-focus-ring: color-mix(in srgb, var(--btn-primary-bg) 15%, transparent);
 
   --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.08);
   --shadow-footer: 0 8px 32px rgba(0, 0, 0, 0.1);
@@ -52,18 +51,21 @@
   --completed-text: #9ca3af;
   --completed-border: #999;
 
-  --tag-bg: #ede9fe;
-  --tag-text: #5b21b6;
+  --tag-bg: var(--btn-primary-bg);
+  --tag-text: var(--btn-primary-text);
 
-  --toast-bg: #1c1c1e;
-  --toast-text: #f2f2f7;
-  --toast-undo: #a78bfa;
+  --toast-bg: #ffffff;
+  --toast-text: #111111;
+  --toast-undo: var(--btn-primary-bg);
+  --toast-border: #e5e7eb;
+  --toast-progress-track: #ede9fe;
+  --toast-progress: var(--btn-primary-bg);
 }
 
 [data-theme="dark"] {
   /* 暗い背景上でも識別できる紺（白文字とのコントラスト比 約8:1） */
   --btn-primary-bg: #2b4a8b;
-  --btn-primary-hover: #34579f;
+  --btn-primary-hover: var(--btn-primary-bg);
   --btn-primary-text: #ffffff;
 
   --bg-page: #0f0f0f;
@@ -80,12 +82,12 @@
   --text-deadline: #8e8e93;
 
   --border: #3a3a3c;
-  --border-focus: #a78bfa;
+  --border-focus: var(--btn-primary-bg);
   --divider: #2c2c2e;
 
-  --brand: #a78bfa;
-  --brand-hover: #7c3aed;
-  --brand-focus-ring: rgba(167, 139, 250, 0.2);
+  --brand: var(--btn-primary-bg);
+  --brand-hover: var(--btn-primary-bg);
+  --brand-focus-ring: color-mix(in srgb, var(--btn-primary-bg) 20%, transparent);
 
   --shadow-card: 0 4px 12px rgba(0, 0, 0, 0.3);
   --shadow-footer: 0 8px 32px rgba(0, 0, 0, 0.4);
@@ -113,12 +115,15 @@
   --completed-text: #636366;
   --completed-border: #4b5563;
 
-  --tag-bg: #3b2d6e;
-  --tag-text: #c4b5fd;
+  --tag-bg: var(--btn-primary-bg);
+  --tag-text: var(--btn-primary-text);
 
-  --toast-bg: #f2f2f7;
-  --toast-text: #1c1c1e;
-  --toast-undo: #6c5ce7;
+  --toast-bg: #2c2c2e;
+  --toast-text: #f2f2f7;
+  --toast-undo: var(--btn-primary-bg);
+  --toast-border: #48484a;
+  --toast-progress-track: rgba(255, 255, 255, 0.15);
+  --toast-progress: #f2f2f7;
 }
 
 * {
