@@ -1,6 +1,7 @@
 import { useState } from "react";
 import styles from "./TaskInput.module.css";
 import TagChip from "../TagChip/TagChip";
+import StarIcon from "../StarIcon/StarIcon";
 import VoiceInput from "../VoiceInput/VoiceInput.jsx";
 import { endOfDayAfter, endOfDayAfterMonths, formatInZone, fromZonedInputValue, getMonthRange, getWeekRange, toZonedInputValue } from "../../utils/date";
 
@@ -20,7 +21,7 @@ const QUICK_PRESETS = PRESETS.slice(0, 3);
 const MORE_PRESETS = PRESETS.slice(3);
 
 // 入力値（deadline など）は設定タイムゾーンの "YYYY-MM-DDTHH:mm" で保持し、保存時に変換する
-export default function TaskInput({ onAddTask, allTags = [], timeZone, weekStartsOn = 1 }) {
+export default function TaskInput({ onAddTask, allTags = [], timeZone, weekStartsOn = 1, starIcon = "star", starName = "スター" }) {
     const [taskName, setTaskName] = useState("");
     const [deadline, setDeadline] = useState("");
     const [selectedPreset, setSelectedPreset] = useState(null);
@@ -282,14 +283,16 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone, weekStart
                     )}
                 </div>
             )}
-            <label className={`${styles.starOption} ${starred ? styles.starOptionActive : ""}`}>
-                <input
-                    type="checkbox"
-                    checked={starred}
-                    onChange={(e) => setStarred(e.target.checked)}
-                />
-                <span>スターを付ける</span>
-            </label>
+            <button
+                type="button"
+                className={`${styles.starOption} ${starred ? styles.starOptionActive : ""}`}
+                onClick={() => setStarred(value => !value)}
+                aria-label={`${starName}を${starred ? "外す" : "付ける"}`}
+                aria-pressed={starred}
+                title={`${starName}を${starred ? "外す" : "付ける"}`}
+            >
+                <StarIcon name={starIcon} active={starred} size={22} />
+            </button>
             </div>
 
             {formError && <p className={styles.formError} role="alert">{formError}</p>}

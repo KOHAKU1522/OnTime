@@ -1,4 +1,5 @@
 import styles from "./SortChips.module.css";
+import StarIcon from "../StarIcon/StarIcon";
 
 const OPTIONS = [
     { value: "short", label: "期限順" },
@@ -7,7 +8,7 @@ const OPTIONS = [
     { value: "completed", label: "完了済み" },
 ];
 
-export default function SortChips({ value, onChange, starredFirst, onStarredFirstChange }) {
+export default function SortChips({ value, onChange, starredFirst, starIcon = "star", starName = "スター", onStarredFirstChange }) {
     return (
         <div className={styles.chips}>
             {OPTIONS.map(opt => (
@@ -23,12 +24,13 @@ export default function SortChips({ value, onChange, starredFirst, onStarredFirs
                 <>
                     <span className={styles.separator} aria-hidden="true" />
                     <button
-                        className={`${styles.chip} ${starredFirst ? styles.starActive : ""}`}
+                        className={`${styles.chip} ${styles.starChip} ${starredFirst ? styles.starActive : ""}`}
                         onClick={() => onStarredFirstChange(!starredFirst)}
                         aria-pressed={starredFirst}
-                        title="スター付きタスクを最上部に表示します"
+                        title={`${starName}付きタスクを最上部に表示します`}
                     >
-                        ★ スター優先
+                        <StarIcon name={starIcon} active={starredFirst} size={16} />
+                        {starName}優先
                     </button>
                 </>
             )}

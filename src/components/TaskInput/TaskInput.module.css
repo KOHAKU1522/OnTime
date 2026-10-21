@@ -121,49 +121,18 @@
 .starOption {
     display: flex;
     align-items: center;
+    justify-content: center;
     align-self: flex-start;
-    gap: 6px;
-    min-height: 36px;
-    padding: 0 10px;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    padding: 0;
     border: 1px solid var(--border);
-    border-radius: 8px;
-    background: var(--bg-card-alt);
-    color: var(--text-secondary);
-    font-size: 0.85rem;
+    border-radius: 10px;
+    background: var(--bg-input);
+    color: var(--color-warning);
     cursor: pointer;
     transition: background 0.15s, border-color 0.15s, color 0.15s;
-}
-
-.starOption input {
-    appearance: none;
-    display: grid;
-    place-content: center;
-    width: 18px;
-    height: 18px;
-    margin: 0;
-    border: 1px solid var(--border);
-    border-radius: 4px;
-    background: var(--bg-input);
-    cursor: pointer;
-}
-
-.starOption input::after {
-    width: 5px;
-    height: 9px;
-    border: solid #fff;
-    border-width: 0 2px 2px 0;
-    content: "";
-    transform: rotate(45deg) scale(0);
-    transition: transform 0.12s;
-}
-
-.starOption input:checked {
-    border-color: var(--color-warning);
-    background: var(--color-warning);
-}
-
-.starOption input:checked::after {
-    transform: rotate(45deg) scale(1);
 }
 
 .starOptionActive {
@@ -416,10 +385,6 @@
     .toggleBtn {
         display: inline-flex;
         align-items: center;
-        min-height: 44px;
-    }
-
-    .starOption {
         min-height: 44px;
     }
 

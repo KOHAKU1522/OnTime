@@ -80,10 +80,16 @@
 }
 
 .starMark {
-    font-size: 0.65rem;
+    display: inline-flex;
+    align-items: center;
     color: #f59e0b;
     flex-shrink: 0;
     line-height: 1;
+}
+
+.barStar {
+    flex-shrink: 0;
+    color: #f59e0b;
 }
 
 /* ===== タスク詳細ポップアップ ===== */
@@ -134,8 +140,8 @@
 }
 
 .popupStar {
+    display: inline-flex;
     color: #f59e0b;
-    font-size: 0.95rem;
 }
 
 .popupRow {

@@ -69,6 +69,8 @@ export default function CalendarPage({ isGuest, guestTasks }) {
                 value={sortType}
                 onChange={setSortType}
                 starredFirst={settings.starredFirst}
+                starIcon={settings.starIcon}
+                starName={settings.starName}
                 onStarredFirstChange={(value) => updateSettings({ starredFirst: value })}
             />
             <div className={styles.ganttWrapper}>
@@ -77,6 +79,7 @@ export default function CalendarPage({ isGuest, guestTasks }) {
                     tasks={filteredTasks.filter(t => toDate(t.deadline))}
                     sortType={sortType}
                     starredFirst={settings.starredFirst}
+                    starIcon={settings.starIcon}
                     timeZone={settings.timeZone}
                     user={user}
                     showToast={showToast}

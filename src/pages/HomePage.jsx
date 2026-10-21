@@ -198,13 +198,15 @@ export default function HomePage({ isGuest }) {
                             isGuest={isGuest}
                             timeZone={timeZone}
                             weekStartsOn={settings.weekStartsOn}
+                            starIcon={settings.starIcon}
+                            starName={settings.starName}
                             embedded
                         />
                     </section>
                 </div>
             )}
 
-            <TaskInput onAddTask={handleAddTask} timeZone={timeZone} weekStartsOn={settings.weekStartsOn} allTags={[...new Set(allTasks.flatMap(t => t.tags ?? []))]} />
+            <TaskInput onAddTask={handleAddTask} timeZone={timeZone} weekStartsOn={settings.weekStartsOn} starIcon={settings.starIcon} starName={settings.starName} allTags={[...new Set(allTasks.flatMap(t => t.tags ?? []))]} />
 
             <TaskList
                 tasks={allTasks}
@@ -214,6 +216,8 @@ export default function HomePage({ isGuest }) {
                 setSortType={setSortType}
                 showToast={showToast}
                 starredFirst={settings.starredFirst}
+                starIcon={settings.starIcon}
+                starName={settings.starName}
                 onStarredFirstChange={(value) => updateSettings({ starredFirst: value })}
             />
 

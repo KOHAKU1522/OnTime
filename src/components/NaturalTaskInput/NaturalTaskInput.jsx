@@ -2,6 +2,7 @@ import { useState } from "react";
 import { auth } from "../../firebase";
 import styles from "./NaturalTaskInput.module.css";
 import { formatInZone, fromZonedInputValue } from "../../utils/date";
+import StarIcon from "../StarIcon/StarIcon";
 
 // サーバーのエラーコードごとの案内（内部の原因は画面に出さない）
 const ERROR_MESSAGES = {
@@ -26,7 +27,7 @@ const formatDateTime = (value, timeZone) => {
 };
 
 // 自然言語からタスクを読み取り、利用者の確認後にだけ登録する
-export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekStartsOn = 1, embedded = false }) {
+export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekStartsOn = 1, embedded = false, starIcon = "star", starName = "スター" }) {
     const [text, setText] = useState("");
     const [turns, setTurns] = useState([]); // AI との会話履歴（最初の依頼文・質問・回答）
     // これまでに分かった内容（タスク名・期限）。回答を元の依頼と結び付けるためにサーバーへ送り返す
@@ -170,14 +171,16 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekSta
                             {proposal.notes.map((note, i) => <li key={i}>{note}</li>)}
                         </ul>
                     )}
-                    <label className={styles.starOption}>
-                        <input
-                            type="checkbox"
-                            checked={starred}
-                            onChange={(e) => setStarred(e.target.checked)}
-                        />
-                        <span>★ スターを付ける</span>
-                    </label>
+                    <button
+                        type="button"
+                        className={`${styles.starOption} ${starred ? styles.starOptionActive : ""}`}
+                        onClick={() => setStarred(value => !value)}
+                        aria-label={`${starName}を${starred ? "外す" : "付ける"}`}
+                        aria-pressed={starred}
+                        title={`${starName}を${starred ? "外す" : "付ける"}`}
+                    >
+                        <StarIcon name={starIcon} active={starred} size={20} />
+                    </button>
                     <div className={styles.actions}>
                         <button type="button" className={styles.textBtn} onClick={reset} disabled={busy}>キャンセル</button>
                         <button type="button" className={styles.secondaryBtn} onClick={handleRevise} disabled={busy}>修正する</button>

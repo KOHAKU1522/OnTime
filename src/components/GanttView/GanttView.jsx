@@ -8,13 +8,14 @@ import { addDaysToKey, dateKeyInZone, dayNumber, parseDateKey, weekdayOfKey } fr
 import { deleteTaskAndOfferUndo } from "../../utils/taskTrash";
 import { useDialog } from "../../hooks/useDialog";
 import { reportFirestoreError } from "../../utils/firestoreError";
+import StarIcon from "../StarIcon/StarIcon";
 
 const CELL_WIDTH = 28;
 const DAYS_BEFORE = 14;
 const DAYS_AFTER = 30;
 
 // 日付の区切りは設定タイムゾーンの暦日で計算する
-export default function GanttView({ tasks, user, showToast, timeZone, sortType = "short", starredFirst = true }) {
+export default function GanttView({ tasks, user, showToast, timeZone, sortType = "short", starredFirst = true, starIcon = "star" }) {
     const scrollRef = useRef(null);
     const [popupTask, setPopupTask] = useState(null);
     const { confirm } = useDialog();
@@ -132,7 +133,7 @@ export default function GanttView({ tasks, user, showToast, timeZone, sortType =
                                                     : "var(--color-blue)"
                                     }}
                                 />
-                                {task.starred && <span className={styles.starMark}>★</span>}
+                                {task.starred && <span className={styles.starMark}><StarIcon name={starIcon} active size={11} /></span>}
                                 <span className={styles.taskName} title={task.taskName}>
                                     {task.taskName.length > 7
                                         ? task.taskName.slice(0, 7) + "…"
@@ -251,7 +252,8 @@ export default function GanttView({ tasks, user, showToast, timeZone, sortType =
                                         }}
                                     >
                                         <span className={styles.barLabel}>
-                                            {task.starred ? "★ " : ""}{task.taskName}
+                                            {task.starred && <StarIcon name={starIcon} active size={13} className={styles.barStar} />}
+                                            {task.taskName}
                                         </span>
                                     </div>
                                 </div>
@@ -269,7 +271,7 @@ export default function GanttView({ tasks, user, showToast, timeZone, sortType =
                 <div className={styles.popupSheet} onClick={e => e.stopPropagation()}>
                     <div className={styles.popupHandle} />
                     <div className={styles.popupTitle}>
-                        {popupTask.starred && <span className={styles.popupStar}>★</span>}
+                        {popupTask.starred && <span className={styles.popupStar}><StarIcon name={starIcon} active size={16} /></span>}
                         {popupTask.taskName}
                     </div>
                     <div className={styles.popupRow}>
