@@ -45,7 +45,7 @@ export default function LoginPage({ setIsGuest }) {
 
         // リダイレクトエラーのみハンドリング
         getRedirectResult(auth).catch((error) => {
-            console.error(error);
+            console.error("[Auth] リダイレクト認証に失敗しました", { code: error?.code ?? "unknown" });
             setErrorMessage("Googleログインに失敗しました");
         });
 

@@ -27,7 +27,8 @@ export const classifyFirestoreError = (err) => {
 };
 
 // UID をログに残さないようにパスを伏せる
-const maskPath = (path) => (path ? String(path).replace(/^users\/[^/]+/, "users/{uid}") : undefined);
+const maskPath = (path) => (path ? String(path).replace(/^users\/[^/]+/, "users/{uid}")
+    .replace(/^(users\/\{uid\}\/[^/]+)\/.*$/, "$1/{document}") : undefined);
 
 // 診断ログ。permission-denied の場合は開発者向けに確認ポイントも出す
 export const logFirestoreError = (operation, err, path) => {
@@ -40,8 +41,7 @@ export const logFirestoreError = (operation, err, path) => {
     });
     if (kind === "permission") {
         console.warn(
-            "[Firestore] permission-denied: 本番のセキュリティルールがこのパスへの書き込みを許可しているか確認してください" +
-            "（リポジトリの firestore.rules を `firebase deploy --only firestore:rules` で反映）。"
+            "[Firestore] permission-denied: 接続先プロジェクト、ログイン中のアカウント、本番ルールの読み取り・書き込み条件を確認してください。"
         );
     }
 };

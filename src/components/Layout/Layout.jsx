@@ -8,8 +8,8 @@ import PageLoader from "../PageLoader/PageLoader";
 import { purgeExpiredTrash } from "../../utils/taskTrash";
 import { logFirestoreError, reportFirestoreError } from "../../utils/firestoreError";
 import { db } from "../../firebase";
+import { useTasks } from "../../hooks/useTasks";
 import { useAuthUser } from "../../hooks/useAuthUser";
-import { collection, onSnapshot } from "firebase/firestore";
 import { runMacrosForUser } from "../../utils/macro";
 
 import { useToast } from "../../hooks/useToast";
@@ -19,7 +19,7 @@ import { useUserSettings } from "../../hooks/useUserSettings";
 export default function Layout() {
 
     const user = useAuthUser();
-    const [tasks, setTasks] = useState([]);
+    const { tasks, tasksStatus, tasksError, retryTasks } = useTasks(user);
     const [sortType, setSortType] = useState("short");
     const [notificationsEnabled, setNotificationsEnabled] = useState(
         () => localStorage.getItem("notificationsEnabled") === "true"
@@ -32,20 +32,6 @@ export default function Layout() {
     const { settings, updateSettings, loaded: settingsLoaded } = useUserSettings(user?.uid, showToast);
 
     useNotifications(tasks, notificationsEnabled, notifyMinutes);
-
-    useEffect(() => {
-        if (!user?.uid) return;
-        const tasksRef = collection(db, "users", user.uid, "tasks");
-        const unsubscribe = onSnapshot(
-            tasksRef,
-            (snapshot) => {
-                setTasks(snapshot.docs.map(d => ({ id: d.id, ...d.data() })));
-            },
-            (err) => showToast(reportFirestoreError("タスクを読み込めませんでした", err, tasksRef.path))
-        );
-
-        return () => unsubscribe();
-    }, [user?.uid, showToast]);
 
     // マクロチェック：ユーザー確定後にセッションにつき1回（主処理はサーバーの定期実行）
     // 設定（タイムゾーン）の読み込み後に実行し、日付の判定をサーバーと一致させる
@@ -79,7 +65,7 @@ export default function Layout() {
             <main className={styles.content}>
                 <Suspense fallback={<PageLoader />}>
                     <Outlet context={{
-                        user, tasks, sortType, setSortType,
+                        user, tasks, tasksStatus, tasksError, retryTasks, sortType, setSortType,
                         showToast,
                         notificationsEnabled, toggleNotifications,
                         notifyMinutes, changeNotifyMinutes,
