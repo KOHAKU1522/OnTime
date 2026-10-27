@@ -14,10 +14,11 @@ import News from "../components/News/News";
 import { useNewsEnabled } from "../hooks/useNewsEnabled";
 import NaturalTaskInput from "../components/NaturalTaskInput/NaturalTaskInput";
 import { reportFirestoreError } from "../utils/firestoreError";
+import TaskReadBoundary from "../components/TaskReadBoundary";
 
 export default function HomePage({ isGuest }) {
 
-    const { user, tasks, sortType, setSortType, showToast, settings, updateSettings } = useOutletContext();
+    const { user, tasks, tasksStatus, tasksError, retryTasks, sortType, setSortType, showToast, settings, updateSettings } = useOutletContext();
     const [showMenu, setShowMenu] = useState(false);
     const [newsEnabled] = useNewsEnabled();
     const [showAiInstructions, setShowAiInstructions] = useState(false);
@@ -111,6 +112,7 @@ export default function HomePage({ isGuest }) {
     };
 
     return (
+        <TaskReadBoundary status={tasksStatus} error={tasksError} onRetry={retryTasks}>
         <div className={styles.home}>
             <header className={styles.header}>
                 <div>
@@ -224,5 +226,6 @@ export default function HomePage({ isGuest }) {
             {showMenu && <ProfileMenu onClose={() => setShowMenu(false)} />}
 
         </div>
+        </TaskReadBoundary>
     );
 }

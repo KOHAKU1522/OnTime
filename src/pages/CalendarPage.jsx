@@ -5,9 +5,10 @@ import GanttView from "../components/GanttView/GanttView";
 import SortChips from "../components/SortChips/SortChips";
 import styles from "./CalendarPage.module.css";
 import { getTagStyle } from "../utils/tagColors";
+import TaskReadBoundary from "../components/TaskReadBoundary";
 
 export default function CalendarPage({ isGuest, guestTasks }) {
-    const { user, tasks, sortType, setSortType, settings, updateSettings, showToast } = useOutletContext();
+    const { user, tasks, tasksStatus, tasksError, retryTasks, sortType, setSortType, settings, updateSettings, showToast } = useOutletContext();
     const [selectedTags, setSelectedTags] = useState([]);
 
     const today = new Date();
@@ -33,6 +34,7 @@ export default function CalendarPage({ isGuest, guestTasks }) {
     }).length;
 
     return (
+        <TaskReadBoundary status={tasksStatus} error={tasksError} onRetry={retryTasks}>
         <div className={styles.page}>
             <div className={styles.header}>
                 <h2 className={styles.title}>カレンダー</h2>
@@ -86,5 +88,6 @@ export default function CalendarPage({ isGuest, guestTasks }) {
                 />
             </div>
         </div>
+        </TaskReadBoundary>
     );
 }
