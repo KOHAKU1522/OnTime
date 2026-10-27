@@ -35,6 +35,11 @@
     "typescript": "^6.0.3",
     "vite": "^8.3.4"
   },
+  "overrides": {
+    "@firebase/firestore": {
+      "@grpc/grpc-js": "1.14.6"
+    }
+  },
   "engines": {
     "node": ">=24 <25"
   }
