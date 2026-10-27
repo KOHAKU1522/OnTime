@@ -6,9 +6,9 @@ export default function TaskPeriodCounts({ tasks, timeZone, weekStartsOn, now = 
     const periods = [
         ["今日", getDayRange(now, timeZone), styles.today],
         ["今週", getWeekRange(now, weekStartsOn, timeZone), styles.week],
-        ["1週間以内", getUpcomingRange(now, 7, timeZone), styles.week],
+        ["1週間", getUpcomingRange(now, 7, timeZone), styles.week],
         ["今月", getMonthRange(now, timeZone), styles.month],
-        ["1ヶ月以内（31日）", getUpcomingRange(now, 31, timeZone), styles.month],
+        ["1ヶ月", getUpcomingRange(now, 31, timeZone), styles.month],
     ];
 
     return (
