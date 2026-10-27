@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { toDate, isSameDayInZone } from "../utils/date";
+import { toDate } from "../utils/date";
+import TaskPeriodCounts from "../components/TaskPeriodCounts/TaskPeriodCounts";
 import { useOutletContext } from "react-router-dom";
 import GanttView from "../components/GanttView/GanttView";
 import SortChips from "../components/SortChips/SortChips";
@@ -28,10 +29,6 @@ export default function CalendarPage({ isGuest, guestTasks }) {
         : allTasks;
 
     const activeCount = filteredTasks.filter(t => !t.completed).length;
-    const todayCount = filteredTasks.filter(t => {
-        if (t.completed) return false;
-        return isSameDayInZone(toDate(t.deadline), today, settings.timeZone);
-    }).length;
 
     return (
         <TaskReadBoundary status={tasksStatus} error={tasksError} onRetry={retryTasks}>
@@ -42,11 +39,9 @@ export default function CalendarPage({ isGuest, guestTasks }) {
                     <span className={styles.taskCount}>
                         {activeCount === 0 ? "タスクなし" : `${activeCount}件`}
                     </span>
-                    {todayCount > 0 && (
-                        <span className={styles.todayBadge}>今日 {todayCount}件</span>
-                    )}
                 </div>
             </div>
+            <TaskPeriodCounts tasks={filteredTasks} timeZone={settings.timeZone} weekStartsOn={settings.weekStartsOn} now={today} />
 
             {allTags.length > 0 && (
                 <div className={styles.tagFilter}>

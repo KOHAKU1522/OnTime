@@ -1,7 +1,7 @@
 import {
     DEFAULT_TIME_ZONE, addDaysToKey, addMonthsToKey, dateKeyInZone, dateKeyToDate,
     parseDateKey, resolveTimeZone, weekdayOfKey, zonedTimeToDate, getZonedParts,
-} from "./timezone";
+} from "./timezone.js";
 
 export { DEFAULT_TIME_ZONE, dateKeyInZone, resolveTimeZone };
 
@@ -39,6 +39,12 @@ const rangeFromKeys = (startKey, endKey, timeZone) => ({
 export const getDayRange = (now, timeZone) => {
     const key = dateKeyInZone(now, timeZone);
     return rangeFromKeys(key, addDaysToKey(key, 1), timeZone);
+};
+
+// 今日を含む指定日数。月末や夏時間でも設定タイムゾーンの日付で区切る。
+export const getUpcomingRange = (now, days, timeZone) => {
+    const key = dateKeyInZone(now, timeZone);
+    return rangeFromKeys(key, addDaysToKey(key, days), timeZone);
 };
 
 // weekStartsOn: 0=日曜 … 6=土曜

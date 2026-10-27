@@ -27,6 +27,7 @@ const RepeatIcon = () => <Icon><polyline points="17 1 21 5 17 9" /><path d="M3 1
 const LogOutIcon = () => <Icon><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4" /><polyline points="16 17 21 12 16 7" /><line x1="21" y1="12" x2="9" y2="12" /></Icon>;
 const TagIcon = () => <Icon><path d="M20.59 13.41l-7.17 7.17a2 2 0 01-2.83 0L2 12V2h10l8.59 8.59a2 2 0 010 2.82z" /><line x1="7" y1="7" x2="7.01" y2="7" /></Icon>;
 const CalendarIcon = () => <Icon><rect x="3" y="4" width="18" height="18" rx="2" /><line x1="16" y1="2" x2="16" y2="6" /><line x1="8" y1="2" x2="8" y2="6" /><line x1="3" y1="10" x2="21" y2="10" /></Icon>;
+const HistoryIcon = () => <Icon aria-hidden="true"><path d="M3 11a9 9 0 1 1 2.6 7.4" /><polyline points="3 4 3 11 10 11" /><polyline points="12 7 12 12 15 14" /></Icon>;
 const WEEKDAY_OPTIONS = ["日曜日", "月曜日", "火曜日", "水曜日", "木曜日", "金曜日", "土曜日"];
 const NewsIcon = () => <Icon><path d="M4 22h16a2 2 0 002-2V4a2 2 0 00-2-2H8a2 2 0 00-2 2v16a2 2 0 01-2 2zm0 0a2 2 0 01-2-2v-9c0-1.1.9-2 2-2h2" /><line x1="10" y1="6" x2="18" y2="6" /><line x1="10" y1="10" x2="18" y2="10" /><line x1="10" y1="14" x2="14" y2="14" /></Icon>;
 const GlobeIcon = () => <Icon><circle cx="12" cy="12" r="10" /><line x1="2" y1="12" x2="22" y2="12" /><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z" /></Icon>;
@@ -440,7 +441,15 @@ export default function SettingPage() {
                     <div className={`${styles.row} ${styles.rowStatic}`}>
                         <span className={styles.rowIcon}><InfoIcon /></span>
                         <span className={styles.rowLabel}>バージョン</span>
-                        <span className={styles.rowValue}>v1.2.1</span>
+                        <span className={styles.rowValue}>v1.2.2</span>
+                    </div>
+
+                    <div className={styles.divider} />
+
+                    <div className={`${styles.row} ${styles.rowStatic}`}>
+                        <span className={styles.rowIcon}><HistoryIcon /></span>
+                        <span className={styles.rowLabel}>最終更新日</span>
+                        <span className={styles.rowValue}>2026/10/27</span>
                     </div>
 
                     <div className={styles.divider} />

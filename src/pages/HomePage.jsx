@@ -5,7 +5,8 @@ import { useOutletContext } from "react-router-dom";
 
 import { db } from "../firebase";
 import { addDoc, collection } from "firebase/firestore";
-import { toDate, getDayRange, getWeekRange, getMonthRange, isInRange, formatInZone, fromZonedInputValue } from "../utils/date";
+import { formatInZone, fromZonedInputValue } from "../utils/date";
+import TaskPeriodCounts from "../components/TaskPeriodCounts/TaskPeriodCounts";
 
 import TaskInput from "../components/TaskInput/TaskInput";
 import TaskList from "../components/TaskList/TaskList";
@@ -61,13 +62,6 @@ export default function HomePage({ isGuest }) {
     const [guestTasks, setGuestTasks] = useState([]);
     const allTasks = isGuest ? [...tasks, ...guestTasks] : tasks;
 
-    // 期限が今日・今週・今月の範囲にある未完了タスク数（週は設定した開始曜日から）
-    const activeDeadlines = allTasks.filter(t => !t.completed).map(t => toDate(t.deadline)).filter(Boolean);
-    const countIn = (range) => activeDeadlines.filter(d => isInRange(d, range)).length;
-    const todayCount = countIn(getDayRange(today, timeZone));
-    const weekCount = countIn(getWeekRange(today, settings.weekStartsOn, timeZone));
-    const monthCount = countIn(getMonthRange(today, timeZone));
-
     const handleAddTask = async (task) => {
 
         if (isGuest) {
@@ -122,11 +116,7 @@ export default function HomePage({ isGuest }) {
                             {activeCount === 0 ? "タスクはありません" : `${activeCount}件のタスク`}
                         </span>
                     </div>
-                    <div className={styles.periodRow} aria-label="期限が近い未完了タスク数">
-                        <span className={todayCount > 0 ? styles.todayBadge : styles.periodBadge}>今日 {todayCount}件</span>
-                        <span className={weekCount > 0 ? styles.weekBadge : styles.periodBadge}>今週 {weekCount}件</span>
-                        <span className={monthCount > 0 ? styles.monthBadge : styles.periodBadge}>今月 {monthCount}件</span>
-                    </div>
+                    <TaskPeriodCounts tasks={allTasks} timeZone={timeZone} weekStartsOn={settings.weekStartsOn} now={today} />
                 </div>
                 <button className={styles.userIcon} onClick={() => setShowMenu(true)}>
                     {(settings.profileImage ?? user?.photoURL)
