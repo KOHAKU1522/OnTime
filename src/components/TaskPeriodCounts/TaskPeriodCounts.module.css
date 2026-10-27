@@ -1,0 +1,34 @@
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 6px;
+}
+
+.badge {
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: 2px 7px;
+    border-radius: 99px;
+    white-space: nowrap;
+}
+
+.empty {
+    color: var(--text-secondary);
+    background: var(--bg-card-alt);
+}
+
+.today {
+    color: var(--color-danger, #ef4444);
+    background: var(--color-danger-bg, #fef2f2);
+}
+
+.week {
+    color: var(--color-warning);
+    background: var(--color-warning-bg);
+}
+
+.month {
+    color: var(--color-success);
+    background: var(--color-success-bg);
+}
