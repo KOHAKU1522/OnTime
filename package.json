@@ -36,6 +36,8 @@
     "vite": "^8.3.4"
   },
   "overrides": {
+    "glob": "14.0.2",
+    "minimatch": "11.0.1",
     "@firebase/firestore": {
       "@grpc/grpc-js": "1.14.6"
     }
