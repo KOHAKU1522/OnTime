@@ -441,7 +441,7 @@ export default function SettingPage() {
                     <div className={`${styles.row} ${styles.rowStatic}`}>
                         <span className={styles.rowIcon}><InfoIcon /></span>
                         <span className={styles.rowLabel}>バージョン</span>
-                        <span className={styles.rowValue}>v1.2.2</span>
+                        <span className={styles.rowValue}>v1.2.3</span>
                     </div>
 
                     <div className={styles.divider} />
@@ -449,7 +449,7 @@ export default function SettingPage() {
                     <div className={`${styles.row} ${styles.rowStatic}`}>
                         <span className={styles.rowIcon}><HistoryIcon /></span>
                         <span className={styles.rowLabel}>最終更新日</span>
-                        <span className={styles.rowValue}>2026/10/27</span>
+                        <span className={styles.rowValue}>2026/11/5</span>
                     </div>
 
                     <div className={styles.divider} />
