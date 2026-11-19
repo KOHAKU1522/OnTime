@@ -1,3 +1,4 @@
+import { updateLocal, deleteLocal } from "../../utils/localData";
 import styles from "./TaskCard.module.css";
 import StarIcon from "../StarIcon/StarIcon";
 
@@ -116,23 +117,21 @@ export default function TaskCard({ task, user, showToast, allTags = [], now = ne
     // ===== 星（重要）トグル =====
     const toggleStar = async (e) => {
         e.stopPropagation();
-        if (!user) return;
-        const taskRef = doc(db, "users", user.uid, "tasks", task.id);
-        await runTaskOp(() => updateDoc(taskRef, { starred: !task.starred }), "重要マークを変更できませんでした");
+        const taskRef = user ? doc(db, "users", user.uid, "tasks", task.id) : null;
+        await runTaskOp(() => (user ? updateDoc : (_ref, patch) => updateLocal("tasks", task.id, patch))(taskRef, { starred: !task.starred }), "重要マークを変更できませんでした");
     };
 
     // ===== 完了（アンドゥ付き）=====
     const completeTask = async () => {
-        if (!user) return;
-        const taskRef = doc(db, "users", user.uid, "tasks", task.id);
+        const taskRef = user ? doc(db, "users", user.uid, "tasks", task.id) : null;
         const ok = await runTaskOp(
-            () => updateDoc(taskRef, { completed: true, completedAt: new Date() }),
+            () => (user ? updateDoc : (_ref, patch) => updateLocal("tasks", task.id, patch))(taskRef, { completed: true, completedAt: new Date() }),
             "タスクを完了できませんでした"
         );
 
         if (ok && showToast) {
             showToast("タスクを完了しました", () => runTaskOp(
-                () => updateDoc(taskRef, { completed: false, completedAt: null }),
+                () => (user ? updateDoc : (_ref, patch) => updateLocal("tasks", task.id, patch))(taskRef, { completed: false, completedAt: null }),
                 "元に戻せませんでした"
             ));
         }
@@ -140,16 +139,15 @@ export default function TaskCard({ task, user, showToast, allTags = [], now = ne
 
     // ===== 未完了に戻す =====
     const uncompleteTask = async () => {
-        if (!user) return;
-        const taskRef = doc(db, "users", user.uid, "tasks", task.id);
+        const taskRef = user ? doc(db, "users", user.uid, "tasks", task.id) : null;
         const ok = await runTaskOp(
-            () => updateDoc(taskRef, { completed: false, completedAt: null }),
+            () => (user ? updateDoc : (_ref, patch) => updateLocal("tasks", task.id, patch))(taskRef, { completed: false, completedAt: null }),
             "未完了に戻せませんでした"
         );
 
         if (ok && showToast) {
             showToast("未完了に戻しました", () => runTaskOp(
-                () => updateDoc(taskRef, { completed: true, completedAt: new Date() }),
+                () => (user ? updateDoc : (_ref, patch) => updateLocal("tasks", task.id, patch))(taskRef, { completed: true, completedAt: new Date() }),
                 "元に戻せませんでした"
             ));
         }
@@ -157,7 +155,7 @@ export default function TaskCard({ task, user, showToast, allTags = [], now = ne
 
     // ===== 削除（遅延削除 + アンドゥ）=====
     const deleteTask = () => {
-        if (!user) return;
+        if (!user) { try { deleteLocal("tasks", task.id, showToast); } catch { showToast?.("\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f"); } return; }
 
         // サーバーから即時削除し、5秒以内なら「元に戻す」で復元できる
         deleteTaskAndOfferUndo(db, user.uid, task.id, showToast);
@@ -165,10 +163,9 @@ export default function TaskCard({ task, user, showToast, allTags = [], now = ne
 
     // ===== 説明欄の保存 =====
     const handleDescriptionBlur = async () => {
-        if (!user) return;
-        const taskRef = doc(db, "users", user.uid, "tasks", task.id);
+        const taskRef = user ? doc(db, "users", user.uid, "tasks", task.id) : null;
         await runTaskOp(
-            () => updateDoc(taskRef, { description: description || null }),
+            () => (user ? updateDoc : (_ref, patch) => updateLocal("tasks", task.id, patch))(taskRef, { description: description || null }),
             "メモを保存できませんでした"
         );
     };

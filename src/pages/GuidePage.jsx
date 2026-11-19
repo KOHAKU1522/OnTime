@@ -38,7 +38,7 @@ function GuideBlock({ entry }) {
     );
 }
 
-export default function GuidePage() {
+export default function GuidePage({ onFinish }) {
 
     useEffect(() => {
         window.scrollTo(0, 0);
@@ -49,9 +49,9 @@ export default function GuidePage() {
     return (
         <div className={styles.page}>
             <div className={styles.header}>
-                <button className={styles.backBtn} onClick={() => navigate(-1)}>
+                {!onFinish && <button className={styles.backBtn} onClick={() => navigate(-1)} aria-label="戻る">
                     <BackIcon />
-                </button>
+                </button>}
                 <h2 className={styles.title}>アプリの使い方</h2>
             </div>
 
@@ -71,6 +71,7 @@ export default function GuidePage() {
                     ))}
                 </div>
             )}
+            {onFinish && <button type="button" className={styles.startButton} onClick={onFinish}>アプリを使い始める</button>}
         </div>
     );
 }

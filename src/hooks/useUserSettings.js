@@ -38,13 +38,13 @@ const normalize = (data) => ({
 
 // ユーザーごとの設定を users/{uid}/settings/preferences に保存する（ゲストは端末内のみ）
 export function useUserSettings(uid, onError) {
-    const [settings, setSettings] = useState(DEFAULT_SETTINGS);
+    const [settings, setSettings] = useState(() => { try { return normalize(JSON.parse(localStorage.getItem("ontime.local.settings") || "null")); } catch { return DEFAULT_SETTINGS; } });
     // 設定を読み込んだユーザーID（読み込み完了の判定に使う。ゲストは常に完了扱い）
     const [loadedUid, setLoadedUid] = useState(null);
     const loaded = !uid || loadedUid === uid;
 
     useEffect(() => {
-        if (!uid) return;
+        if (!uid) { try { setSettings(normalize(JSON.parse(localStorage.getItem("ontime.local.settings") || "null"))); } catch { setSettings(DEFAULT_SETTINGS); } return; }
         const ref = doc(db, "users", uid, "settings", "preferences");
         return onSnapshot(
             ref,
@@ -63,7 +63,7 @@ export function useUserSettings(uid, onError) {
         const prev = settings;
         const next = normalize({ ...settings, ...patch });
         setSettings(next); // 先に画面へ反映
-        if (!uid) return true;
+        if (!uid) { try { localStorage.setItem("ontime.local.settings", JSON.stringify(next)); return true; } catch { setSettings(prev); onError?.("\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f"); return false; } }
         try {
             await setDoc(doc(db, "users", uid, "settings", "preferences"), next, { merge: true });
             return true;

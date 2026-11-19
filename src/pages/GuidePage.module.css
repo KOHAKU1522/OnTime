@@ -75,6 +75,20 @@
     gap: 12px;
 }
 
+.startButton {
+    display: block;
+    width: 100%;
+    min-height: 48px;
+    margin: 24px auto 0;
+    border: 0;
+    border-radius: 12px;
+    background: var(--btn-primary-bg);
+    color: var(--btn-primary-text);
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+}
+
 /* ===== code card ===== */
 .codeCard {
     background: var(--bg-card);

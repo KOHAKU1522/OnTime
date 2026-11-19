@@ -19,6 +19,7 @@ export default function ProfileMenu({ onClose }) {
     }, []);
 
     const handleLogout = async () => {
+        if (!user) { navigate(ROUTES.LOGIN); return; }
         const ok = await confirm({ title: "ログアウトしますか？", confirmLabel: "ログアウト", danger: true });
         if (!ok) return;
         await signOut(auth);
@@ -73,7 +74,7 @@ export default function ProfileMenu({ onClose }) {
                             <line x1="21" y1="12" x2="9" y2="12"/>
                         </svg>
                     </span>
-                    <span className={styles.menuLabel}>ログアウト</span>
+                    <span className={styles.menuLabel}>{user ? "\u30ed\u30b0\u30a2\u30a6\u30c8" : "\u30ed\u30b0\u30a4\u30f3"}</span>
                 </button>
 
                 <div className={styles.safeArea} />

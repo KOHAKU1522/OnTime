@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "../firebase";
-import { Navigate } from "react-router-dom";
 
-export default function ProtectedRoute({ children, isGuest }) {
+
+export default function ProtectedRoute({ children }) {
     const [user, setUser] = useState(undefined);
     const [authError, setAuthError] = useState(false);
 
@@ -27,7 +27,7 @@ export default function ProtectedRoute({ children, isGuest }) {
     </div>;
     if (user === undefined) return <p role="status">認証状態を確認しています…</p>;
 
-    if (!user && !isGuest) return <Navigate to="/" />;
+
 
     return children;
 }

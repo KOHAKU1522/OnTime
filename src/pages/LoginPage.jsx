@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { LOGIN_PAGE_SUBTITLE } from "../const";
 import styles from "./LoginPage.module.css";
-import { useDialog } from "../hooks/useDialog";
 
 import { useNavigate } from "react-router-dom";
 
@@ -17,14 +16,13 @@ import {
     sendEmailVerification,
 } from "firebase/auth";
 
-export default function LoginPage({ setIsGuest }) {
+export default function LoginPage() {
 
     const [subtitle] = useState(() =>
         LOGIN_PAGE_SUBTITLE[Math.floor(Math.random() * LOGIN_PAGE_SUBTITLE.length)]
     );
 
     const navigate = useNavigate();
-    const { notify } = useDialog();
 
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -164,12 +162,7 @@ export default function LoginPage({ setIsGuest }) {
                 <button
                     className={styles.button}
                     onClick={() => {
-                        setIsGuest(true);
                         navigate("/home");
-                        notify({
-                            title: "ゲストとして利用します",
-                            message: "ゲストログインの場合、「データの保存」「カレンダー機能」「マクロ機能」等がご利用いただけません。",
-                        });
                     }}
                 >
                     ログインせずに使う

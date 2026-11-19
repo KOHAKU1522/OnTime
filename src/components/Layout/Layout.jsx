@@ -1,3 +1,4 @@
+import { runLocalMacros } from "../../utils/localData";
 import Footer from "../Footer/Footer";
 import Toast from "../Toast/Toast";
 import { Outlet } from "react-router-dom";
@@ -36,13 +37,14 @@ export default function Layout() {
     // マクロチェック：ユーザー確定後にセッションにつき1回（主処理はサーバーの定期実行）
     // 設定（タイムゾーン）の読み込み後に実行し、日付の判定をサーバーと一致させる
     useEffect(() => {
-        if (!user?.uid || !settingsLoaded || macroCheckedRef.current) return;
+        if (user === undefined || !settingsLoaded || macroCheckedRef.current) return;
         macroCheckedRef.current = true;
 
+        if (!user) { try { runLocalMacros(settings.timeZone); } catch { showToast("\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f"); } return; }
         runMacrosForUser(db, user.uid, settings.timeZone).catch((err) => {
             showToast(reportFirestoreError("マクロによるタスク追加に失敗しました", err, `users/${user.uid}/macros`));
         });
-    }, [user?.uid, settingsLoaded, settings.timeZone, showToast]);
+    }, [user, settingsLoaded, settings.timeZone, showToast]);
 
     // 取り消し期限を過ぎた削除済みタスクの退避データを整理する（失敗しても動作に影響しない）
     useEffect(() => {

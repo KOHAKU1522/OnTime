@@ -1,7 +1,7 @@
 import { useState } from "react";
 import styles from "./TaskInput.module.css";
 import TagChip from "../TagChip/TagChip";
-import StarIcon from "../StarIcon/StarIcon";
+// import StarIcon from "../StarIcon/StarIcon";
 import VoiceInput from "../VoiceInput/VoiceInput.jsx";
 import { endOfDayAfter, endOfDayAfterMonths, formatInZone, fromZonedInputValue, getMonthRange, getWeekRange, toZonedInputValue } from "../../utils/date";
 
@@ -21,7 +21,7 @@ const QUICK_PRESETS = PRESETS.slice(0, 3);
 const MORE_PRESETS = PRESETS.slice(3);
 
 // 入力値（deadline など）は設定タイムゾーンの "YYYY-MM-DDTHH:mm" で保持し、保存時に変換する
-export default function TaskInput({ onAddTask, allTags = [], timeZone, weekStartsOn = 1, starIcon = "star", starName = "スター" }) {
+export default function TaskInput({ onAddTask, allTags = [], timeZone, weekStartsOn = 1 /*, starIcon = "star", starName = "スター" */ }) {
     const [taskName, setTaskName] = useState("");
     const [deadline, setDeadline] = useState("");
     const [selectedPreset, setSelectedPreset] = useState(null);
@@ -283,6 +283,7 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone, weekStart
                     )}
                 </div>
             )}
+            {/* スターの事前設定を再開する場合は、このボタンと StarIcon の import・props を戻す。
             <button
                 type="button"
                 className={`${styles.starOption} ${starred ? styles.starOptionActive : ""}`}
@@ -292,7 +293,7 @@ export default function TaskInput({ onAddTask, allTags = [], timeZone, weekStart
                 title={`${starName}を${starred ? "外す" : "付ける"}`}
             >
                 <StarIcon name={starIcon} active={starred} size={22} />
-            </button>
+            </button> */}
             </div>
 
             {formError && <p className={styles.formError} role="alert">{formError}</p>}

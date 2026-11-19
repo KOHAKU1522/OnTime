@@ -11,7 +11,8 @@ import ProtectedRoute from './components/ProtectedRoute';
 import Layout from "./components/Layout/Layout";
 import DialogProvider from "./components/Dialog/DialogProvider";
 import { useDarkMode } from "./hooks/useDarkMode";
-import { lazy, useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
+import PageLoader from './components/PageLoader/PageLoader';
 
 // それ以外のページは開いたときに読み込む（読み込み中表示は Layout の Suspense）
 const CalendarPage = lazy(() => import("./pages/CalendarPage"));
@@ -25,31 +26,42 @@ const CodeRefPage = lazy(() => import("./pages/CodeRefPage"));
 function App() {
 
   useDarkMode();
+  const [showFirstGuide, setShowFirstGuide] = useState(() => {
+    try { return localStorage.getItem('ontime.guide.seen') !== 'true'; }
+    catch { return true; }
+  });
 
-  const [isGuest, setIsGuest] = useState(false);
-  const [guestTasks, setGuestTasks] = useState([]);
+  const finishFirstGuide = () => {
+    try { localStorage.setItem('ontime.guide.seen', 'true'); } catch { /* Continue for this session. */ }
+    setShowFirstGuide(false);
+  };
 
   return (
     <DialogProvider>
+      {showFirstGuide ? (
+        <Suspense fallback={<PageLoader />}>
+          <GuidePage onFinish={finishFirstGuide} />
+        </Suspense>
+      ) : (
       <Routes>
         <Route path={ROUTES.LOGIN}
-          element={<LoginPage setIsGuest={setIsGuest} />}
+          element={<LoginPage />}
         />
 
         <Route
           element={
-            <ProtectedRoute isGuest={isGuest}>
+            <ProtectedRoute>
               <Layout />
             </ProtectedRoute>
           }
         >
           <Route
             path={ROUTES.HOME}
-            element={<HomePage isGuest={isGuest} guestTasks={guestTasks} setGuestTasks={setGuestTasks} />}
+            element={<HomePage />}
           />
           <Route
             path={ROUTES.CALENDAR}
-            element={<CalendarPage isGuest={isGuest} guestTasks={guestTasks} />}
+            element={<CalendarPage />}
           />
           <Route path={ROUTES.SETTING} element={<SettingPage />} />
           <Route path={ROUTES.MACRO} element={<MacroPage />} />
@@ -58,6 +70,7 @@ function App() {
           <Route path={ROUTES.OTHER_APPS} element={<OtherAppsPage />} />
         </Route>
       </Routes>
+      )}
     </DialogProvider>
   );
 }

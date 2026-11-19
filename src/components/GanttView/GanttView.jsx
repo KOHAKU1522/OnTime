@@ -1,3 +1,4 @@
+import { updateLocal, deleteLocal } from "../../utils/localData";
 import styles from "./GanttView.module.css";
 import { useRef, useEffect, useState } from "react";
 import { db } from "../../firebase";
@@ -78,17 +79,15 @@ export default function GanttView({ tasks, user, showToast, timeZone, sortType =
     const dateList = Array.from({ length: DAYS_BEFORE + DAYS_AFTER + 1 }, (_, i) => addDaysToKey(minKey, i));
 
     const handleComplete = async (task) => {
-        if (!user) return;
-        const taskRef = doc(db, "users", user.uid, "tasks", task.id);
+        const taskRef = user ? doc(db, "users", user.uid, "tasks", task.id) : null;
         try {
-            await updateDoc(taskRef, { completed: true, completedAt: new Date() });
+            await (user ? updateDoc : (_ref, patch) => updateLocal("tasks", task.id, patch))(taskRef, { completed: true, completedAt: new Date() });
         } catch (err) {
-            showToast?.(reportFirestoreError("タスクを完了できませんでした", err, taskRef.path));
+            showToast?.(reportFirestoreError("タスクを完了できませんでした", err, taskRef?.path ?? "local"));
         }
     };
 
     const handleDelete = async (task) => {
-        if (!user) return;
         const ok = await confirm({
             title: "タスクを削除しますか？",
             message: `「${task.taskName}」を削除します。削除後5秒間は元に戻せます。`,
@@ -96,7 +95,8 @@ export default function GanttView({ tasks, user, showToast, timeZone, sortType =
             danger: true,
         });
         if (!ok) return;
-        await deleteTaskAndOfferUndo(db, user.uid, task.id, showToast);
+        if (user) await deleteTaskAndOfferUndo(db, user.uid, task.id, showToast);
+        else { try { deleteLocal("tasks", task.id, showToast); } catch { showToast?.("\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f"); } }
     };
 
     const popupDl = popupTask ? getDate(popupTask.deadline) : null;

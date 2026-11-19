@@ -1,3 +1,4 @@
+import { addLocal } from "../utils/localData";
 import { useEffect, useRef, useState } from "react";
 import styles from "./HomePage.module.css";
 
@@ -17,7 +18,7 @@ import NaturalTaskInput from "../components/NaturalTaskInput/NaturalTaskInput";
 import { reportFirestoreError } from "../utils/firestoreError";
 import TaskReadBoundary from "../components/TaskReadBoundary";
 
-export default function HomePage({ isGuest }) {
+export default function HomePage() {
 
     const { user, tasks, tasksStatus, tasksError, retryTasks, sortType, setSortType, showToast, settings, updateSettings } = useOutletContext();
     const [showMenu, setShowMenu] = useState(false);
@@ -58,31 +59,14 @@ export default function HomePage({ isGuest }) {
 
     const activeCount = tasks.filter(t => !t.completed).length;
 
-    // ゲストモード用の追加タスク
-    const [guestTasks, setGuestTasks] = useState([]);
-    const allTasks = isGuest ? [...tasks, ...guestTasks] : tasks;
+    const allTasks = tasks;
 
     const handleAddTask = async (task) => {
 
-        if (isGuest) {
-            const newTask = {
-                taskName: task.taskName,
-                deadline: parseInput(task.deadline),
-                startDate: parseInput(task.startDate),
-                description: task.description || null,
-                tags: task.tags ?? [],
-                starred: task.starred === true,
-                completed: false,
-                createdAt: new Date()
-            };
-            
-            showToast("ゲストモード：保存されません");
-            
-            setGuestTasks(prev => [...prev, newTask]);
-            return true;
+        if (!user) {
+            try { addLocal("tasks", { taskName: task.taskName, deadline: parseInput(task.deadline), startDate: parseInput(task.startDate), description: task.description || null, tags: task.tags ?? [], starred: task.starred === true, completed: false, createdAt: new Date() }); return true; }
+            catch { showToast("\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f"); return false; }
         }
-
-        if (!user) return false;
 
         try {
             await addDoc(
@@ -133,11 +117,10 @@ export default function HomePage({ isGuest }) {
                 type="button"
                 className={`${styles.panelToggle} ${styles.aiPanelToggle}`}
                 onClick={() => setShowAiInstructions(true)}
-                disabled={isGuest}
-                aria-label={isGuest ? "AIへの指示はログイン後に利用できます" : "AIへの指示を開く"}
-                aria-expanded={showAiInstructions && !isGuest}
+                aria-label="AI"
+                aria-expanded={showAiInstructions}
                 aria-controls="home-ai-instructions-dialog"
-                title={isGuest ? "AIへの指示はログイン後に利用できます" : "AIへの指示を開く"}
+                title="AI"
             >
                 <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="url(#ai-brain-rainbow)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                     <defs>
@@ -156,7 +139,7 @@ export default function HomePage({ isGuest }) {
                 </svg>
             </button>
 
-            {showAiInstructions && !isGuest && (
+            {showAiInstructions && (
                 <div
                     className={styles.aiBackdrop}
                     onClick={(event) => {
@@ -187,7 +170,6 @@ export default function HomePage({ isGuest }) {
                         </header>
                         <NaturalTaskInput
                             onAddTask={handleAddTask}
-                            isGuest={isGuest}
                             timeZone={timeZone}
                             weekStartsOn={settings.weekStartsOn}
                             starIcon={settings.starIcon}

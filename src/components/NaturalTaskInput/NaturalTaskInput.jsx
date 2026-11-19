@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { auth } from "../../firebase";
+import { getAiToken } from "../../firebase";
 import styles from "./NaturalTaskInput.module.css";
 import { formatInZone, fromZonedInputValue } from "../../utils/date";
 import StarIcon from "../StarIcon/StarIcon";
@@ -28,7 +28,7 @@ const formatDateTime = (value, timeZone) => {
 };
 
 // 自然言語からタスクを読み取り、利用者の確認後にだけ登録する
-export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekStartsOn = 1, embedded = false, starIcon = "star", starName = "スター" }) {
+export default function NaturalTaskInput({ onAddTask, timeZone, weekStartsOn = 1, embedded = false, starIcon = "star", starName = "スター" }) {
     const [text, setText] = useState("");
     const [voiceSession, setVoiceSession] = useState(0);
     const [turns, setTurns] = useState([]); // AI との会話履歴（最初の依頼文・質問・回答）
@@ -61,7 +61,7 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekSta
         setStatus("parsing");
         setError("");
         try {
-            const token = await auth.currentUser?.getIdToken();
+            const token = await getAiToken();
             if (!token) throw Object.assign(new Error("no token"), { code: "UNAUTHORIZED" });
 
             const response = await fetch("/.netlify/functions/parse-task", {
@@ -92,6 +92,7 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekSta
             }
         } catch (err) {
             console.error("[parse-task] 解析エラー", { code: err.code ?? "NETWORK" });
+            if (err.code === "auth/operation-not-allowed") err.code = "NOT_CONFIGURED";
             if (!err.code && !navigator.onLine) err.code = "OFFLINE";
             // 利用上限・入力不備はサーバーのメッセージ（待ち時間・上限値を含む）をそのまま表示する
             const useServerMessage = (err.code === "RATE_LIMITED" || err.code === "BAD_REQUEST" || err.code === "AI_FAILED") && err.serverMessage;
@@ -127,7 +128,6 @@ export default function NaturalTaskInput({ onAddTask, isGuest, timeZone, weekSta
         }]);
     };
 
-    if (isGuest) return null;
 
     const busy = status !== "idle";
 

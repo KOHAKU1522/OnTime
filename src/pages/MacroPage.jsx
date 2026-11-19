@@ -1,3 +1,4 @@
+import { readLocal, addLocal, updateLocal, deleteLocal } from "../utils/localData";
 import { useState, useEffect } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { db } from "../firebase";
@@ -72,7 +73,12 @@ export default function MacroPage() {
     const { confirm } = useDialog();
 
     useEffect(() => {
-        if (!uid) return;
+        if (!uid) {
+            if (user === undefined) return;
+            const load = () => { try { setMacros(readLocal("macros")); } catch { showToast("\u4fdd\u5b58\u3067\u304d\u307e\u305b\u3093\u3067\u3057\u305f"); } };
+            load(); window.addEventListener("ontime-local-change", load); window.addEventListener("storage", load);
+            return () => { window.removeEventListener("ontime-local-change", load); window.removeEventListener("storage", load); };
+        }
         const ref = collection(db, "users", uid, "macros");
         const unsub = onSnapshot(
             ref,
@@ -80,10 +86,9 @@ export default function MacroPage() {
             err => showToast(reportFirestoreError("マクロを読み込めませんでした", err, `users/${uid}/macros`))
         );
         return () => unsub();
-    }, [uid, showToast]);
+    }, [uid, user, showToast]);
 
     const runMacroOp = async (operation, errorMessage) => {
-        if (!uid) return false;
         try {
             await operation();
             return true;
@@ -94,7 +99,7 @@ export default function MacroPage() {
     };
 
     const handleToggle = (macro) => runMacroOp(
-        () => updateDoc(doc(db, "users", uid, "macros", macro.id), { enabled: !macro.enabled }),
+        () => uid ? updateDoc(doc(db, "users", uid, "macros", macro.id), { enabled: !macro.enabled }) : updateLocal("macros", macro.id, { enabled: !macro.enabled }),
         "切り替えできませんでした"
     );
 
@@ -107,7 +112,7 @@ export default function MacroPage() {
         });
         if (!ok) return;
         await runMacroOp(
-            () => deleteDoc(doc(db, "users", uid, "macros", macro.id)),
+            () => uid ? deleteDoc(doc(db, "users", uid, "macros", macro.id)) : deleteLocal("macros", macro.id),
             "削除できませんでした"
         );
     };
@@ -169,7 +174,7 @@ export default function MacroPage() {
         };
 
         const ok = await runMacroOp(
-            () => editingId
+            () => !uid ? (editingId ? updateLocal("macros", editingId, fields) : addLocal("macros", { ...fields, enabled: true, lastTriggeredKey: null, createdAt: new Date() })) : editingId
                 ? updateDoc(doc(db, "users", uid, "macros", editingId), { ...fields, updatedAt: serverTimestamp() })
                 : addDoc(collection(db, "users", uid, "macros"), {
                     ...fields,

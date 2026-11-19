@@ -75,8 +75,7 @@ const AppsIcon = () => (
 
 export default function SettingPage() {
     const navigate = useNavigate();
-    const user = auth.currentUser;
-    const { tasks, notificationsEnabled, toggleNotifications, notifyMinutes, changeNotifyMinutes, settings, updateSettings, showToast } = useOutletContext();
+    const { user, tasks, notificationsEnabled, toggleNotifications, notifyMinutes, changeNotifyMinutes, settings, updateSettings, showToast } = useOutletContext();
     const { confirm } = useDialog();
     const [newsEnabled, setNewsEnabled] = useNewsEnabled();
     const [isDark, setIsDark] = useDarkMode();
@@ -100,6 +99,10 @@ export default function SettingPage() {
     const thisMonthCount = monthlyData.reduce((sum, d) => sum + d.count, 0);
 
     const handleLogout = async () => {
+        if (!user) {
+            navigate(ROUTES.LOGIN);
+            return;
+        }
         const ok = await confirm({ title: "ログアウトしますか？", confirmLabel: "ログアウト", danger: true });
         if (!ok) return;
         await signOut(auth);
@@ -427,9 +430,9 @@ export default function SettingPage() {
             <section className={styles.section}>
                 <div className={styles.sectionTitle}>アカウント</div>
                 <div className={styles.card}>
-                    <button className={`${styles.row} ${styles.danger}`} onClick={handleLogout}>
+                    <button className={`${styles.row} ${user ? styles.danger : ""}`} onClick={handleLogout}>
                         <span className={styles.rowIcon}><LogOutIcon /></span>
-                        <span className={styles.rowLabel}>ログアウト</span>
+                        <span className={styles.rowLabel}>{user ? "ログアウト" : "ログイン画面へ"}</span>
                     </button>
                 </div>
             </section>
@@ -441,7 +444,7 @@ export default function SettingPage() {
                     <div className={`${styles.row} ${styles.rowStatic}`}>
                         <span className={styles.rowIcon}><InfoIcon /></span>
                         <span className={styles.rowLabel}>バージョン</span>
-                        <span className={styles.rowValue}>v1.2.3</span>
+                        <span className={styles.rowValue}>v1.2.4</span>
                     </div>
 
                     <div className={styles.divider} />
@@ -449,7 +452,7 @@ export default function SettingPage() {
                     <div className={`${styles.row} ${styles.rowStatic}`}>
                         <span className={styles.rowIcon}><HistoryIcon /></span>
                         <span className={styles.rowLabel}>最終更新日</span>
-                        <span className={styles.rowValue}>2026/11/5</span>
+                        <span className={styles.rowValue}>2026/11/19</span>
                     </div>
 
                     <div className={styles.divider} />

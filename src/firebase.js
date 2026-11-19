@@ -1,6 +1,6 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
-import { getAuth } from "firebase/auth";
+import { getAuth, signInAnonymously } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_API_KEY,
@@ -15,3 +15,13 @@ const app = initializeApp(firebaseConfig);
 
 export const db = getFirestore(app);
 export const auth = getAuth(app);
+
+// Separate auth keeps guest task data local while the AI endpoint retains token verification and rate limits.
+const guestApp = initializeApp(firebaseConfig, "ai-guest");
+const guestAuth = getAuth(guestApp);
+export async function getAiToken() {
+  if (auth.currentUser) return auth.currentUser.getIdToken();
+  await guestAuth.authStateReady();
+  const user = guestAuth.currentUser ?? (await signInAnonymously(guestAuth)).user;
+  return user.getIdToken();
+}

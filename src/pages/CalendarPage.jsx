@@ -8,13 +8,13 @@ import styles from "./CalendarPage.module.css";
 import { getTagStyle } from "../utils/tagColors";
 import TaskReadBoundary from "../components/TaskReadBoundary";
 
-export default function CalendarPage({ isGuest, guestTasks }) {
+export default function CalendarPage() {
     const { user, tasks, tasksStatus, tasksError, retryTasks, sortType, setSortType, settings, updateSettings, showToast } = useOutletContext();
     const [selectedTags, setSelectedTags] = useState([]);
 
     const today = new Date();
 
-    const allTasks = isGuest ? [...tasks, ...guestTasks] : tasks;
+    const allTasks = tasks;
 
     const allTags = [...new Set(allTasks.flatMap(t => t.tags ?? []))];
 

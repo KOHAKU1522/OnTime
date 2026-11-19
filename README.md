@@ -33,3 +33,7 @@ If `AWS_LAMBDA_JS_RUNTIME` is explicitly configured in the Netlify UI, set it to
 Server-only environment variables for AI parsing are `GEMINI_API_KEY`,
 `FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, and `FIREBASE_PRIVATE_KEY`.
 Never prefix server secrets with `VITE_`.
+
+## Guest mode
+
+Guest tasks, macros and settings are stored in this browser's localStorage and are separate from signed-in data. Local macros run when the app is opened. AI parsing requires an internet connection and Firebase Authentication anonymous sign-in to be enabled in the Firebase console; it uses a separate anonymous identity only for the existing authenticated AI endpoint and rate limits.

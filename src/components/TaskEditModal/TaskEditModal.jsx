@@ -1,3 +1,4 @@
+import { updateLocal } from "../../utils/localData";
 import { useState } from "react";
 import { db } from "../../firebase";
 import { doc, updateDoc } from "firebase/firestore";
@@ -31,13 +32,12 @@ export default function TaskEditModal({ task, user, timeZone, onClose, allTags =
 
     const handleSave = async () => {
         if (!taskName) return;
-        if (!user) return;
 
         setSaving(true);
         setError("");
-        const taskRef = doc(db, "users", user.uid, "tasks", task.id);
+        const taskRef = user ? doc(db, "users", user.uid, "tasks", task.id) : null;
         try {
-            await updateDoc(taskRef, {
+            await (user ? updateDoc : (_ref, patch) => updateLocal("tasks", task.id, patch))(taskRef, {
                 taskName,
                 deadline: deadline ? fromZonedInputValue(deadline, timeZone) : null,
                 startDate: startDate ? fromZonedInputValue(startDate, timeZone) : null,
@@ -46,20 +46,19 @@ export default function TaskEditModal({ task, user, timeZone, onClose, allTags =
             });
             onClose();
         } catch (err) {
-            setError(reportFirestoreError("保存できませんでした", err, taskRef.path));
+            setError(reportFirestoreError("保存できませんでした", err, taskRef?.path ?? "local"));
         } finally {
             setSaving(false);
         }
     };
 
     const handleUncomplete = async () => {
-        if (!user) return;
-        const taskRef = doc(db, "users", user.uid, "tasks", task.id);
+        const taskRef = user ? doc(db, "users", user.uid, "tasks", task.id) : null;
         try {
-            await updateDoc(taskRef, { completed: false, completedAt: null });
+            await (user ? updateDoc : (_ref, patch) => updateLocal("tasks", task.id, patch))(taskRef, { completed: false, completedAt: null });
             onClose();
         } catch (err) {
-            setError(reportFirestoreError("未完了に戻せませんでした", err, taskRef.path));
+            setError(reportFirestoreError("未完了に戻せませんでした", err, taskRef?.path ?? "local"));
         }
     };
 
